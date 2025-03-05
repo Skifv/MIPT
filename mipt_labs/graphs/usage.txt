@@ -1,0 +1,5 @@
+data:
+
+percent/absolute (обязательно)
+x y
+столбец x столбец y
