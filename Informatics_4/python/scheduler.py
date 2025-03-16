@@ -1,5 +1,5 @@
 import heapq
-import random
+from numpy import random
 
 
 # -------------------------------
@@ -21,7 +21,7 @@ def schedule_next_arrival(current_time, arrival_mode):
         return current_time + 0.02  # фиксированный интервал 0.02 с (50 кадров/с)
     elif arrival_mode == 'exponential':
         # random.expovariate(lambda): lambda = 1/mean, здесь mean = 0.02, lambda = 50
-        return current_time + random.expovariate(50)
+        return current_time + random.poisson(lam=0.02, size=None)
     else:
         raise ValueError("Неизвестный режим поступления")
 
@@ -49,7 +49,7 @@ def scheduler(users, scheduler_type):
 # Функция симуляции работы базовой станции
 # -------------------------------
 def simulate(sim_time, arrival_mode, scheduler_type, seed=42):
-    random.seed(seed)
+    random.seed(seed=seed)
     
     # Инициализация пользователей: A, B, C
     users = [User("A", 72), User("B", 54), User("C", 36)]
@@ -60,11 +60,12 @@ def simulate(sim_time, arrival_mode, scheduler_type, seed=42):
     event_counter = 0  # для корректного упорядочивания событий с одинаковым временем
     
     # Планируем первое событие для каждого пользователя
-    for user in users:
+    for user in reversed(users):
         arrival_time = schedule_next_arrival(0, arrival_mode)
+        
         heapq.heappush(events, (arrival_time, event_counter, 'arrival', user))
         event_counter += 1
-
+        
     current_time = 0.0
     channel_busy = False  # состояние канала (занят/свободен)
     
@@ -73,7 +74,14 @@ def simulate(sim_time, arrival_mode, scheduler_type, seed=42):
 
     # Главный цикл симуляции
     while current_time < sim_time and events:
-        event = heapq.heappop(events)
+        print(current_time)
+        
+        event = min(events, key=lambda e: e[0])
+        for i in range(len(events)):
+            if events[i] == event:
+                events.remove(events[i])
+                break
+        
         event_time, _, event_type, event_user = event
         current_time = event_time  # продвигаем симуляционное время
 
@@ -122,7 +130,7 @@ def simulate(sim_time, arrival_mode, scheduler_type, seed=42):
 # Основной блок: запуск симуляции для разных режимов и планировщиков
 # -------------------------------
 if __name__ == "__main__":
-    sim_time = 20  # время симуляции, сек.
+    sim_time = 10  # время симуляции, сек.
     arrival_modes = ['CBR', 'exponential']
     scheduler_types = ['PF', 'MAX_rate', 'MAX_min']
 
