@@ -1,0 +1,131 @@
+\section{Введение}
+\subsection{Цели работы} 
+\begin{itemize}
+    \item изучение зависимости показателя преломления
+необыкновенной волны от направления в двоякопреломляющем кристалле; 
+    \item определение главных показателей преломления в кристалле.
+\end{itemize}
+
+\subsection{Используемые приборы}
+
+\begin{itemize}
+    \item гелий-неоновый лазер;
+    \item вращающийся столик с неподвижным лимбом;
+    \item призма из исландского шпата;
+    \item поляроид.
+\end{itemize}
+
+\subsection{Теоретическая часть}
+
+\subsubsection{Двойное лучепреломление в анизотропных кристаллах}
+Явление двойного лучепреломления возникает в кристаллах с анизотропными свойствами, где световой луч разделяется на два независимых луча: \textbf{обыкновенный} (o-луч) и \textbf{необыкновенный} (e-луч). Эти лчи отличаются поляризацией, направлением распространения и фазовой скоростью.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{birefringence.png}
+    \caption{Разделение света на обыкновенный (o) и необыкновенный (e) лучи в кристалле кальцита}
+    \label{fig:birefringence}
+\end{figure}
+
+\textbf{Физическая природа анизотропии:}  
+В кристаллической решётке электроны находятся в анизотропных потенциальных ямах. Для одноосных кристаллов (напр., кальцит) потенциал имеет вид:
+\begin{equation}
+    U = a_{\parallel}x^2 + a_{\perp}(y^2 + z^2),
+\end{equation}
+где \( a_{\parallel} \neq a_{\perp} \). Направление оси \( x \) называется \textbf{оптической осью} кристалла. Различие в коэффициентах \( a_{\parallel} \) и \( a_{\perp} \) приводит к разной поляризуемости среды вдоль и поперёк оптической оси.
+
+\textbf{Уравнения Максвелла:}  
+Для плоских волн в кристаллах выполняются соотношения:
+\begin{equation}
+    \mathbf{D} = -\frac{c}{\omega} \mathbf{k} \times \mathbf{H}, \quad \mathbf{H} = \frac{c}{\omega} \mathbf{k} \times \mathbf{E},
+\end{equation}
+где \( \mathbf{D} = \varepsilon_{\perp}\mathbf{E}_{\perp} + \varepsilon_{\parallel}\mathbf{E}_{\parallel} \). Векторы \( \mathbf{D} \), \( \mathbf{H} \), \( \mathbf{k} \) взаимно перпендикулярны, а вектор Пойнтинга \( \mathbf{S} \) для необыкновенной волны не совпадает с \( \mathbf{k} \).
+
+\textbf{Свойства лучей:}  
+\begin{itemize}
+    \item \textbf{Обыкновенный луч}:
+    \begin{itemize}
+        \item Поляризован перпендикулярно главному сечению (плоскости, содержащей оптическую ось и волновой вектор \( \mathbf{k} \)).
+        \item Векторы \( \mathbf{E} \) и \( \mathbf{D} \) коллинеарны.
+        \item Фазовая скорость постоянна: \( v_o = \frac{c}{n_o} \), где \( n_o = \sqrt{\varepsilon_{\perp}} \).
+    \end{itemize}
+    
+    \item \textbf{Необыкновенный луч}:
+    \begin{itemize}
+        \item Поляризован в главном сечении.
+        \item Векторы \( \mathbf{E} \) и \( \mathbf{D} \) неколлинеарны.
+        \item Фазовая скорость зависит от угла \( \theta \) между \( \mathbf{k} \) и оптической осью (выводится непосредственно из уравнений Максвелла):
+        \begin{equation}
+            \frac{1}{v_e^2} = \frac{\sin^2\theta}{(c/n_{\parallel})^2} + \frac{\cos^2\theta}{(c/n_{\perp})^2}.
+        \end{equation}
+    \end{itemize}
+\end{itemize}
+\subsubsection{Двойное лучепреломление в анизотропных кристаллах}
+Явление двойного лучепреломления наблюдается в кристаллах с анизотропной структурой, таких как исландский шпат. При прохождении света через такой кристалл луч разделяется на два компонента:
+\begin{itemize}
+    \item \textbf{Обыкновенный луч (o-луч)}, поляризованный перпендикулярно главному сечению, с постоянным показателем преломления \( n_o = \sqrt{\varepsilon_{\perp}} = 1.655 \);
+    \item \textbf{Необыкновенный луч (e-луч)}, поляризованный в главном сечении, чей показатель преломления зависит от угла \( \theta \) между оптической осью и волновым вектором:
+\end{itemize}
+
+\begin{equation}
+    \frac{1}{n_e^2(\theta)} = \frac{\sin^2\theta}{n_e^2} + \frac{\cos^2\theta}{n_o^2},
+    \label{eq:n_theta}
+\end{equation}
+где \( n_e = \sqrt{\varepsilon_{\parallel}} = 1.485 \) (для \( \lambda = 0.63 \, \mu m \)). Для малой анизотропии (\( n_o - n_e \ll n_o \)) справедливо приближение:
+\begin{equation}
+    n_e(\theta) \approx n_e + (n_o - n_e)\cos^2\theta.
+    \label{eq:n_approx}
+\end{equation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{prism_refraction.png}
+    \caption{Ход лучей в кристаллической призме. Оптическая ось соответствует длинному катету}
+    \label{fig:prism_refraction}
+\end{figure}
+
+\subsubsection{Экспериментальная установка}
+Исследование проводилось на установке (рис. \ref{fig:setup}), включающей:
+\begin{itemize}
+    \item He-Ne лазер (\( \lambda = 632.8 \, nm \)) с линейной поляризацией;
+    \item Призму из исландского шпата с преломляющим углом \( A \);
+    \item Поворотный столик с лимбом для измерения углов;
+    \item Экран для визуализации лучей.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{experimental_setup.png}
+    \caption{Схема установки}
+    \label{fig:setup}
+\end{figure}
+
+\textbf{Ключевые соотношения:}
+\begin{itemize}
+    \item Угол отклонения \( \psi \) связан с углами падения \( \varphi_1 \) и преломления \( \varphi_2 \):
+    \begin{equation}
+        \varphi_2 = A + \psi - \varphi_1.
+        \label{eq:phi2}
+    \end{equation}
+
+    \item Закон Снеллиуса для двух граней призмы:
+    \begin{equation}
+        \begin{cases}
+            \sin\varphi_1 = n\sin\beta_1, \\
+            \sin\varphi_2 = n\sin(A - \beta_1).
+        \end{cases}
+        \label{eq:snell}
+    \end{equation}
+
+    \item Формула для показателя преломления при симметричном ходе лучей (\( \varphi_1 = \varphi_2 \)):
+    \begin{equation}
+        n = \frac{\sin\left(\frac{\psi_m + A}{2}\right)}{\sin\left(\frac{A}{2}\right)},
+        \label{eq:n_min}
+    \end{equation}
+    где \( \psi_m \) — угол наименьшего отклонения.
+\end{itemize}
+
+При превышении критического угла падения \( \varphi_{\text{кр}} \) один из лучей испытывает полное внутреннее отражение. Область работоспособности призмы как поляризатора определяется разностью показателей \( \Delta n = n_o - n_e = 0.17 \).
+
+
+
