@@ -75,8 +75,8 @@ plt.errorbar(xdata, ydata, xerr=xerr, yerr=yerr, fmt='o', color="blue", label="�
 plt.plot(x_fit, y_fit, 'r-', label=f"МНК: y = ({a_rounded} ± {sigma_a_rounded})x")
 
 # Оформление графика
-plt.xlabel("λ, нм")
-plt.ylabel("sin(α)")
+plt.xlabel("x_n, мм")
+plt.ylabel("nλf_2, м^2")
 plt.legend()
 plt.grid(True)
 
