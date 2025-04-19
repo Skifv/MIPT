@@ -1,2 +1,0 @@
-# MIPT
-MIPT projects
