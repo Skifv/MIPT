@@ -1,0 +1,24 @@
+\babel@toc {russian}{}\relax 
+\contentsline {section}{\numberline {1}Введение}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Цели работы}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Используемые приборы}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Теоретическая часть}{3}{subsection.1.3}%
+\contentsline {subsubsection}{\numberline {1.3.1}Спектральный метод в оптике}{3}{subsubsection.1.3.1}%
+\contentsline {subsubsection}{\numberline {1.3.2}Дифракция на фазовой синусоидальной решётке}{3}{subsubsection.1.3.2}%
+\contentsline {subsubsection}{\numberline {1.3.3}Метод тёмного поля}{4}{subsubsection.1.3.3}%
+\contentsline {subsubsection}{\numberline {1.3.4}Экспериментальная установка}{5}{subsubsection.1.3.4}%
+\contentsline {section}{\numberline {2}Ход работы}{9}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Определение скорости ультразвука по дифракционной картине}{9}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1}Измерение длины ультразвуковой волны}{9}{subsubsection.2.1.1}%
+\contentsline {subsubsection}{\numberline {2.1.2}Расчёт длины ультразвуковой волны и скорости звука}{9}{subsubsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.2}Измерение параметров ультразвуковой волны при различных частотах}{10}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}Измерение координат дифракционных максимумов}{10}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}Анализ зависимости координат максимумов от их порядка}{11}{subsubsection.2.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.3}Расчет длины ультразвуковой волны}{14}{subsubsection.2.2.3}%
+\contentsline {subsubsection}{\numberline {2.2.4}Расчет скорости звука}{15}{subsubsection.2.2.4}%
+\contentsline {subsection}{\numberline {2.3}Наблюдение акустической решётки методом тёмного поля}{16}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {2.3.1}Калибровка измерительной схемы}{16}{subsubsection.2.3.1}%
+\contentsline {subsubsection}{\numberline {2.3.2}Наблюдение акустической решётки}{17}{subsubsection.2.3.2}%
+\contentsline {subsubsection}{\numberline {2.3.3}Количественные измерения акустической решётки}{17}{subsubsection.2.3.3}%
+\contentsline {section}{\numberline {3}Выводы и обсуждение результатов}{20}{section.3}%
+\contentsline {section}{\numberline {4}Справочные данные}{21}{section.4}%

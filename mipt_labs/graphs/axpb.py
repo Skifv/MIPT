@@ -67,7 +67,7 @@ print("sigm a =", sigma_a_rounded)
 print("sigm b =", sigma_b_rounded)
 
 # Определяем границы построения
-x_min = 0
+x_min = min(xdata)
 x_max = max(xdata)
 
 # Генерируем точки для линии тренда
@@ -86,8 +86,8 @@ else:
 plt.plot(x_fit, y_fit, 'r-', label=f"МНК: y = ({a_rounded} ± {sigma_a_rounded})x + ({b_rounded} ± {sigma_b_rounded})")
 
 # Оформление графика
-plt.xlabel("X")
-plt.ylabel("Y")
+plt.xlabel("1/ν, мкс, период звуковой волны")
+plt.ylabel("Λ, мм, длина волны звука")
 plt.legend()
 plt.grid(True)
 

@@ -75,8 +75,8 @@ plt.errorbar(xdata, ydata, xerr=xerr, yerr=yerr, fmt='o', color="blue", label="�
 plt.plot(x_fit, y_fit, 'r-', label=f"МНК: y = ({a_rounded} ± {sigma_a_rounded})x")
 
 # Оформление графика
-plt.xlabel("x_n, мм")
-plt.ylabel("nλf_2, м^2")
+plt.xlabel("1/ν, мкс, период звуковой волны")
+plt.ylabel("Λ, мм, длина волны звука")
 plt.legend()
 plt.grid(True)
 
