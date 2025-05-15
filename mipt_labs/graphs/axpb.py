@@ -86,8 +86,8 @@ else:
 plt.plot(x_fit, y_fit, 'r-', label=f"МНК: y = ({a_rounded} ± {sigma_a_rounded})x + ({b_rounded} ± {sigma_b_rounded})")
 
 # Оформление графика
-plt.xlabel("1/ν, мкс, период звуковой волны")
-plt.ylabel("Λ, мм, длина волны звука")
+plt.xlabel("Расстояние, измеренное УЗ датчиком, см")
+plt.ylabel("Расстояние, измеренное линейкой, см")
 plt.legend()
 plt.grid(True)
 

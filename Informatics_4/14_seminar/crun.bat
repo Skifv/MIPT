@@ -1,0 +1,3 @@
+@echo off
+g++ -o executors\%1.exe %1.cpp
+executors\%1.exe
