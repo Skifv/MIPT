@@ -1,1 +1,0 @@
-./executors/$1.exe

@@ -1,0 +1,20 @@
+{
+    "latex-workshop.latex.tools": [
+        {
+            "name": "compile-and-redirect",
+            "command": "compile_with_output_dir.bat",
+            "args": []
+        }
+    ],
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "Компилировать и перенаправить",
+            "tools": [
+                "compile-and-redirect"
+            ]
+        }
+    ],
+    "latex-workshop.latex.outDir": "temp",
+    "latex-workshop.latex.autoClean.run": "onBuilt",
+    "latex-workshop.view.pdf.viewer": "tab"
+} 

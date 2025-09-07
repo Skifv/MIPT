@@ -1,0 +1,28 @@
+\babel@toc {russian}{}\relax 
+\contentsline {section}{\numberline {1}Задание 1: Фильтры первого порядка}{4}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Параметры интегрирующего звена}{4}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Анализ частотных характеристик}{4}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Коэффициенты передачи на разных частотах}{4}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}Децимация выходного потока}{5}{subsection.1.4}%
+\contentsline {subsection}{\numberline {1.5}Анализ шумовых характеристик}{5}{subsection.1.5}%
+\contentsline {subsection}{\numberline {1.6}Исследование влияния параметра $\mu $}{5}{subsection.1.6}%
+\contentsline {subsection}{\numberline {1.7}Исследование дифференцирующего звена}{6}{subsection.1.7}%
+\contentsline {subsection}{\numberline {1.8}Реализация цифрового фазовращателя}{6}{subsection.1.8}%
+\contentsline {section}{\numberline {2}Задание 2: Звенья второго порядка}{6}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Реализация полосового звена}{6}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Зависимость характеристик от $r_\mu $}{7}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Фильтр с парой сопряженных нулей}{7}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Звено типа all pass}{7}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Задание 3: Нерекурсивные FIR фильтры}{8}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Гребенчатый фильтр}{8}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Фильтр с прямоугольной импульсной реакцией}{8}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Децимация выхода фильтра}{9}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Анализ передачи гармонических сигналов}{9}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}Фильтры с временными окнами}{10}{subsection.3.5}%
+\contentsline {subsection}{\numberline {3.6}Фильтры с частотными окнами}{10}{subsection.3.6}%
+\contentsline {subsection}{\numberline {3.7}Высокопорядковые FIR-фильтры}{11}{subsection.3.7}%
+\contentsline {subsection}{\numberline {3.8}Исследование CIC-фильтра}{11}{subsection.3.8}%
+\contentsline {section}{\numberline {4}Задание 4: FDATool Matlab}{12}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Синтезатор equiripple FIR-фильтров}{12}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Синтезатор типовых IIR-фильтров}{12}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Сравнительный анализ фильтров}{13}{subsection.4.3}%

@@ -46,6 +46,10 @@ INPUT d:/texlive/2025/texmf-dist/tex/generic/babel/txtbabel.def
 INPUT d:/texlive/2025/texmf-dist/tex/generic/babel-english/english.ldf
 INPUT d:/texlive/2025/texmf-dist/tex/generic/babel-english/english.ldf
 INPUT d:/texlive/2025/texmf-dist/tex/generic/babel-english/english.ldf
+INPUT d:/texlive/2025/texmf-dist/tex/generic/babel/locale/en/babel-english.tex
+INPUT d:/texlive/2025/texmf-dist/tex/generic/babel/locale/en/babel-english.tex
+INPUT d:/texlive/2025/texmf-dist/tex/generic/babel/locale/en/babel-english.tex
+INPUT d:/texlive/2025/texmf-dist/tex/generic/babel/locale/en/babel-en.ini
 INPUT d:/texlive/2025/texmf-dist/tex/generic/babel-russian/russianb.ldf
 INPUT d:/texlive/2025/texmf-dist/tex/generic/babel-russian/russianb.ldf
 INPUT d:/texlive/2025/texmf-dist/tex/generic/babel-russian/russianb.ldf
@@ -53,10 +57,6 @@ INPUT d:/texlive/2025/texmf-dist/tex/generic/babel/locale/ru/babel-russian.tex
 INPUT d:/texlive/2025/texmf-dist/tex/generic/babel/locale/ru/babel-russian.tex
 INPUT d:/texlive/2025/texmf-dist/tex/generic/babel/locale/ru/babel-russian.tex
 INPUT d:/texlive/2025/texmf-dist/tex/generic/babel/locale/ru/babel-ru.ini
-INPUT d:/texlive/2025/texmf-dist/tex/generic/babel/locale/en/babel-english.tex
-INPUT d:/texlive/2025/texmf-dist/tex/generic/babel/locale/en/babel-english.tex
-INPUT d:/texlive/2025/texmf-dist/tex/generic/babel/locale/en/babel-english.tex
-INPUT d:/texlive/2025/texmf-dist/tex/generic/babel/locale/en/babel-en.ini
 INPUT d:/texlive/2025/texmf-dist/tex/latex/multirow/multirow.sty
 INPUT d:/texlive/2025/texmf-dist/tex/latex/multirow/multirow.sty
 INPUT d:/texlive/2025/texmf-dist/tex/latex/tools/tabularx.sty
@@ -152,15 +152,9 @@ INPUT d:/texlive/2025/texmf-dist/tex/generic/bitset/bitset.sty
 INPUT d:/texlive/2025/texmf-dist/tex/generic/bitset/bitset.sty
 INPUT d:/texlive/2025/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
 INPUT d:/texlive/2025/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
-INPUT d:/texlive/2025/texmf-dist/tex/generic/atbegshi/atbegshi.sty
-INPUT d:/texlive/2025/texmf-dist/tex/latex/base/atbegshi-ltx.sty
-INPUT d:/texlive/2025/texmf-dist/tex/latex/base/atbegshi-ltx.sty
 INPUT d:/texlive/2025/texmf-dist/tex/latex/hyperref/hpdftex.def
 INPUT d:/texlive/2025/texmf-dist/tex/latex/hyperref/hpdftex.def
 INPUT d:/texlive/2025/texmf-dist/tex/latex/hyperref/hpdftex.def
-INPUT d:/texlive/2025/texmf-dist/tex/latex/atveryend/atveryend.sty
-INPUT d:/texlive/2025/texmf-dist/tex/latex/base/atveryend-ltx.sty
-INPUT d:/texlive/2025/texmf-dist/tex/latex/base/atveryend-ltx.sty
 INPUT d:/texlive/2025/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
 INPUT d:/texlive/2025/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
 INPUT d:/texlive/2025/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
