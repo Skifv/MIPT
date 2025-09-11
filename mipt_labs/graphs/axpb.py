@@ -6,14 +6,12 @@ from scipy.optimize import curve_fit
 def func(x, a, b):
     return a * x + b
 
-# Загружаем данные из файла
-filename = "data.txt"  # Укажи свой файл
-data = np.loadtxt(filename, skiprows=2)  # Пропускаем первые две строки (погрешности)
+filename = "data.txt"
+data = np.loadtxt(filename, skiprows=2)
 
-# Загружаем параметры погрешности
 with open(filename, 'r') as file:
-    error_type = file.readline().strip()  # Чтение типа погрешности (percent или absolute)
-    error_values = file.readline().strip().split()  # Чтение двух значений погрешности (для X и Y)
+    error_type = file.readline().strip()
+    error_values = file.readline().strip().split()
 
 # Если тип погрешности не указан, то ничего не делаем
 if error_values[0] == '':

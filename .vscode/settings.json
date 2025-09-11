@@ -60,5 +60,46 @@
   "C_Cpp_Runner.useLeakSanitizer": false,
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
-  "C_Cpp_Runner.msvcSecureNoWarnings": false
+  "C_Cpp_Runner.msvcSecureNoWarnings": false,
+
+    "latex-workshop.latex.autoBuild.run": "onSave",
+  "latex-workshop.view.pdf.viewer": "tab",
+
+  // Рецепт сборки: сначала latexmk, затем копирование PDF
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "latexmk (build dir) + copy PDF to root",
+      "tools": ["latexmk", "copy-pdf"]
+    }
+  ],
+
+  // Инструменты сборки
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk",
+      "command": "latexmk",
+      "args": [
+        "-pdf",
+        "-interaction=nonstopmode",
+        "-synctex=1",
+        "-output-directory=build",
+        "%DOC%"
+      ]
+    },
+    {
+      "name": "copy-pdf",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "copy",
+        "build\\%DOCFILE%.pdf",
+        "pdfs\\%DOCFILE%.pdf"
+      ]
+    }
+  ],
+
+  // 🔇 Игнорирование предупреждений вида Underfull \hbox
+  "latex-workshop.latex.log.ignoreRegExp": [
+    "Underfull \\\\hbox"
+  ]
 }
