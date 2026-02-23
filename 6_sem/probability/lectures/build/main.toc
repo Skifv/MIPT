@@ -1,0 +1,23 @@
+\babel@toc {russian}{}\relax 
+\contentsline {chapter}{\numberline {1}Лекция 1: Математические основы непрерывных цепей Маркова}{3}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Непрерывные цепи Маркова}{3}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}Основные понятия}{3}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}Допущение о регулярности траекторий}{4}{subsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.1.3}Непрерывность переходных вероятностей в нуле}{4}{subsection.1.1.3}%
+\contentsline {subsection}{\numberline {1.1.4}Непрерывность на всей временной оси}{7}{subsection.1.1.4}%
+\contentsline {subsection}{\numberline {1.1.5}Дифференцируемость переходных вероятностей и матрица интенсивностей}{8}{subsection.1.1.5}%
+\contentsline {subsection}{\numberline {1.1.6}Дифференциальные уравнения Колмогорова — Феллера}{9}{subsection.1.1.6}%
+\contentsline {subsection}{\numberline {1.1.7}Вероятностный смысл элементов матрицы интенсивностей}{10}{subsection.1.1.7}%
+\contentsline {subsection}{\numberline {1.1.8}Время пребывания в состоянии и смысл величины $q_{ii}$}{11}{subsection.1.1.8}%
+\contentsline {subsubsection}{Проблема измеримости и переход к счётным множествам}{12}{figure.1.2}%
+\contentsline {subsubsection}{Вывод распределения времени пребывания}{12}{figure.1.2}%
+\contentsline {chapter}{\numberline {2}Лекция 2. Эргодические цепи Маркова и потоки событий}{15}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Вероятностный смысл элементов матрицы интенсивностей и механика скачков}{15}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Эргодические непрерывные цепи Маркова}{16}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Классификация состояний и их свойства}{17}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Эргодические теоремы}{18}{subsection.2.2.2}%
+\contentsline {section}{\numberline {2.3}Примеры решения задач}{19}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Потоки событий}{22}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Марковская природа потоков без последствия}{23}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Интенсивности переходов в потоке без последействия}{23}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.4.3}Ординарность и эквивалентные определения пуассоновского процесса}{25}{subsection.2.4.3}%

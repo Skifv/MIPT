@@ -1,0 +1,44 @@
+% Layout
+% -------------------------------------------------------------------------
+\usepackage[
+    top=2cm,           % Увеличен отступ сверху, чтобы текст не налезал на колонтитул 
+    bottom=1.5cm,      % Увеличен отступ снизу для корректного отображения и печати 
+    left=1.5cm, 
+    right=1.5cm,
+    headheight=25pt,   % Фиксированная высота для устранения ворнингов fancyhdr 
+    includehead        % Включает колонтитул в расчет области печати 
+]{geometry}
+
+\usepackage{fancyhdr}
+\usepackage{multirow}
+\usepackage{lastpage}
+\usepackage{varwidth}
+
+\pagestyle{fancy}
+\fancyhf{} % Полная очистка текущих настроек 
+
+% Настройки для одностороннего документа (как в вашем main.pdf) [cite: 2, 3]
+\fancyhead[L]{\textit{\leftmark}} % Название главы слева 
+\fancyhead[R]{\thepage/\pageref{LastPage}} % Номер страницы справа 
+
+\fancyfoot[C]{} % Очистка центральной части футера 
+
+% Стиль для страниц, где начинаются главы (обычно там пустые колонтитулы) 
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+\usepackage{titlesec}
+\usepackage{ragged2e} % Пакет для правильного выравнивания без переносов
+
+% Настройка формата главы
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\RaggedRight} % Добавлено \RaggedRight для отмены переносов
+  {\vspace{-2.5cm}\chaptertitlename\ \thechapter} 
+  {10pt} 
+  {\Huge}
+
+% Настройка отступов главы
+\titlespacing*{\chapter}{0pt}{0pt}{20pt}
+% -------------------------------------------------------------------------

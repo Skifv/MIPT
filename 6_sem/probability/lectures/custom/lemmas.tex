@@ -1,0 +1,96 @@
+
+% ╔═════════════════════╗
+% ║  Lemmas and proofs  ║
+% ╚═════════════════════╝
+
+% Lemma
+% -------------------------------------------------------------------------------------
+\newtcolorbox{lemma}[2][] {
+    %
+    % Layout
+    enhanced, breakable, before skip=10pt, after skip=10pt,
+    before upper = {\vspace{3mm}},
+    %
+    % Box
+    boxrule = 2pt,
+    colframe = LEM, colback = BG,
+    sharp corners,
+    %
+    % Title
+    attach boxed title to top left = {
+        xshift=1cm, yshift=-4mm
+    },
+    boxed title style = {
+        boxrule = 2pt,
+        colframe = LEM, colback = LEM,
+        sharp corners
+    },
+    boxed title size = title,
+    coltitle = TEXT,
+    fonttitle = \bfseries,
+    title={#2},
+    %
+    % Text
+    colupper = TEXT,
+    %
+    % Border fixes for multiple pages
+    overlay first={
+        \draw[color=BG, line width = 2pt] (frame.south east)--(frame.south west);
+    },
+    overlay middle={
+        \draw[color=BG, line width = 2pt] (frame.south east)--(frame.south west);
+        \draw[color=BG, line width=2pt] (frame.north east)--(frame.north west);
+    },
+    overlay last={
+        \draw[color=BG, line width=2pt] (frame.north east)--(frame.north west);
+    },
+    %
+    % User input parameters
+    #1
+}
+%
+% Usage:
+% \begin{lemma} [tcolorbox params] {Lemma name}
+%     Formulation
+% \end{lemma}
+% -------------------------------------------------------------------------------------
+
+
+% Lemma proof
+% -------------------------------------------------------------------------------------
+\newtcolorbox{lproof}[1][] {
+    %
+    % Layout
+    enhanced, breakable, before skip=10pt, after skip=10pt,
+    after upper = {\vspace{-2mm}},
+    %
+    % Box
+    opacityback = 0,
+    frame hidden,
+    %
+    % Proof title
+    title = {Доказательство.},
+    attach title to upper = {\ },
+    coltitle = LEM!95!TEXT,
+    fonttitle = \bfseries,
+    %
+    % Text
+    colupper = TEXT,
+    %
+    % Line
+    borderline west = {2pt}{0pt}{LEM},
+    %
+    % Square
+    overlay unbroken and last = {
+        \fill[color=LEM] ([yshift=1.5mm]frame.south east) rectangle ++(-3mm, 3mm);
+    },
+    %
+    % User input parameters
+    #1
+}
+%
+% Usage:
+% \begin{lproof} [tcolorbox params] 
+%    Proof 
+% \end{lproof}
+% -------------------------------------------------------------------------------------

@@ -1,0 +1,55 @@
+
+% ╔══════════════════╗
+% ║  Definition box  ║
+% ╚══════════════════╝
+
+% Definition
+% -------------------------------------------------------------------------------------
+\newtcolorbox{definition}[2][] {
+    %
+    % Layout
+    enhanced, breakable, before skip=10pt, after skip=10pt,
+    before upper = {\vspace{2mm}},
+    %
+    % Box
+    boxrule = 2pt,
+    colframe = DEF, colback = Snow2,
+    sharp corners,
+    %
+    % Title
+    attach boxed title to top left = {
+        xshift=1.5cm, yshift=-4mm
+    },
+    boxed title style = {
+        frame hidden,
+        colframe = DEF, colback = Snow2
+    },
+    boxed title size = title,
+    coltitle = DEF,
+    fonttitle = \bfseries,
+    title={#2},
+    %
+    % Text
+    colupper = TEXT,
+    %
+    % Border fixes for multiple pages
+    overlay first={
+        \draw[color=Snow2, line width = 2pt] (frame.south east)--(frame.south west);
+    },
+    overlay middle={
+        \draw[color=Snow2, line width = 2pt] (frame.south east)--(frame.south west);
+        \draw[color=Snow2, line width=2pt] (frame.north east)--(frame.north west);
+    },
+    overlay last={
+        \draw[color=Snow2, line width=2pt] (frame.north east)--(frame.north west);
+    },
+    %
+    % User input parameters
+    #1
+}
+%
+% Usage:
+% \begin{definition} [tcolorbox params] {Definition name}
+%     definition
+% \end{definition}
+% -------------------------------------------------------------------------------------

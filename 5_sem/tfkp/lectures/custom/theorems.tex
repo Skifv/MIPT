@@ -1,0 +1,108 @@
+
+% ╔═══════════════════════╗
+% ║  Theorems and proofs  ║
+% ╚═══════════════════════╝
+
+% Theorem
+% -------------------------------------------------------------------------------------
+\newtcolorbox{theorem}[2][] {
+    %
+    % Layout
+    enhanced, breakable, before skip=10pt, after skip=10pt,
+    before upper = {\vspace{3mm}},
+    %
+    % Box
+    boxrule = 2pt,
+    colframe = MAIN, colback = BG,
+    sharp corners,
+    drop shadow,
+    %
+    % Title
+    attach boxed title to top left = {
+        xshift=1.3cm, yshift=-4mm
+    },
+    boxed title style = {
+        boxrule = 2pt,
+        colframe = MAIN, colback = BG,
+        sharp corners,
+        underlay = {
+            \begin{scope}
+                \clip ([xshift=2pt, yshift=9.4pt]interior.south east) rectangle ([xshift=4pt]interior.north east);
+                \filldraw [white, opacity=0, drop shadow] (interior.south west) rectangle ([xshift=2pt, yshift=2pt]interior.north east);
+            \end{scope} 
+        },
+    },
+    boxed title size = title,
+    coltitle = MAIN,
+    fonttitle = \bfseries,
+    title={#2},
+    %
+    % Text
+    colupper = TEXT,
+    %
+    % Border fixes for multiple pages
+    overlay first={
+        \draw[color=BG, line width = 4pt] ([yshift=-1pt]frame.south east)--([yshift=-1pt]frame.south west);
+    },
+    overlay middle={
+        \draw[color=BG, line width = 2pt] (frame.south east)--(frame.south west);
+        \draw[color=BG, line width=2pt] (frame.north east)--(frame.north west);
+    },
+    overlay last={
+        \draw[color=BG, line width=2pt] (frame.north east)--(frame.north west);
+    },
+    %
+    % User input parameters
+    #1
+}
+%
+% Usage:
+% \begin{theorem} [tcolorbox params] {Theorem name}
+%     Formulation
+% \end{theorem}
+% -------------------------------------------------------------------------------------
+
+
+% Theorem proof
+% -------------------------------------------------------------------------------------
+\newtcolorbox{tproof}[1][] {
+    %
+    % Layout
+    enhanced, breakable, before skip=10pt, after skip=10pt,
+    after upper = {\vspace{-2mm}},
+    %
+    % Box
+    opacityback = 0,
+    frame hidden,
+    %
+    % CATS !!!!!!!!!!!!!
+    watermark graphics = cats.png,
+    watermark opacity = .1,
+    watermark overzoom = 1,
+    %
+    % Proof title
+    title = {Доказательство.},
+    attach title to upper = {\ },
+    coltitle = MAIN,
+    fonttitle = \bfseries,
+    %
+    % Text
+    colupper = TEXT,
+    %
+    % Line
+    borderline west = {2pt}{0pt}{MAIN},
+    %
+    % Square
+    underlay unbroken and last = {
+        \fill[color=MAIN] ([yshift=1.5mm]frame.south east) rectangle ++(-3mm, 3mm);
+    },
+    %
+    % User input parameters
+    #1
+}
+%
+% Usage:
+% \begin{tproof} [tcolorbox params] 
+%    Proof 
+% \end{tproof}
+% -------------------------------------------------------------------------------------

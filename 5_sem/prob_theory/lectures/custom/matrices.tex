@@ -1,0 +1,214 @@
+
+% ╔═══════════════════════════════════╗
+% ║  Matrices and everything related  ║
+% ╚═══════════════════════════════════╝
+
+% Basic matrix
+% -------------------------------------------------------------------------
+\newcommand{\mat}[2][.7] {
+    \scalebox{#1} {
+        $
+        \left| \hspace{-.5mm} \left| \hspace{.5mm}
+            \begin{matrix}
+                #2
+            \end{matrix}
+        \hspace{.5mm} \right| \hspace{-.5mm} \right|
+        $
+    }
+}
+%
+% Usage example:
+% \mat [.5] {
+%     1 & 2 & 3 \\
+%     4 & 5 & 6
+% }
+% Where '.5' is the scale factor.
+%
+% If scale factor is not specified, it is automatically set to default:
+% \mat {                                     % \mat [.7] {
+%     ...          Is equivalent to          %     ...
+% }                                          % }
+% -------------------------------------------------------------------------
+
+
+% Matrix determinant
+% -------------------------------------------------------------------------
+\newcommand{\mdet}[2][.7] {
+    \scalebox{#1} {
+        $
+        \left|
+        \hspace{.5mm}
+            \begin{matrix}
+                #2
+            \end{matrix}
+        \hspace{.5mm}
+        \right|
+        $
+    }
+}
+%
+% Usage example:
+% \mdet [.5] {
+%     1 & 2 & 3 \\
+%     4 & 5 & 6
+% }
+% Where '.5' is the scale factor.
+%
+% If scale factor is not specified, it is automatically set to default:
+% \mdet {                                     % \mdet [.7] {
+%     ...          Is equivalent to           %     ...
+% }                                           % }
+% --------------------------------------------------------------------------
+
+
+% Small matrix
+% ---------------------------------------------------------------------------
+\newcommand{\smat}[2][1] {
+    \hspace{-.45cm}
+    \scalebox{#1} {
+        $
+        \left| \hspace{-.5mm} \left| \hspace{.5mm}
+            \begin{smallmatrix}
+                #2
+            \end{smallmatrix}
+        \hspace{.5mm} \right| \hspace{-.5mm} \right|
+        $
+    }
+    \hspace{-.4cm}
+}
+%
+% Usage example:
+% \smat [.8] {
+%     1 & 2 & 3 \\
+%     4 & 5 & 6
+% }
+% Where '.8' is the scale factor.
+%
+% If scale factor is not specified, it is automatically set to default:
+% \smat {                                % \smat [1] {
+%     ...       Is equivalent to         %     ...
+% }                                      % }
+% ---------------------------------------------------------------------------
+
+
+% Small matrix determinant
+% ---------------------------------------------------------------------------
+\newcommand{\smdet}[2][1] {
+    \hspace{-.45cm}
+    \scalebox{#1} {
+        $
+        \left|
+            \begin{smallmatrix}
+                #2
+            \end{smallmatrix}
+        \right|
+        $
+    }
+    \hspace{-.4cm}
+}
+
+%
+% Usage example:
+% \smdet [.8] {
+%     1 & 2 & 3 \\
+%     4 & 5 & 6
+% }
+% Where '.8' is the scale factor.
+%
+% If scale factor is not specified, it is automatically set to default:
+% \smdet {                               % \smdet [1] {
+%     ...         Is equivalent to       %     ...
+% }                                      % }
+% ---------------------------------------------------------------------------
+
+
+% Matrix with additional lines (Extended matrix)
+% ---------------------------------------------------------------------------------
+\newcommand{\exmat}[3][.7] {
+    \scalebox{#1} {
+        $
+        \left| \hspace{-.5mm} \left| \hspace{.5mm}
+            \begin{array}{#2}
+                #3
+            \end{array}
+        \hspace{.5mm} \right| \hspace{-.5mm} \right|
+        $
+    }
+}
+%
+% Vertical lines are defined in an argument after \begin like this:
+% \exmat {c c c | c}
+%
+% Horizontal lines are made with \hline (Сan be done with any type of matrix, but may look weird. So better use exmat to get a nice look)
+%
+% Usage example:
+% \exmat [.5] {c c | c} {
+%     1 & 2 & 3 \\
+%     4 & 5 & 6 \\
+%     \hline
+%     7 & 8 & 9
+% }
+%
+% If scale factor is not specified, it is automatically set to default:
+% \exmat {c c | c} {                                % \exmat [.7] {c c | c} {
+%     ...                 Is equivalent to          %     ...
+% }                                                 % }
+% ---------------------------------------------------------------------------------
+
+
+% Extended matrix determinant
+% -----------------------------------
+\newcommand{\exmdet}[3][.7] {
+    \scalebox{#1} {
+        $
+        \left|
+            \begin{array}{#2}
+                #3
+            \end{array}
+        \right|
+        $
+    }
+}
+%
+% Usage example:
+% \exmdet [.5] {c c | c} {
+%     1 & 2 & 3 \\
+%     \hline
+%     4 & 5 & 6
+% }
+% -----------------------------------
+
+
+% % Inline row
+% % ---------------------------------------------------------------------------
+% \newcommand{\inline}[1] {
+%     $
+%     \left(
+%         \begin{matrix}
+%             #1
+%         \end{matrix}
+%     \right)^T
+%     $
+%     \hspace{-.2cm}
+% }
+% %
+% % Usage example:
+% % \inline { 1  &  2  &  3}
+% % ---------------------------------------------------------------------------
+
+
+% % Inline row determinant
+% % ---------------------------------------------------------------------------
+% \newcommand{\inlinedet}[1] {
+%     $
+%     \left|
+%         \begin{matrix}
+%             #1
+%         \end{matrix}
+%     \right|
+%     $
+% }
+% %
+% % Usage example:
+% % \inlinedet { 1  &  2  &  3}
+% % ---------------------------------------------------------------------------

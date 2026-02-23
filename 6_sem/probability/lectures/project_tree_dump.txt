@@ -1,0 +1,2158 @@
+==================================================
+PROJECT STRUCTURE AND CONTENT: lectures
+==================================================
+
+DIRECTORY TREE:
+├── lectures/
+│   └── cats.png
+│   └── logo.png
+│   └── main.tex
+│   └── table_of_contents.tex
+│   ├── custom/
+│   │   └── definitions.tex
+│   │   └── lemmas.tex
+│   │   └── matrices.tex
+│   │   └── other.tex
+│   │   └── symbols.tex
+│   │   └── theorems.tex
+│   ├── include/
+│   │   └── customs.aux
+│   │   └── customs.tex
+│   │   └── setup.tex
+│   ├── lectures/
+│   │   └── lec1.tex
+│   │   └── lec2.tex
+│   ├── pdfs/
+│   ├── settings/
+│   │   └── colors.tex
+│   │   └── graphics.tex
+│   │   └── layout.tex
+│   │   └── links.tex
+│   │   └── mainset.tex
+│   │   └── math.tex
+│   │   └── other.tex
+│   │   └── text.tex
+│   │   └── title.tex
+│   ├── TeX_Probability/
+
+==================================================
+FILE CONTENTS:
+==================================================
+
+
+[FILE]: main.tex
+----------------
+% !TeX root = main.tex
+% !TeX program = pdflatex
+
+\input{include/setup}
+
+
+% TODO:
+% ------------------------------------------------------
+% - Сделать, чтобы матрицы писались в мат. окружениях
+% ------------------------------------------------------
+
+
+
+\begin{document}
+
+% Custom definitions
+% -----------------------------
+\include{include/customs}
+% -----------------------------
+
+% Document contents
+% ------------------------------------------------------------------------
+\include{settings/title}
+\include{table_of_contents}
+
+\chapter{Лекция 1: Математические основы непрерывных цепей Маркова}
+% 1. Непрерывные цепи Маркова, уравнения Колмогорова-Чепмена.
+\input{lectures/lec1}
+
+\chapter{Лекция 2. Эргодические цепи Маркова и потоки событий}
+% % 2. Эргодическая теорема, процесс рождения-гибели, потоки событий.
+\input{lectures/lec2}
+
+% \chapter{Марковские системы обслуживания}
+% % 3. Введение в СМО, нотация Кендалла, формула Литтла.
+% \input{lectures/lec3}
+% % 4. Свойство PASTA и система M|M|1.
+% \input{lectures/lec4}
+% % 5. Система M|M|c и стратегии выбора серверов.
+% \input{lectures/lec5}
+% % 6. Система M|M|c|K и формула Эрланга-B.
+% \input{lectures/lec6}
+
+% \chapter{Системы общего вида и специальные входы}
+% % 7. Система M|G|1 и формула Полячека-Хинчина.
+% \input{lectures/lec7}
+% % 8. Системы с групповым входом (M^x|M|1) и фазовым обслуживанием.
+% \input{lectures/lec8}
+
+% \chapter{Протоколы множественного доступа}
+% % 9. Система ALOHA (синхронная/асинхронная).
+% \input{lectures/lec9}
+% % 10. Алгоритмы разрешения коллизий (стек) и введение в CSMA.
+% \input{lectures/lec10}
+% % 11. Анализ эффективности и модели настойчивого/ненастойчивого CSMA.
+% \input{lectures/lec11}
+
+% ------------------------------------------------------------------------
+
+\end{document}
+[END OF main.tex]
+
+
+[FILE]: table_of_contents.tex
+-----------------------------
+\newpage
+\tableofcontents
+\thispagestyle{empty}
+[END OF table_of_contents.tex]
+
+
+[FILE]: custom\definitions.tex
+------------------------------
+
+% ╔══════════════════╗
+% ║  Definition box  ║
+% ╚══════════════════╝
+
+% Definition
+% -------------------------------------------------------------------------------------
+\newtcolorbox{definition}[2][] {
+    %
+    % Layout
+    enhanced, breakable, before skip=10pt, after skip=10pt,
+    before upper = {\vspace{2mm}},
+    %
+    % Box
+    boxrule = 2pt,
+    colframe = DEF, colback = Snow2,
+    sharp corners,
+    %
+    % Title
+    attach boxed title to top left = {
+        xshift=1.5cm, yshift=-4mm
+    },
+    boxed title style = {
+        frame hidden,
+        colframe = DEF, colback = Snow2
+    },
+    boxed title size = title,
+    coltitle = DEF,
+    fonttitle = \bfseries,
+    title={#2},
+    %
+    % Text
+    colupper = TEXT,
+    %
+    % Border fixes for multiple pages
+    overlay first={
+        \draw[color=Snow2, line width = 2pt] (frame.south east)--(frame.south west);
+    },
+    overlay middle={
+        \draw[color=Snow2, line width = 2pt] (frame.south east)--(frame.south west);
+        \draw[color=Snow2, line width=2pt] (frame.north east)--(frame.north west);
+    },
+    overlay last={
+        \draw[color=Snow2, line width=2pt] (frame.north east)--(frame.north west);
+    },
+    %
+    % User input parameters
+    #1
+}
+%
+% Usage:
+% \begin{definition} [tcolorbox params] {Definition name}
+%     definition
+% \end{definition}
+% -------------------------------------------------------------------------------------
+[END OF custom\definitions.tex]
+
+
+[FILE]: custom\lemmas.tex
+-------------------------
+
+% ╔═════════════════════╗
+% ║  Lemmas and proofs  ║
+% ╚═════════════════════╝
+
+% Lemma
+% -------------------------------------------------------------------------------------
+\newtcolorbox{lemma}[2][] {
+    %
+    % Layout
+    enhanced, breakable, before skip=10pt, after skip=10pt,
+    before upper = {\vspace{3mm}},
+    %
+    % Box
+    boxrule = 2pt,
+    colframe = LEM, colback = BG,
+    sharp corners,
+    %
+    % Title
+    attach boxed title to top left = {
+        xshift=1cm, yshift=-4mm
+    },
+    boxed title style = {
+        boxrule = 2pt,
+        colframe = LEM, colback = LEM,
+        sharp corners
+    },
+    boxed title size = title,
+    coltitle = TEXT,
+    fonttitle = \bfseries,
+    title={#2},
+    %
+    % Text
+    colupper = TEXT,
+    %
+    % Border fixes for multiple pages
+    overlay first={
+        \draw[color=BG, line width = 2pt] (frame.south east)--(frame.south west);
+    },
+    overlay middle={
+        \draw[color=BG, line width = 2pt] (frame.south east)--(frame.south west);
+        \draw[color=BG, line width=2pt] (frame.north east)--(frame.north west);
+    },
+    overlay last={
+        \draw[color=BG, line width=2pt] (frame.north east)--(frame.north west);
+    },
+    %
+    % User input parameters
+    #1
+}
+%
+% Usage:
+% \begin{lemma} [tcolorbox params] {Lemma name}
+%     Formulation
+% \end{lemma}
+% -------------------------------------------------------------------------------------
+
+
+% Lemma proof
+% -------------------------------------------------------------------------------------
+\newtcolorbox{lproof}[1][] {
+    %
+    % Layout
+    enhanced, breakable, before skip=10pt, after skip=10pt,
+    after upper = {\vspace{-2mm}},
+    %
+    % Box
+    opacityback = 0,
+    frame hidden,
+    %
+    % Proof title
+    title = {Доказательство.},
+    attach title to upper = {\ },
+    coltitle = LEM!95!TEXT,
+    fonttitle = \bfseries,
+    %
+    % Text
+    colupper = TEXT,
+    %
+    % Line
+    borderline west = {2pt}{0pt}{LEM},
+    %
+    % Square
+    overlay unbroken and last = {
+        \fill[color=LEM] ([yshift=1.5mm]frame.south east) rectangle ++(-3mm, 3mm);
+    },
+    %
+    % User input parameters
+    #1
+}
+%
+% Usage:
+% \begin{lproof} [tcolorbox params] 
+%    Proof 
+% \end{lproof}
+% -------------------------------------------------------------------------------------
+[END OF custom\lemmas.tex]
+
+
+[FILE]: custom\matrices.tex
+---------------------------
+
+% ╔═══════════════════════════════════╗
+% ║  Matrices and everything related  ║
+% ╚═══════════════════════════════════╝
+
+% Basic matrix
+% -------------------------------------------------------------------------
+\newcommand{\mat}[2][.7] {
+    \scalebox{#1} {
+        $
+        \left| \hspace{-.5mm} \left| \hspace{.5mm}
+            \begin{matrix}
+                #2
+            \end{matrix}
+        \hspace{.5mm} \right| \hspace{-.5mm} \right|
+        $
+    }
+}
+%
+% Usage example:
+% \mat [.5] {
+%     1 & 2 & 3 \\
+%     4 & 5 & 6
+% }
+% Where '.5' is the scale factor.
+%
+% If scale factor is not specified, it is automatically set to default:
+% \mat {                                     % \mat [.7] {
+%     ...          Is equivalent to          %     ...
+% }                                          % }
+% -------------------------------------------------------------------------
+
+
+% Matrix determinant
+% -------------------------------------------------------------------------
+\newcommand{\mdet}[2][.7] {
+    \scalebox{#1} {
+        $
+        \left|
+        \hspace{.5mm}
+            \begin{matrix}
+                #2
+            \end{matrix}
+        \hspace{.5mm}
+        \right|
+        $
+    }
+}
+%
+% Usage example:
+% \mdet [.5] {
+%     1 & 2 & 3 \\
+%     4 & 5 & 6
+% }
+% Where '.5' is the scale factor.
+%
+% If scale factor is not specified, it is automatically set to default:
+% \mdet {                                     % \mdet [.7] {
+%     ...          Is equivalent to           %     ...
+% }                                           % }
+% --------------------------------------------------------------------------
+
+
+% Small matrix
+% ---------------------------------------------------------------------------
+\newcommand{\smat}[2][1] {
+    \hspace{-.45cm}
+    \scalebox{#1} {
+        $
+        \left| \hspace{-.5mm} \left| \hspace{.5mm}
+            \begin{smallmatrix}
+                #2
+            \end{smallmatrix}
+        \hspace{.5mm} \right| \hspace{-.5mm} \right|
+        $
+    }
+    \hspace{-.4cm}
+}
+%
+% Usage example:
+% \smat [.8] {
+%     1 & 2 & 3 \\
+%     4 & 5 & 6
+% }
+% Where '.8' is the scale factor.
+%
+% If scale factor is not specified, it is automatically set to default:
+% \smat {                                % \smat [1] {
+%     ...       Is equivalent to         %     ...
+% }                                      % }
+% ---------------------------------------------------------------------------
+
+
+% Small matrix determinant
+% ---------------------------------------------------------------------------
+\newcommand{\smdet}[2][1] {
+    \hspace{-.45cm}
+    \scalebox{#1} {
+        $
+        \left|
+            \begin{smallmatrix}
+                #2
+            \end{smallmatrix}
+        \right|
+        $
+    }
+    \hspace{-.4cm}
+}
+
+%
+% Usage example:
+% \smdet [.8] {
+%     1 & 2 & 3 \\
+%     4 & 5 & 6
+% }
+% Where '.8' is the scale factor.
+%
+% If scale factor is not specified, it is automatically set to default:
+% \smdet {                               % \smdet [1] {
+%     ...         Is equivalent to       %     ...
+% }                                      % }
+% ---------------------------------------------------------------------------
+
+
+% Matrix with additional lines (Extended matrix)
+% ---------------------------------------------------------------------------------
+\newcommand{\exmat}[3][.7] {
+    \scalebox{#1} {
+        $
+        \left| \hspace{-.5mm} \left| \hspace{.5mm}
+            \begin{array}{#2}
+                #3
+            \end{array}
+        \hspace{.5mm} \right| \hspace{-.5mm} \right|
+        $
+    }
+}
+%
+% Vertical lines are defined in an argument after \begin like this:
+% \exmat {c c c | c}
+%
+% Horizontal lines are made with \hline (Сan be done with any type of matrix, but may look weird. So better use exmat to get a nice look)
+%
+% Usage example:
+% \exmat [.5] {c c | c} {
+%     1 & 2 & 3 \\
+%     4 & 5 & 6 \\
+%     \hline
+%     7 & 8 & 9
+% }
+%
+% If scale factor is not specified, it is automatically set to default:
+% \exmat {c c | c} {                                % \exmat [.7] {c c | c} {
+%     ...                 Is equivalent to          %     ...
+% }                                                 % }
+% ---------------------------------------------------------------------------------
+
+
+% Extended matrix determinant
+% -----------------------------------
+\newcommand{\exmdet}[3][.7] {
+    \scalebox{#1} {
+        $
+        \left|
+            \begin{array}{#2}
+                #3
+            \end{array}
+        \right|
+        $
+    }
+}
+%
+% Usage example:
+% \exmdet [.5] {c c | c} {
+%     1 & 2 & 3 \\
+%     \hline
+%     4 & 5 & 6
+% }
+% -----------------------------------
+
+
+% % Inline row
+% % ---------------------------------------------------------------------------
+% \newcommand{\inline}[1] {
+%     $
+%     \left(
+%         \begin{matrix}
+%             #1
+%         \end{matrix}
+%     \right)^T
+%     $
+%     \hspace{-.2cm}
+% }
+% %
+% % Usage example:
+% % \inline { 1  &  2  &  3}
+% % ---------------------------------------------------------------------------
+
+
+% % Inline row determinant
+% % ---------------------------------------------------------------------------
+% \newcommand{\inlinedet}[1] {
+%     $
+%     \left|
+%         \begin{matrix}
+%             #1
+%         \end{matrix}
+%     \right|
+%     $
+% }
+% %
+% % Usage example:
+% % \inlinedet { 1  &  2  &  3}
+% % ---------------------------------------------------------------------------
+[END OF custom\matrices.tex]
+
+
+[FILE]: custom\other.tex
+------------------------
+
+% ╔══════════════════════════════════════╗
+% ║  Statements and other constructions  ║
+% ╚══════════════════════════════════════╝
+
+% Note 
+% -------------------------------------------------------------------------------------
+\newtcolorbox{note}[1][] {
+    %
+    % Layout
+    enhanced, breakable, before skip=10pt, after skip=10pt,
+    before upper = {\vspace{2mm}},
+    %
+    % Box
+    boxrule = 1pt,
+    colframe = SUB, 
+    colback = BG,
+    sharp corners,
+    % borderline = {1.5pt}{0mm}{SUB, dashed},
+    %
+    % Title
+    attach boxed title to top left = {
+        xshift=1.5cm, yshift=-3mm
+    },
+    boxed title style = {
+        frame hidden,
+        colframe = SUB, colback = BG,
+        % Adjusting ends of border break
+        overlay = {
+            \draw[color=SUB, line width = 1pt] ([xshift=1.1pt, yshift=-.15pt]frame.west)--([xshift=7pt, yshift=-.15pt]frame.west);
+            \draw[color=SUB, line width = 1pt] ([xshift=-7pt, yshift=-.15pt]frame.east)--([xshift=-1pt, yshift=-.15pt]frame.east);
+        },
+    },
+    boxed title size = title,
+    coltitle = SUB,
+    fonttitle = \bfseries,
+    title={\text{!\ \ Замечание\ \ !}},
+    %
+    % Text
+    colupper = TEXT,
+    %
+    % Border fixes for multiple pages
+    overlay first={
+        \draw[color=BG, line width = 2pt] (frame.south west)--(frame.south east);
+    },
+    overlay middle={
+        \draw[color=BG, line width = 2pt] (frame.south west)--(frame.south east);
+        \draw[color=BG, line width=2pt] (frame.north west)--(frame.north east);
+    },
+    overlay last={
+        \draw[color=BG, line width=2pt] (frame.north west)--(frame.north east);
+    },
+    %
+    % User input parameters
+    #1
+}
+%
+% Usage:
+% \begin{note} [tcolorbox params]
+%     definition
+% \end{definition}
+% -------------------------------------------------------------------------------------
+
+
+% Consequence
+% -------------------------------------------------------------------------------------
+\newtcolorbox{conseq}[1][] {
+    %
+    % Layout
+    enhanced, breakable, before skip=10pt, after skip=10pt,
+    before upper = {\vspace{2mm}},
+    %
+    % Box
+    opacityback = 0,
+    frame hidden,
+    %
+    % Consequence title
+    title = {Следствие.},
+    attach title to upper = {\ },
+    coltitle = SUB,
+    fonttitle = \bfseries,
+    %
+    % Text
+    colupper = TEXT,
+    %
+    % Arrow
+    overlay unbroken = {
+        % \draw [SUB, line width=2.5pt] ([xshift=1pt, yshift=-2pt]frame.north west) -- ([xshift=1pt, yshift=3pt]frame.north west);
+        \draw [SUB, line width=1pt, {Bracket[angle=70:4pt, reversed, round]}-{Turned Square[length=8pt, open, round]}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
+    },
+    overlay first = {
+        \draw [SUB, line width=1pt, {Bracket[angle=70:4pt, reversed, round]}-{}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
+    },
+    overlay middle = {
+        \draw [SUB, line width=1pt, -] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
+    },
+    overlay last = {
+        \draw [SUB, line width=1pt, -{Turned Square[length=8pt, open, round]}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
+    },
+    %
+    % User input parameters
+    #1
+}
+%
+% Usage:
+% \begin{conseq}[tcolorbox params] 
+%    Text 
+% \end{conseq}
+% -------------------------------------------------------------------------------------
+
+
+% Statement
+% -------------------------------------------------------------------------------------
+\newtcolorbox{statement}[1][] {
+    %
+    % Layout
+    enhanced, breakable, before skip=10pt, after skip=0pt,
+    before upper = {\vspace{2mm}},
+    %
+    % Box
+    opacityback = 0,
+    frame hidden,
+    %
+    % Statement title
+    title = {Утв.},
+    attach title to upper = {\ },
+    coltitle = MAIN,
+    fonttitle = \bfseries,
+    %
+    % Text
+    colupper = TEXT,
+    %
+    % Circle
+    overlay unbroken and first = {
+        \draw[MAIN, line width=1.2pt] ([yshift=-18pt, xshift=1pt]frame.north west) -- ++(-4pt, 8pt) -- ++(8pt, 0pt) -- ++(-4pt, -8pt) -- ++(-4pt, 8pt);
+    },
+    %
+    % User input parameters
+    #1
+}
+%
+% Usage:
+% \begin{statement}[tcolorbox params] 
+%    Text 
+% \end{statement}
+% -------------------------------------------------------------------------------------
+
+% Statement proof
+% -------------------------------------------------------------------------------------
+\newtcolorbox{sproof}[1][] {
+    %
+    % Layout
+    enhanced, breakable, before skip=0pt, after skip=10pt,
+    after upper = {\vspace{-2mm}},
+    %
+    % Box
+    opacityback = 0,
+    frame hidden,
+    %
+    % Proof title
+    title = {Доказательство.},
+    attach title to upper = {\ },
+    coltitle = MAIN,
+    fonttitle = \bfseries,
+    %
+    % Text
+    colupper = TEXT,
+    %
+    % Line
+    borderline west = {1.5pt}{0pt}{MAIN},
+    %
+    % Square
+    underlay unbroken and last = {
+        \fill[color=MAIN] ([yshift=1.5mm]frame.south east) rectangle ++(-3mm, 3mm);
+    },
+    %
+    % User input parameters
+    #1
+}
+%
+% Usage:
+% \begin{sproof} [tcolorbox params] 
+%    Proof 
+% \end{sproof}
+% -------------------------------------------------------------------------------------
+
+
+
+
+
+
+[END OF custom\other.tex]
+
+
+[FILE]: custom\symbols.tex
+--------------------------
+
+% ╔═════════════════════════════╗
+% ║  Symbols and abbreviations  ║
+% ╚═════════════════════════════╝
+
+% Math symbols
+% ---------------------------------------
+\newcommand{\nequiv}{\not\equiv}
+% ---------------------------------------
+
+% Math operations
+% ---------------------------------------
+\newcommand{\sign}{\text{sign}~}
+% ---------------------------------------
+
+% Summation with displaystyle
+% ---------------------------------------
+\newcommand{\dsum}{\displaystyle \sum}
+% ---------------------------------------
+
+% Matrix operations 
+% -----------------------------
+\newcommand{\rg}{\text{rg}~}
+\newcommand{\tr}{\text{tr}~}
+% -----------------------------
+
+% Special letters for number sets
+% ----------------------------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\renewcommand{\P}{\mathbb{P}}
+\renewcommand{\C}{\mathbb{C}}
+\newcommand{\E}{\mathcal{E}}
+\newcommand{\Z}{\mathbb{Z}}
+% ----------------------------
+
+% Basic arrows
+% -----------------------------------------
+\newcommand{\lrarr}{\longleftrightarrow}
+\newcommand{\rarr}{\longrightarrow}
+\newcommand{\larr}{\longleftarrow}
+% -----------------------------------------
+
+% Implication arrows
+% -----------------------------------------
+\newcommand{\LRarr}{\Longleftrightarrow}
+\newcommand{\Rarr}{\Longrightarrow}
+\newcommand{\Larr}{\Longleftarrow}
+% -----------------------------------------
+
+% Elementary transformations
+% -------------------------------------------------------------------------------------------
+\newcommand{\equivprstr}{\overset{\text{э. п.}}{\underset{\text{стр.}}{\sim}}}
+\newcommand{\equivprstlb}{\overset{\text{э. п.}}{\underset{\text{стлб.}}{\sim}}}
+\newcommand{\arrprstr}{\overset{\text{э. п.}}{\underset{\text{стр.}}{\longrightarrow}}}
+\newcommand{\arrprstlb}{\overset{\text{э. п.}}{\underset{\text{стлб.}}{\longrightarrow}}}
+% -------------------------------------------------------------------------------------------
+
+% Linear functions
+% -------------------------------------------
+\newcommand{\Ker}{\text{Ker}~}
+\renewcommand{\Im}{\text{Im}~}
+% -------------------------------------------
+
+
+
+[END OF custom\symbols.tex]
+
+
+[FILE]: custom\theorems.tex
+---------------------------
+
+% ╔═══════════════════════╗
+% ║  Theorems and proofs  ║
+% ╚═══════════════════════╝
+
+% Theorem
+% -------------------------------------------------------------------------------------
+\newtcolorbox{theorem}[2][] {
+    %
+    % Layout
+    enhanced, breakable, before skip=10pt, after skip=10pt,
+    before upper = {\vspace{3mm}},
+    %
+    % Box
+    boxrule = 2pt,
+    colframe = MAIN, colback = BG,
+    sharp corners,
+    drop shadow,
+    %
+    % Title
+    attach boxed title to top left = {
+        xshift=1.3cm, yshift=-4mm
+    },
+    boxed title style = {
+        boxrule = 2pt,
+        colframe = MAIN, colback = BG,
+        sharp corners,
+        underlay = {
+            \begin{scope}
+                \clip ([xshift=2pt, yshift=9.4pt]interior.south east) rectangle ([xshift=4pt]interior.north east);
+                \filldraw [white, opacity=0, drop shadow] (interior.south west) rectangle ([xshift=2pt, yshift=2pt]interior.north east);
+            \end{scope} 
+        },
+    },
+    boxed title size = title,
+    coltitle = MAIN,
+    fonttitle = \bfseries,
+    title={#2},
+    %
+    % Text
+    colupper = TEXT,
+    %
+    % Border fixes for multiple pages
+    overlay first={
+        \draw[color=BG, line width = 4pt] ([yshift=-1pt]frame.south east)--([yshift=-1pt]frame.south west);
+    },
+    overlay middle={
+        \draw[color=BG, line width = 2pt] (frame.south east)--(frame.south west);
+        \draw[color=BG, line width=2pt] (frame.north east)--(frame.north west);
+    },
+    overlay last={
+        \draw[color=BG, line width=2pt] (frame.north east)--(frame.north west);
+    },
+    %
+    % User input parameters
+    #1
+}
+%
+% Usage:
+% \begin{theorem} [tcolorbox params] {Theorem name}
+%     Formulation
+% \end{theorem}
+% -------------------------------------------------------------------------------------
+
+
+% Theorem proof
+% -------------------------------------------------------------------------------------
+\newtcolorbox{tproof}[1][] {
+    %
+    % Layout
+    enhanced, breakable, before skip=10pt, after skip=10pt,
+    after upper = {\vspace{-2mm}},
+    %
+    % Box
+    opacityback = 0,
+    frame hidden,
+    %
+    % CATS !!!!!!!!!!!!!
+    watermark graphics = cats.png,
+    watermark opacity = .1,
+    watermark overzoom = 1,
+    %
+    % Proof title
+    title = {Доказательство.},
+    attach title to upper = {\ },
+    coltitle = MAIN,
+    fonttitle = \bfseries,
+    %
+    % Text
+    colupper = TEXT,
+    %
+    % Line
+    borderline west = {2pt}{0pt}{MAIN},
+    %
+    % Square
+    underlay unbroken and last = {
+        \fill[color=MAIN] ([yshift=1.5mm]frame.south east) rectangle ++(-3mm, 3mm);
+    },
+    %
+    % User input parameters
+    #1
+}
+%
+% Usage:
+% \begin{tproof} [tcolorbox params] 
+%    Proof 
+% \end{tproof}
+% -------------------------------------------------------------------------------------
+
+
+% Определение фиолетового цвета для рамок
+\definecolor{EXAMP_COLOR}{RGB}{102, 51, 153} 
+
+% Example Box
+% -------------------------------------------------------------------------------------
+\newtcolorbox{example}[2][] {
+    enhanced, breakable, before skip=10pt, after skip=10pt,
+    before upper = {\vspace{3mm}},
+    boxrule = 2pt,
+    colframe = EXAMP_COLOR, 
+    colback = BG, % ИСПОЛЬЗУЕМ ВАШ ЦВЕТ ФОНА ВМЕСТО БЕЛОГО
+    sharp corners,
+    drop shadow,
+    %
+    attach boxed title to top left = {
+        xshift=1.3cm, yshift=-4mm
+    },
+    boxed title style = {
+        boxrule = 2pt,
+        colframe = EXAMP_COLOR, 
+        colback = BG, % И ЗДЕСЬ ТОЖЕ
+        sharp corners,
+        underlay = {
+            \begin{scope}
+                \clip ([xshift=2pt, yshift=9.4pt]interior.south east) rectangle ([xshift=4pt]interior.north east);
+                \filldraw [white, opacity=0, drop shadow] (interior.south west) rectangle ([xshift=2pt, yshift=2pt]interior.north east);
+            \end{scope} 
+        },
+    },
+    boxed title size = title,
+    coltitle = EXAMP_COLOR,
+    fonttitle = \bfseries,
+    title={Пример: #2},
+    colupper = TEXT,
+    %
+    % Исправление границ для многостраничности (теперь прозрачно сливается с фоном)
+    overlay first={
+        \draw[color=BG, line width = 4pt] ([yshift=-1pt]frame.south east)--([yshift=-1pt]frame.south west);
+    },
+    overlay middle={
+        \draw[color=BG, line width = 2pt] (frame.south east)--(frame.south west);
+        \draw[color=BG, line width=2pt] (frame.north east)--(frame.north west);
+    },
+    overlay last={
+        \draw[color=BG, line width=2pt] (frame.north east)--(frame.north west);
+    },
+    #1
+}
+
+% Решение (eproof)
+\newtcolorbox{eproof}[1][] {
+    enhanced, breakable, before skip=10pt, after skip=10pt,
+    after upper = {\vspace{-2mm}},
+    opacityback = 0, % Делаем фон прозрачным, чтобы просвечивал BG
+    frame hidden,
+    title = {Решение.},
+    attach title to upper = {\ },
+    coltitle = EXAMP_COLOR,
+    fonttitle = \bfseries,
+    colupper = TEXT,
+    borderline west = {2pt}{0pt}{EXAMP_COLOR},
+    underlay unbroken and last = {
+        \fill[color=EXAMP_COLOR] ([yshift=1.5mm]frame.south east) rectangle ++(-3mm, 3mm);
+    },
+    #1
+}
+[END OF custom\theorems.tex]
+
+
+[FILE]: include\customs.tex
+---------------------------
+\input{custom/other}
+\input{custom/definitions}
+\input{custom/lemmas}
+\input{custom/matrices}
+\input{custom/symbols}
+\input{custom/theorems}
+[END OF include\customs.tex]
+
+
+[FILE]: include\setup.tex
+-------------------------
+\input{settings/mainset}
+\input{settings/colors}
+\input{settings/links}
+\input{settings/graphics}
+\input{settings/layout}
+\input{settings/math}
+\input{settings/other}
+\input{settings/text}
+[END OF include\setup.tex]
+
+
+[FILE]: lectures\lec1.tex
+-------------------------
+\section{Непрерывные цепи Маркова}
+
+В данном разделе мы переходим к изучению марковских процессов с дискретным множеством состояний $S \subseteq \Z$, но протекающих в непрерывном времени $T = [0, +\infty)$. Переход к непрерывному времени требует уточнения как самого определения процесса, так и свойств его траекторий.
+
+\subsection{Основные понятия}
+
+\begin{definition}{Марковская цепь с непрерывным временем}
+    Случайный процесс $\{X(t), t \geqslant 0\}$ называется \textit{марковской цепью с непрерывным временем}, если для любых моментов времени $t_0 < t_1 < \dots < t_n < t$ и любых состояний $x_0, x_1, \dots, x_n, j \in S$ выполняется условие:
+    \[
+    \P(X(t) = j \mid X(t_n) = x_n, \dots, X(t_0) = x_0) = \P(X(t) = j \mid X(t_n) = x_n).
+    \]
+    Иными словами, будущее состояние процесса зависит от прошлого только через настоящее состояние.
+\end{definition}
+
+Основной характеристикой цепи являются вероятности перехода за время от $s$ до $t$ ($s \leqslant t$):
+\[
+p_{ij}(s, t) \doteq \P(X(t) = j \mid X(s) = i).
+\]
+
+Эти вероятности обладают следующими естественными свойствами:
+\begin{enumerate}
+    \item $0 \leqslant p_{ij}(s, t) \leqslant 1$ для любых $i, j, s, t$.
+    \item $\sum_{j \in S} p_{ij}(s, t) = 1$ (условие нормировки: из состояния $i$ за время $t-s$ процесс обязательно перейдет в какое-то состояние $j \in S$).
+    \item $p_{ii}(t, t) = 1$ и $p_{ij}(t, t) = 0$ при $i \ne j$ (в фиксированный момент времени состояние не меняется).
+\end{enumerate}
+
+Матрица, составленная из этих вероятностей, называется \textit{матрицей перехода}:
+\[
+P(s, t) \doteq \|p_{ij}(s, t)\|_{i, j \in S}.
+\]
+
+\begin{theorem}{Теорема. Уравнение Колмогорова — Чепмена}
+    Для любых моментов времени $t_1 \leqslant t \leqslant t_2$ матрица перехода удовлетворяет следующему соотношению:
+    \[
+    P(t_1, t_2) = P(t_1, t) \cdot P(t, t_2).
+    \]
+\end{theorem}
+
+Пусть $\pi_i(t) \doteq \P(X(t) = i)$ — вероятность того, что в момент времени $t$ цепь находится в состоянии $i$. Тогда $\pi(t) = (\pi_0(t), \pi_1(t), \dots)^T$ эволюционирует согласно матричному уравнению:
+\[
+\pi(t) = P^T(s, t) \cdot \pi(s), \quad s \leqslant t.
+\]
+Здесь мы используем транспонированную матрицу, так как работаем с вектором-столбцом распределения вероятностей.
+
+Цепь называется \textit{однородной}, если вероятности перехода зависят только от длины интервала времени $\Delta t = t - s$. В этом случае:
+\[
+P(s, s+t) = P(0, t) \equiv P(t).
+\]
+Уравнение Колмогорова — Чепмена для однородных цепей принимает вид $P(t+s) = P(t) \cdot P(s)$.
+
+\subsection{Допущение о регулярности траекторий}
+
+Для построения математически строгой теории необходимо определить, в каком классе функций мы рассматриваем реализации случайного процесса $X(t)$. Возникает вопрос: любые ли траектории подходят для описания эволюции матрицы перехода $P(t)$?
+
+Если не накладывать ограничений на свойства траекторий, возможны «патологические» случаи. Например, может возникнуть ситуация, когда в любой окрестности момента скачка происходит бесконечное число переходов за конечное время (эффект «взрыва»). Чтобы исключить подобные сценарии и обеспечить дифференцируемость вероятностных характеристик, мы вводим следующее фундаментальное допущение.
+
+\begin{note}
+    Мы будем рассматривать только такие марковские цепи, траектории которых \textbf{почти наверное} являются \textbf{непрерывными справа} функциями времени. 
+\end{note}
+
+Это условие означает, что после совершения любого скачка цепь обязательно остается в новом состоянии в течение некоторого положительного времени $\Delta t > 0$. Визуально такие траектории представляют собой ступенчатые функции, значения которых в точках разрыва совпадают с пределом справа (см. рис. \ref{traektoria}).
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[scale=0.9]
+        % Оси
+        \draw[->, thick] (0,0) -- (7,0) node[right] {$T$};
+        \draw[->, thick] (0,0) -- (0,5) node[above] {$S$};
+        
+        % Сетка состояний
+        \foreach \y in {1,2,3,4} \draw (0.1,\y) -- (-0.1,\y) node[left] {\small $\y$};
+            
+        % Траектория (непрерывность справа)
+        \draw[very thick, DeepSkyBlue4] (0,4) -- (1.5,4);
+        \draw[very thick, DeepSkyBlue4] (1.5,2) -- (3.5,2);
+        \draw[very thick, DeepSkyBlue4] (3.5,3) -- (5,3);
+        \draw[->, very thick, DeepSkyBlue4] (5,1) -- (6.5,1);
+        
+        % Пунктирные линии скачков
+        \draw[dashed, gray] (1.5,4) -- (1.5,2);
+        \draw[dashed, gray] (3.5,2) -- (3.5,3);
+        \draw[dashed, gray] (5,3) -- (5,1);
+        
+        % Узлы (точки включения слева)
+        \filldraw[DeepSkyBlue4] (0,4) circle (2pt);
+        \filldraw[DeepSkyBlue4] (1.5,2) circle (2pt);
+        \filldraw[DeepSkyBlue4] (3.5,3) circle (2pt);
+        \filldraw[DeepSkyBlue4] (5,1) circle (2pt);
+        
+        % Пустые кружки (исключения справа)
+        \draw[DeepSkyBlue4, fill=white] (1.5,4) circle (2pt);
+        \draw[DeepSkyBlue4, fill=white] (3.5,2) circle (2pt);
+        \draw[DeepSkyBlue4, fill=white] (5,3) circle (2pt);
+
+    \end{tikzpicture}
+    \caption{Типичная траектория непрерывной цепи Маркова со ступенчатой структурой и непрерывностью справа.}
+    \label{traektoria}
+\end{figure}
+
+\subsection{Непрерывность переходных вероятностей в нуле}
+
+Выбранный класс траекторий позволяет гарантировать «хорошее» поведение переходных вероятностей при малых приращениях времени.
+
+\begin{theorem}{Теорема 1. О непрерывности матрицы перехода в нуле}
+    Пусть $\{X(t), t \geqslant 0\}$ — однородная марковская цепь с непрерывными справа траекториями. Тогда матрица перехода $P(t)$ непрерывна в нуле справа:
+    \[
+    \lim_{t \to 0+0} P(t) = I,
+    \]
+    что для элементов матрицы означает:
+    \[
+    \lim_{t \to 0+0} p_{ii}(t) = 1, \quad \lim_{t \to 0+0} p_{ij}(t) = 0 \text{ при } i \neq j.
+    \]
+\end{theorem}
+
+\begin{tproof}
+    Рассмотрим произвольное состояние $i \in S$, для которого $\P(X(t) = i) > 0$. По определению условной вероятности имеем:
+    \[
+    p_{ii}(t, t) = \P(X(t) = i \mid X(t) = i) = 1.
+    \]
+    Перепишем это равенство через пространство элементарных исходов $\Omega$:
+    \[
+    \P(\{\omega \in \Omega : X(\omega, t) = i\} \mid X(t) = i) = 1.
+    \]
+
+    Для дальнейшего доказательства введем определение непрерывности справа для процессов с дискретным пространством состояний. Траектория $X(\omega, t)$ называется непрерывной справа в точке $t$, если для данного исхода $\omega$ существует такое $\delta(\omega) > 0$, что для любого $\tau \in [t, t + \delta(\omega))$ выполняется равенство $X(\omega, \tau) = X(\omega, t)$. Это означает, что на некотором малом интервале времени справа состояние процесса остается неизменным.
+
+    Пусть $E \subset \Omega$ — подмножество исходов, для которых траектории непрерывны справа. По условию $\P(E) = 1$, следовательно, вероятность дополнения равна нулю: $\P(\Omega \setminus E) = 0$. Представим исходное событие $\{\omega \in \Omega : X(\omega, t) = i\}$ как объединение двух непересекающихся множеств, принадлежащих $E$ и $\Omega \setminus E$ соответственно:
+    \[
+    \{\omega \in \Omega : X(\omega, t) = i\} = \{\omega \in E : X(\omega, t) = i\} \cup \{\omega \in \Omega \setminus E : X(\omega, t) = i\}.
+    \]
+    В силу аддитивности вероятности и того факта, что $\P(\Omega \setminus E) = 0$, вероятность второго слагаемого зануляется:
+    \[
+    \P(\{\omega \in \Omega \setminus E : X(\omega, t) = i\} \mid X(t) = i) \leqslant \frac{\P(\Omega \setminus E)}{\P(X(t) = i)} = 0.
+    \]
+    Таким образом, полная мера сосредоточена на множестве регулярных исходов $E$.
+
+    Рассмотрим последовательность моментов времени $\{t_n\}$, стремящуюся к $t$ сверху ($t_n \to t + 0$). Согласно определению непрерывности справа, для каждого $\omega \in E$, если система находится в состоянии $i$ в момент $t$, то она обязательно будет находиться в нем во все моменты $t_k$ при достаточно больших $k$. Формально это записывается через предел вложенных множеств:
+    \[
+    \{\omega \in E : X(\omega, t) = i\} = \bigcup_{n=1}^{\infty} \bigcap_{k \geqslant n} \{\omega \in E : X(\omega, t_k) = i\}.
+    \]
+    События $B_n = \bigcap_{k \geqslant n} \{\omega \in E : X(\omega, t_k) = i\}$ являются монотонно растущими по $n$ ($B_n \subset B_{n+1}$). Воспользуемся свойством непрерывности вероятностной меры:
+    \[
+    1 = \P\left( \bigcup_{n=1}^{\infty} B_n \mid X(t) = i \right) = \lim_{n \to \infty} \P\left( \bigcap_{k \geqslant n} \{X(\omega, t_k) = i\} \mid X(t) = i \right).
+    \]
+    Заметим, что для любого фиксированного $n$ выполняется включение $B_n \subseteq \{X(\omega, t_n) = i\}$. Следовательно, для вероятностей справедливо неравенство:
+    \[
+    \P(B_n \mid X(t) = i) \leqslant \P(X(t_n) = i \mid X(t) = i) = p_{ii}(t, t_n).
+    \]
+    Переходя к пределу при $n \to \infty$ и учитывая, что любая вероятность не превосходит единицу, получаем:
+    \[
+    1 \leqslant \lim_{n \to \infty} p_{ii}(t, t_n) \leqslant 1 \implies \lim_{n \to \infty} p_{ii}(t, t_n) = 1.
+    \]
+    В силу произвольности последовательности $\{t_n\}$ и однородности цепи имеем $\lim_{t \to 0+0} p_{ii}(t) = 1$.
+
+    Теперь оценим внедиагональные элементы $p_{ij}(t)$ при $i \neq j$. Из условия нормировки суммы вероятностей в строке матрицы перехода следует:
+    \[
+    \sum_{k \in S} p_{ik}(t) = p_{ii}(t) + \sum_{j \neq i} p_{ij}(t) = 1.
+    \]
+    Для любого конкретного $j \neq i$ справедливо:
+    \[
+    0 \leqslant p_{ij}(t) \leqslant \sum_{k \neq i} p_{ik}(t) = 1 - p_{ii}(t).
+    \]
+    Так как $\lim_{t \to 0+0} (1 - p_{ii}(t)) = 0$, то по теореме о зажатой функции получаем:
+    \[
+    \lim_{t \to 0+0} p_{ij}(t) = 0 \quad \forall i \neq j.
+    \]
+    Таким образом, предел матрицы перехода при стремлении времени к нулю равен единичной матрице: $\lim_{t \to 0+0} P(t) = I$.
+\end{tproof}
+
+На основе полученных свойств мы можем дать классификацию рассматриваемых процессов.
+
+\begin{definition}{Стандартная стохастическая полугруппа}
+    Семейство матриц $\{P(t)\}_{t \geqslant 0}$ называется \textit{стандартной стохастической полугруппой}, если выполняются следующие условия:
+    \begin{enumerate}
+        \item $P(0) = I$;
+        \item $P(t+s) = P(t) \cdot P(s)$ для всех $t, s \geqslant 0$ (полугрупповое свойство);
+        \item $\lim_{t \to 0+0} P(t) = I$ (условие стандартности).
+    \end{enumerate}
+\end{definition}    
+
+\begin{definition}{Стандартная марковская цепь}
+    Марковская цепь, матрица перехода которой образует стандартную стохастическую полугруппу, называется \textit{стандартной}.
+\end{definition}
+
+\subsection{Непрерывность на всей временной оси}
+
+Установив поведение матрицы перехода в нуле, мы можем показать, что свойство непрерывности характерно для стандартной цепи Маркова в любой момент времени $t \geqslant 0$.
+
+\begin{theorem}{Теорема 2. О непрерывности матрицы перехода}
+    Матрица перехода $P(t)$ конечной стандартной цепи Маркова непрерывна для любого момента времени $t \in T$.
+\end{theorem}
+
+\begin{tproof}
+
+    Согласно условию стандартности, при стремлении приращения времени к нулю матрица перехода стремится к единичной: $\lim_{h \to 0+0} P(h) = I$. Поскольку предел матрицы равен $I$, существует такая малая правая окрестность нуля, в которой определитель $\det P(h)$ отличен от нуля. Это гарантирует \textbf{обратимость} матрицы $P(h)$ при достаточно малых $h > 0$. Можно также показать, что для обратной матрицы выполняется аналогичное предельное соотношение:
+    \[
+    \lim_{h \to 0+0} P^{-1}(h) = I. %
+    \]
+
+    \textbf{Непрерывность справа.}
+    Рассмотрим поведение функции в произвольной точке $t$ при положительном приращении $h$. Воспользуемся полугрупповым свойством $P(t+h) = P(t) \cdot P(h)$. Переходя к пределу, получаем:
+    \[
+    \lim_{h \to 0+0} P(t + h) = P(t) \cdot \lim_{h \to 0+0} P(h) = P(t) \cdot I = P(t). 
+    \]
+    Это подтверждает непрерывность матрицы перехода справа. 
+
+    \textbf{Непрерывность слева.}
+    Для проверки предела слева рассмотрим значение матрицы в точке $t - h$. Согласно полугрупповому свойству, справедливо равенство $P(t) = P(t - h) \cdot P(h)$. Отсюда выразим искомую матрицу через обратную:
+    \[
+    P(t - h) = P(t) \cdot P^{-1}(h). 
+    \]
+    Устремляя $h$ к нулю и учитывая доказанное выше свойство обратной матрицы, находим:
+    \[
+    \lim_{h \to 0+0} P(t - h) = P(t) \cdot \lim_{h \to 0+0} P^{-1}(h) = P(t) \cdot I = P(t). 
+    \]
+    Таким образом, совпадение односторонних пределов со значением $P(t)$ доказывает непрерывность матрицы перехода в любой точке $t \in T$. 
+\end{tproof}
+
+\subsection{Дифференцируемость переходных вероятностей и матрица интенсивностей}
+
+Установленное ранее свойство глобальной непрерывности позволяет наложить более строгие аналитические условия на поведение матрицы перехода, что необходимо для вывода уравнений эволюции процесса в дифференциальной форме.
+
+\begin{theorem}{Теорема 3. О дифференцируемости матрицы перехода}
+    При соблюдении тех же условий регулярности, что и в теореме 2, матрица перехода $P(t)$ является дифференцируемой для любого момента времени $t \in T$. Более того, матрица $P(t)$ является дифференцируемой справа в точке $t = 0$ даже для случая цепей со счетным множеством состояний, если допустить, что значения производных диагональных элементов $p_{ii}(t)$ могут быть равны $-\infty$.
+\end{theorem}
+
+Наличие производной в нуле позволяет ввести фундаментальную характеристику непрерывной цепи Маркова — матрицу интенсивностей переходов (инфинитезимальный генератор).
+
+\begin{theorem}{Теорема 4. О существовании инфинитезимальной матрицы}
+    Для матрицы перехода $P(t)$ стандартной цепи Маркова существует предел при $h \to 0+0$:
+    \[
+    \exists Q \doteq \lim_{h \to 0+0} \dfrac{P(h) - I}{h}, %
+    \]
+    где $Q = \|q_{ij}\|$ — матрица интенсивностей. Элементы данной матрицы обладают следующими свойствами:
+    \begin{enumerate}
+        \item Все внедиагональные элементы конечны и неотрицательны: $0 \leqslant q_{ij} < \infty$ при $i \neq j$.
+        \item Диагональные элементы определяются как $q_{ii} \doteq -q_i$, где $q_i$ — интенсивность выхода из состояния $i$, при этом $q_i \in [0, +\infty]$.
+    \end{enumerate}
+\end{theorem}
+
+\begin{note}
+    В случае конечного числа состояний интенсивность выхода $q_i = \sum_{j \neq i} q_{ij}$ всегда конечна как сумма конечного числа слагаемых. Однако в цепях со счетным множеством состояний, несмотря на конечность каждой отдельной интенсивности перехода ($q_{ij} < \infty$), их бесконечная сумма может расходиться, что приводит к ситуации $q_i = \infty$.
+\end{note}
+
+Для корректного суммирования по строкам и анализа устойчивости процесса вводится следующее понятие.
+
+\begin{definition}{Консервативная цепь Маркова}
+    Цепь Маркова называется \textit{консервативной}, если для всех её состояний интенсивность выхода конечна ($q_i < \infty$) и сумма интенсивностей в каждой строке матрицы $Q$ равна нулю:
+    \[
+    \sum_{j \in S} q_{ij} = 0, \quad \forall i \in S.
+    \]
+\end{definition}
+
+Заметим, что любая цепь с конечным числом состояний всегда является консервативной. Для счетных же цепей консервативность является дополнительным условием, гарантирующим, что за конечное время не произойдет «ухода» процесса в бесконечность.
+
+\subsection{Дифференциальные уравнения Колмогорова — Феллера}
+
+В теории однородных дискретных цепей Маркова динамика системы описывалась матрицей перехода за один шаг. В случае же конечных однородных стандартных цепей Маркова с непрерывными справа траекториями динамика матрицы перехода полностью определяется её поведением в нуле, то есть матрицей интенсивностей $Q$. %
+
+\begin{theorem}{Теорема 5. Уравнения Колмогорова}
+    Пусть $P(t)$ - матрица перехода конечной стандартной цепи Маркова. Тогда она удовлетворяет следующей системе дифференциальных уравнений:
+    \[
+    \dot{P}(t) = P(t) \cdot Q, \quad P(0) = I \quad (\text{прямое уравнение}),
+    \]
+    \[
+    \dot{P}(t) = Q \cdot P(t), \quad P(0) = I \quad (\text{обратное уравнение}).
+    \]
+    Данные уравнения имеют единственное решение, выражающееся через матричную экспоненту:
+    \[
+    P(t) = \exp(Q \cdot t).
+    \]
+\end{theorem}
+
+\begin{tproof}
+    Согласно определению матрицы интенсивностей, предел разностного отношения в нуле равен $Q = \lim_{h \to 0+0} \frac{P(h) - I}{h}$. Воспользуемся полугрупповым свойством матрицы перехода $P(t + h) = P(t) \cdot P(h) = P(h) \cdot P(t)$ %.
+    
+    Для вывода \textbf{прямого уравнения} рассмотрим приращение матрицы перехода справа:
+    \[
+    \dfrac{P(t + h) - P(t)}{h} = \dfrac{P(t) \cdot P(h) - P(t)}{h} = P(t) \cdot \dfrac{P(h) - I}{h}.
+    \]
+    Переходя к пределу при $h \to 0+0$, в правой части получаем произведение $P(t) \cdot Q$. Таким образом, $\dot{P}(t) = P(t) \cdot Q$.
+    
+    Для вывода \textbf{обратного уравнения} воспользуемся коммутативностью матриц в полугрупповом свойстве:
+    \[
+    \dfrac{P(t + h) - P(t)}{h} = \dfrac{P(h) \cdot P(t) - P(t)}{h} = \dfrac{P(h) - I}{h} \cdot P(t).
+    \]
+    Аналогично, при $h \to 0+0$ предел левой части дает производную $\dot{P}(t)$, а правая часть стремится к $Q \cdot P(t)$. С учетом начального условия $P(0) = I$, решение данной системы в теории матричных функций представляется как $P(t) = e^{Qt}$. %
+\end{tproof}
+
+\begin{note}
+    Стоит учитывать, что в случае цепей со счетным числом состояний «зеркальность» уравнений Колмогорова может нарушаться. Обратное уравнение обычно сохраняется в исходном виде, в то время как для справедливости прямого уравнения требуется дополнительное условие равномерной сходимости разностного отношения $\frac{P(h) - I}{h}$ к матрице $Q$ по строкам %.
+\end{note}
+
+\subsection{Вероятностный смысл элементов матрицы интенсивностей}
+
+Ранее было показано, что динамика матрицы перехода полностью определяется матрицей $Q$. Теперь рассмотрим, как эволюционирует вектор распределения вероятностей состояний $\pi(t) = (\pi_0(t), \pi_1(t), \dots)^T$. Из матричного уравнения эволюции $\pi(t+h) = P^T(h) \cdot \pi(t)$ и свойств дифференцируемости, установленных в предыдущих теоремах, при $h \to 0$ мы получаем систему дифференциальных уравнений:
+\[
+    \dot{\pi}(t) = Q^T \cdot \pi(t)
+\]
+с начальным условием $\pi(0) = \pi_0$. Таким образом, все переходные вероятности и распределения в любой момент времени однозначно определяются матрицей $Q$, которая не зависит от времени $t$.
+
+\begin{definition}{Матрица интенсивностей}
+    Матрица $Q$, называемая также \textit{матрицей интенсивностей} или \textit{инфинитезимальным генератором}, состоит из элементов, которые определяются как пределы переходных вероятностей при стремлении временного интервала к нулю:
+    \[
+        q_{ii} \doteq \lim_{h \to 0+0} \dfrac{p_{ii}(h) - 1}{h}, \quad q_{ij} \doteq \lim_{h \to 0+0} \dfrac{p_{ij}(h)}{h} \quad \text{при } i \neq j.
+    \]
+\end{definition}
+
+Данные предельные соотношения позволяют записать асимптотическое разложение переходных вероятностей для малых промежутков времени $h$:
+\[
+    p_{ii}(h) = 1 + q_{ii} \cdot h + o(h), \quad p_{ij}(h) = q_{ij} \cdot h + o(h) \quad \text{при } i \neq j.
+\]
+Хотя эти формулы представляют собой лишь линейную аппроксимацию (разложение первого порядка по $h$), они полностью и однозначно определяют поведение цепи на любом конечном интервале времени через матричную экспоненту $P(t) = e^{Qt}$.
+
+\begin{statement}
+    Для любого $i \neq j$ число $q_{ij}$ называется \textit{интенсивностью перехода} из состояния $i$ в состояние $j$. Это значение характеризует мгновенную скорость, с которой процесс покидает текущее состояние в пользу другого.
+\end{statement}
+
+Воспользуемся условием нормировки суммы переходных вероятностей $\sum_{j \in S} p_{ij}(h) = 1$ для вывода связи между диагональными и внедиагональными элементами. Подставляя асимптотические разложения, получаем:
+\[
+    (1 + q_{ii} \cdot h + o(h)) + \sum_{j \neq i} (q_{ij} \cdot h + o(h)) = 1.
+\]
+Сокращая единицу и деля на $h$ при $h \to 0$, приходим к равенству, которое, впрочем, нам уже знакомо:
+\[
+    q_{ii} + \sum_{j \neq i} q_{ij} = 0 \implies \sum_{j \neq i} q_{ij} = -q_{ii}.
+\]
+
+\begin{note}
+    Величину $q_i \doteq -q_{ii}$ называют \textit{интенсивностью выхода} из состояния $i$. Она суммирует интенсивности всех возможных способов покинуть данное состояние. Таким образом, в консервативной цепи интенсивность выхода в точности равна сумме интенсивностей переходов во все остальные возможные состояния.
+\end{note}
+
+\subsection{Время пребывания в состоянии и смысл величины \texorpdfstring{$q_{ii}$}{q\_ii}}
+
+Рассмотрим консервативную марковскую цепь $\{X(t), t \geqslant 0\}$ с непрерывными справа траекториями и конечным или счётным числом состояний. Нам необходимо выяснить, как долго процесс задерживается в выбранном состоянии $i$ до того, как совершит первый скачок в любое другое состояние.
+
+\begin{definition}{Время пребывания в состоянии}
+    Для любого состояния $i \in S$ определим величину $\tau_i(\omega)$ как \textit{время пребывания в состоянии} $i$ при условии, что в начальный момент времени процесс находился в этом состоянии ($X(0) = i$):
+    \[
+        \tau_i(\omega) \doteq \inf \{t > 0 : X(\omega, t) \ne i \mid X(0) = i\}.
+    \]
+\end{definition}
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[scale=1.2, >=Stealth]
+        % Оси
+        \draw[->, thick] (0,0) -- (6,0) node[right] {$t$};
+        \draw[->, thick] (0,0) -- (0,4) node[above] {$S$};
+
+        % Состояния на оси S
+        \draw (0.1, 2.5) -- (-0.1, 2.5) node[left] {$i$};
+        \draw (0.1, 1.0) -- (-0.1, 1.0) node[left] {$j$};
+
+        % Траектория в состоянии i
+        \draw[very thick, DeepSkyBlue4] (0, 2.5) -- (3, 2.5);
+        \filldraw[DeepSkyBlue4] (0, 2.5) circle (2pt);
+        \draw[DeepSkyBlue4, fill=white] (3, 2.5) circle (2pt);
+
+        % Траектория после скачка в j
+        \draw[very thick, DeepSkyBlue4] (3, 1.0) -- (5, 1.0);
+        \filldraw[DeepSkyBlue4] (3, 1.0) circle (2pt);
+        \draw[->, very thick, DeepSkyBlue4] (5, 1.0) -- (5.8, 1.0);
+
+        % Пунктир скачка
+        \draw[dashed, gray] (3, 2.5) -- (3, 0) node[below] {$\tau_i(\omega)$};
+        \draw[dashed, gray] (3, 2.5) -- (3, 1.0);
+
+        % Фигурная скобка времени пребывания
+        \draw[decorate, decoration={brace, amplitude=5pt, mirror}] (0, -0.4) -- (3, -0.4) 
+            node[midway, below, yshift=-5pt] {пребывание в состоянии $i$};
+    \end{tikzpicture}
+    \caption{Визуализация времени пребывания $\tau_i$ в состоянии $i$ до момента первого скачка.}
+\end{figure}
+
+Наша цель — найти функцию распределения этой случайной величины, в частности, вероятность $\P(\tau_i > t)$.
+
+\subsubsection{Проблема измеримости и переход к счётным множествам}
+
+
+При вычислении инфимума по несчётному множеству времени $T = [0, +\infty)$ возникают технические сложности с доказательством того, что $\tau_i$ действительно является случайной величиной. В несчётном случае пересечение событий $\bigcap_{t \in [0, \tau]} \{X(t) = i\}$ может не принадлежать $\sigma$-алгебре событий $\mathcal{F}$.
+
+Для обхода этой проблемы введём произвольное счётное всюду плотное в $T$ множество $D$. Положим:
+\[
+    \tau_i^D(\omega) \doteq \inf \{t \in D : X(\omega, t) \ne i \mid X(0) = i\}.
+\]
+
+\begin{statement}
+    В силу предположения о непрерывности траекторий справа, почти наверное (п.н.) выполняется равенство:
+    \[
+        \tau_i(\omega) = \tau_i^D(\omega).
+    \]
+\end{statement}
+
+\begin{sproof}
+    Поскольку инфимум по подмножеству всегда не меньше инфимума по всему множеству, очевидно, что $\tau_i(\omega) \leqslant \tau_i^D(\omega)$. Если $\tau_i(\omega) = \infty$, равенство тривиально.
+    
+    В обратную сторону: так как $D$ всюду плотно в $T$, то существует последовательность $\{t_n\} \subset D$, такая что $t_n \to \tau_i(\omega) + 0$ (справа). В силу непрерывности траекторий справа, если процесс покинул состояние $i$ в момент $\tau_i$, то в достаточно малой окрестности справа он также будет находиться в состоянии $j \ne i$. Следовательно, для достаточно больших $n$ выполняется $X(t_n) \ne i$, что влечёт $\tau_i^D(\omega) \leqslant t_n$. Переходя к пределу, получаем $\tau_i^D(\omega) \leqslant \tau_i(\omega)$. Таким образом, $\tau_i^D = \tau_i$ почти наверное.
+\end{sproof}
+
+\begin{note}
+    Введение счётного множества $D$ позволяет строго обосновать, что $\tau_i^D$ является случайной величиной. Действительно, событие $\{\omega : \tau_i^D(\omega) > t\}$ можно представить как счётное пересечение измеримых событий:
+    \[
+        \{\omega : \tau_i^D(\omega) > t\} = \bigcap_{d \in D \cap [0, t]} \{\omega : X(\omega, d) = i\}.
+    \]
+    Поскольку каждое событие $\{X(\omega, d) = i\}$ принадлежит $\sigma$-алгебре $\mathcal{F}$, их счётное пересечение также принадлежит $\mathcal{F}$, что гарантирует измеримость $\tau_i^D$.
+\end{note}
+
+\subsubsection{Вывод распределения времени пребывания}
+
+Для явного нахождения распределения величины $\tau_i$ воспользуемся конструкцией всюду плотного множества на отрезке $[0, t]$, основанной на двоично-рациональных точках (сетке Дирихле).
+
+Рассмотрим на произвольном фиксированном интервале $[0, t]$ последовательность вложенных множеств $D_n$:
+\[
+    D_n \doteq \left\{ \frac{jt}{2^n} \right\}_{j=0}^{2^n} = \left\{ 0, \frac{t}{2^n}, \frac{2t}{2^n}, \dots, t \right\}.
+\]
+Легко заметить, что $D_n \subset D_{n+1}$, так как при увеличении $n$ на единицу в сетку добавляются середины предыдущих интервалов. Объединение всех таких сеток образует счетное всюду плотное множество на $[0, t]$:
+\[
+    D(t) \doteq \bigcup_{n=0}^{\infty} D_n.
+\]
+
+\begin{center}
+    \begin{tikzpicture}[scale=1.5]
+        % Цикл для отрисовки уровней разбиения D_1, D_2, D_3, D_4
+        \foreach \n/\label in {1/1, 2/2, 3/3, 4/4} {
+            \pgfmathsetmacro{\y}{-\n*0.7}
+            \draw[thick] (0,\y) -- (4,\y);
+            \node[left] at (-0.2, \y) {$D_{\label}$};
+            
+            \pgfmathsetmacro{\steps}{pow(2,\n)}
+            \foreach \i in {0,...,\steps} {
+                \pgfmathsetmacro{\x}{\i*4/\steps}
+                \filldraw[SUB] (\x,\y) circle (1.2pt);
+            }
+        }
+        
+        % Обозначения t на концах
+        \foreach \n in {1,2,3,4} {
+            \pgfmathsetmacro{\y}{-\n*0.7}
+            \node[below, scale=0.8] at (0, \y-0.05) {$0$};
+            \node[below, scale=0.8] at (4, \y-0.05) {$t$};
+        }
+
+        % Стрелка вниз (измельчение)
+        \draw[->, gray, dashed] (4.5, -0.7) -- (4.5, -2.8) node[midway, right, scale=0.8, TEXT] {$n \to \infty$};
+    \end{tikzpicture}
+\end{center}
+
+Для того чтобы получить счетное всюду плотное множество $D$ на всей полупрямой $[0, +\infty)$, достаточно рассмотреть объединение таких множеств для расширяющихся интервалов, например: $D \doteq \bigcup_{N \in \mathbb{N} \cup \{0\}} D(t \cdot 2^N)$.
+
+\begin{theorem}{Теорема. О распределении времени пребывания}
+    Пусть $\{X(t), t \geqslant 0\}$ — однородная стандартная цепь Маркова с интенсивностью выхода $q_i \in [0, +\infty)$ из состояния $i$. Тогда время пребывания $\tau_i$ в состоянии $i$ имеет показательное (экспоненциальное) распределение с параметром $q_i$:
+    \[
+        \P(\tau_i > t \mid X(0) = i) = e^{-q_i t}, \quad t \geqslant 0.
+    \]
+\end{theorem}
+
+\begin{tproof}
+    Рассмотрим вероятность того, что процесс не покидает состояние $i$ до момента времени $t$ при условии $X(0)=i$. Согласно ранее доказанному свойству о непрерывности траекторий, эта вероятность эквивалентна вероятности того, что процесс находится в состоянии $i$ во всех точках счетного всюду плотного множества $D(t)$.
+    
+    Воспользуемся непрерывностью вероятностной меры и тем фактом, что последовательность событий $A_n = \{ \text{процесс в состоянии } i \text{ во всех точках } D_n \}$ является монотонно убывающей ($A_{n+1} \subset A_n$):
+    \[
+        \P(\tau_i > t \mid X(0)=i) = \P\left( \bigcap_{n=0}^{\infty} \bigcap_{j=1}^{2^n} \left\{ X\left( \frac{jt}{2^n} \right) = i \right\} \;\middle|\; X(0)=i \right) = \linebreak \lim_{n \to \infty} \P\left( \bigcap_{j=1}^{2^n} \left\{ X\left( \frac{jt}{2^n} \right) = i \right\} \;\middle|\; X(0)=i \right).
+    \]
+
+    Применим марковское свойство и свойство однородности. Вероятность того, что в каждый из $2^n$ моментов времени с шагом $\Delta t = \frac{t}{2^n}$ процесс окажется в состоянии $i$, при условии, что он начал в $i$, равна произведению соответствующих переходных вероятностей:
+    \[
+        \P\left( \bigcap_{j=1}^{2^n} \left\{ X\left( \frac{jt}{2^n} \right) = i \right\} \;\middle|\; X(0)=i \right) = \prod_{j=1}^{2^n} \P\left( X\left( \frac{jt}{2^n} \right) = i \;\middle|\; X\left( \frac{(j-1)t}{2^n} \right) = i \right).
+    \]
+    В силу однородности каждая вероятность в произведении равна $p_{ii}\left( \frac{t}{2^n} \right)$. Тогда:
+    \[
+        \P(\tau_i > t \mid X(0)=i) = \lim_{n \to \infty} \left[ p_{ii}\left( \frac{t}{2^n} \right) \right]^{2^n}.
+    \]
+
+    Воспользуемся полученным ранее асимптотическим разложением для переходной вероятности $p_{ii}(h) = 1 + q_{ii} h + o(h)$ при $h \to 0$. Подставляя $h = \frac{t}{2^n}$:
+    \[
+        \P(\tau_i > t \mid X(0)=i) = \lim_{n \to \infty} \left( 1 + q_{ii} \frac{t}{2^n} + o\left( \frac{t}{2^n} \right) \right)^{2^n}.
+    \]
+
+    Данный предел является классическим определением экспоненты (второй замечательный предел):
+    \[
+        \lim_{n \to \infty} \left( 1 + \frac{q_{ii} t}{2^n} \right)^{2^n} = e^{q_{ii} t}.
+    \]
+
+    Итого, с учетом обозначения $q_{ii} = -q_i$, получаем:
+    \[
+        \P(\tau_i > t \mid X(0)=i) = e^{q_{ii} t} = e^{-q_i t}.
+    \]
+    Для безусловной вероятности $\P(\tau_i > t) = \P(\tau_i > t \mid X(0)=i) \cdot \P(X(0)=i)$. Обозначим $\pi_i(0) \doteq \P(X(0) = i)$, тогда:
+    \[
+        \P(\tau_i > t) = e^{-q_i t} \cdot \pi_i(0).
+    \]
+    Если в начальный момент времени процесс находился в состоянии $i$ с вероятностью 1 ($\pi_i(0) = 1$), то:
+    \[
+        \P(\tau_i > t) = e^{-q_i t}, \quad \text{следовательно, } \tau_i \sim \text{Exp}(q_i).
+    \]
+\end{tproof}
+
+\begin{note}
+    Полученный результат раскрывает глубокий физический и вероятностный смысл интенсивности $q_i$. Величина, обратная интенсивности выхода, $\mathbb{E}\tau_i = \frac{1}{q_i}$, представляет собой \textbf{среднее время пребывания} процесса в состоянии $i$. Чем выше интенсивность $q_i$, тем меньше времени (в среднем) система проводит в данном состоянии до совершения скачка. 
+    
+    Отсутствие памяти у показательного распределения согласуется с марковским свойством: будущее поведение процесса после момента $t$ при условии $\{X(t)=i\}$ не зависит от того, как долго процесс уже находился в этом состоянии до момента $t$.
+\end{note}
+[END OF lectures\lec1.tex]
+
+
+[FILE]: lectures\lec2.tex
+-------------------------
+% --- Лекция 2: Продолжение исследования непрерывных цепей Маркова ---
+
+\section{Вероятностный смысл элементов матрицы интенсивностей и механика скачков}
+
+На предыдущей лекции мы установили смысл диагональных элементов матрицы интенсивностей $Q$: величина $q_{ii} = -q_i$ определяет интенсивность выхода из состояния $i$, а время пребывания в этом состоянии распределено экспоненциально с параметром $q_i$. Теперь перейдем к рассмотрению внедиагональных элементов $q_{ij}$ при $i \neq j$ и выясним, как они определяют вероятности переходов (скачков) между различными состояниями.
+
+\begin{definition}{Вероятность перехода в момент скачка}
+    Обозначим через $F_{ij}(h)$ условную вероятность того, что цепь Маркова в момент времени $t+h$ окажется в состоянии $j$, при условии, что в момент $t$ она находилась в состоянии $i$, и к моменту $t+h$ произошло изменение состояния (цепь не находится в $i$):
+    \begin{equation}
+        F_{ij}(h) \doteq \mathbb{P}(X(t+h) = j \mid X(t) = i, X(t+h) \neq i), \quad i \neq j.
+    \end{equation}
+\end{definition}
+
+Рассмотрим предельную вероятность такого перехода при стремлении временного интервала $h$ к нулю.
+
+\begin{statement}
+    Для непрерывной цепи Маркова предел условной вероятности перехода в состояние $j$ в момент скачка из состояния $i$ равен отношению соответствующей интенсивности к суммарной интенсивности выхода из $i$:
+    \begin{equation}
+        \lim_{h \to 0} F_{ij}(h) = \frac{q_{ij}}{q_i}.
+    \end{equation}
+\end{statement}
+
+\begin{sproof}
+    Воспользуемся определением условной вероятности $\mathbb{P}(A \mid B) = \frac{\mathbb{P}(A \cap B)}{\mathbb{P}(B)}$. 
+    Заметим, что событие $\{X(t+h) = j\}$ при $j \neq i$ влечет за собой событие $\{X(t+h) \neq i\}$. Следовательно, их пересечение совпадает с первым событием: $\{X(t+h) = j\} \cap \{X(t+h) \neq i\} = \{X(t+h) = j\}$.
+    
+    Тогда искомая вероятность записывается как:
+    \begin{equation}
+        F_{ij}(h) = \frac{\mathbb{P}(X(t+h) = j \mid X(t) = i)}{\mathbb{P}(X(t+h) \neq i \mid X(t) = i)}.
+    \end{equation}
+    
+    Применим асимптотические разложения переходных вероятностей при $h \to 0$:
+    \begin{enumerate}
+        \item В числителе: $P_{ij}(h) = q_{ij} h + o(h)$ для всех $i \neq j$.
+        \item В знаменателе: вероятность выхода из состояния $i$ есть дополнение к вероятности остаться в нем:
+        $1 - P_{ii}(h) = 1 - (1 + q_{ii} h + o(h)) = -q_{ii} h - o(h) = q_i h + o(h)$.
+    \end{enumerate}
+    
+    Подставляя эти разложения, получаем:
+    \begin{equation}
+        F_{ij}(h) = \frac{q_{ij} h + o(h)}{q_i h + o(h)} = \frac{q_{ij} + \frac{o(h)}{h}}{q_i + \frac{o(h)}{h}}.
+    \end{equation}
+    
+    Переходя к пределу при $h \to 0$, все члены порядка $\frac{o(h)}{h}$ исчезают, и мы получаем окончательный результат:
+    \begin{equation}
+        \lim_{h \to 0} F_{ij}(h) = \frac{q_{ij}}{q_i}.
+    \end{equation}
+\end{sproof}
+
+Таким образом, внедиагональные элементы $q_{ij}$ определяют «приоритетность» выбора конкретного состояния $j$ в момент, когда процесс покидает состояние $i$.
+
+\begin{note}
+    Данный результат согласуется с конструкцией, предложенной Кай Лаем. Можно строго доказать, что времена пребывания в состояниях независимы в совокупности, а выбор следующего состояния не зависит от времени, проведенного в текущем.
+\end{note}
+
+\subsection*{Механика поведения цепи}
+
+На основе полученных свойств можно описать эволюцию цепи Маркова как дискретно-событийный процесс:
+\begin{enumerate}
+    \item Пусть в начальный момент времени $t=0$ процесс находится в некотором состоянии $i \in S$.
+    \item Процесс «задерживается» в состоянии $i$ в течение случайного времени $\tau_i$, имеющего экспоненциальное распределение с параметром $q_i$ (то есть $\tau_i \sim \text{Exp}(q_i)$).
+    \item В момент завершения времени ожидания процесс совершает скачок в новое состояние $j \neq i$ с вероятностью $\frac{q_{ij}}{q_i}$.
+    \item После перехода в состояние $j$ процесс снова «задерживается» в нем на время $\tau_j \sim \text{Exp}(q_j)$, и цикл повторяется.
+\end{enumerate}
+
+\section{Эргодические непрерывные цепи Маркова}
+
+Перейдем к изучению асимптотического поведения непрерывных цепей Маркова при $t \to \infty$. Как и в дискретном случае, центральное место здесь занимает понятие стационарного распределения и классификация состояний.
+
+\begin{definition}{Стационарное распределение}
+    Вектор вероятностей $\pi_0$ называется стационарным распределением непрерывной цепи Маркова, если для любого момента времени $t > 0$ выполняется уравнение:
+    \begin{equation}
+        P^T(t) \cdot \pi_0 = \pi_0.
+    \end{equation}
+    Для однородной цепи с матрицей интенсивностей $Q$ стационарное распределение находится из \textbf{стационарного уравнения Колмогорова}:
+    \begin{equation}
+        \boxed{Q^T \pi_0 = 0}.
+    \end{equation}
+\end{definition}
+
+\subsection{Классификация состояний и их свойства}
+
+Классификация состояний в непрерывном времени $t \in [0, +\infty)$ строится аналогично дискретному случаю, однако вместо числа шагов $n$ мы рассматриваем интегральные характеристики на всей временной оси.
+
+\begin{definition}{Сообщаемость и существенность}
+    \begin{enumerate}
+        \item Состояние $j$ \textit{достижимо} из $i$ ($i \to j$), если $\exists t > 0 : p_{ij}(t) > 0$.
+        \item Состояния $i$ и $j$ \textit{сообщаются} ($i \leftrightarrow j$), если $i \to j$ и $j \to i$.
+        \item Состояние $i$ называется \textit{существенным}, если из того, что $i \to j$, следует $j \to i$.
+    \end{enumerate}
+\end{definition}
+
+\begin{theorem}{Теорема о солидарности}
+    Для неразложимой цепи Маркова (где все состояния сообщаются, $i \leftrightarrow j$) все состояния имеют один и тот же тип: они либо все невозвратны, либо все нулевые возвратные, либо все положительно возвратные.
+\end{theorem}
+
+\begin{note}
+В отличие от дискретных цепей, в непрерывном случае понятие \textbf{периодичности} не вводится. Поскольку время перехода между состояниями является случайной величиной с экспоненциальным распределением, возможен возврат за любое время $t > 0$, что делает невозможным существование фиксированного шага (периода) $d > 1$. Таким образом, все состояния в непрерывных цепях апериодичны.
+\end{note}
+
+Для введения понятий возвратности обозначим через $\tau_{ii} \doteq \inf \{t > J_1 : X(t) = i \mid X(0) = i\}$ случайную величину времени первого возвращения в состояние $i$ (после первого скачка $J_1$).
+
+\begin{definition}{Типы возвратности}
+    \begin{enumerate}
+        \item Состояние $i$ называется \textit{возвратным}, если $\mathbb{P}(\tau_{ii} < \infty) = 1$. Аналогично можно показать, что данное определение в терминах переходных вероятностей это эквивалентно:
+            \begin{equation}
+                \int_0^{+\infty} p_{ii}(t) \, dt = \infty.
+            \end{equation}
+        \item Если $\mathbb{P}(\tau_{ii} < \infty) < 1$ (или интеграл выше сходится), состояние называется \textit{невозвратным}.
+        \item Возвратное состояние $i$ называется \textit{положительно возвратным}, если среднее время возврата конечно ($\mathbb{E}\tau_{ii} < \infty$). Это эквивалентно условию, что предельная вероятность пребывания в состоянии строго положительна:
+            \begin{equation}
+                \lim_{t \to \infty} p_{ii}(t) = \pi_i > 0.
+            \end{equation}
+        \item Возвратное состояние $i$ называется \textit{нулевым возвратным}, если среднее время возврата бесконечно ($\mathbb{E}\tau_{ii} = \infty$). В этом случае, несмотря на неизбежность возвращения, вероятность застать её в состоянии $i$ стремится к нулю:
+            \begin{equation}
+                \lim_{t \to \infty} p_{ii}(t) = 0.
+            \end{equation}
+    \end{enumerate}
+\end{definition}
+
+\begin{statement}{[Классификация состояний в конечных цепях]}
+    В конечной непрерывной цепи Маркова:
+    \begin{itemize}
+        \item Все состояния в закрытых классах являются положительно возвратными и существенными.
+        \item Все состояния в открытых классах являются нулевыми, невозвратными и несущественными.
+        \item Нулевых возвратных состояний в конечных цепях не существует.
+    \end{itemize}
+\end{statement}
+
+\subsection{Эргодические теоремы}
+
+\begin{definition}{Сильная эргодичность}
+    Непрерывная цепь Маркова называется сильно эргодической, если $\forall i, j \in S$ существует предел $\lim_{t \to \infty} p_{ij}(t) = p_j > 0$, не зависящий от начального состояния $i$.
+\end{definition}
+
+\begin{theorem}{Эргодическая теорема для конечных цепей}
+    Конечная непрерывная цепь Маркова сильно эргодична тогда и только тогда, когда она неразложима.
+\end{theorem}
+
+\begin{tproof}
+    $\Rightarrow$ Пусть цепь сильно эргодична. Тогда $\lim_{t \to \infty} p_{ij}(t) = p_j > 0$, что влечет существование такого $T$, что при всех $t \geqslant T$ выполняется $p_{ij}(t) > 0$. Это означает, что любое состояние достижимо из любого другого, то есть цепь неразложима.
+    
+    $\Leftarrow$ В дискретном случае требовалась апериодичность. Как уже было отмечено, в непрерывном времени $p_{ii}(t) > 0$ для всех $t \geqslant 0$, поэтому неразложимости достаточно для того, чтобы за некоторое время $T$ установилась строгая положительность всех $p_{ij}(t)$. Это свойство выполняется в силу того, что время жизни в каждом состоянии распределено по закону $\text{Exp}(q_i)$, а условие неразложимости гарантирует наличие пути между любыми состояниями. Поскольку скачок в соседнее состояние возможен за сколь угодно малое время, из любого $i$ можно попасть в любое $j$ с ненулевой вероятностью за любое время $t > 0$. Далее доказательство сводится к дискретному случаю.
+\end{tproof}
+
+\begin{theorem}{Эргодическое свойство средних*}
+    В конечной однородной неразложимой непрерывной цепи Маркова почти наверное выполняется:
+    \begin{equation}
+        \frac{1}{T} \int_0^T I(X(t)=j) \, dt \xrightarrow[T \to \infty]{\text{п.н.}} p_j,
+    \end{equation}
+    где $p_j$ — стационарная вероятность, выражающаяся через среднее время пребывания в состоянии $1/q_j$ и среднее время возврата $\mathbb{E}\tau_{jj}$:
+    \begin{equation}
+        p_j = \frac{1/q_j}{\mathbb{E}\tau_{jj}}.
+    \end{equation}
+\end{theorem}
+
+\begin{note}
+    Физический смысл $p_j = \frac{\mathbb{E} \text{Exp}(q_j)}{\mathbb{E} \tau_{jj}}$ заключается в том, что предельная доля времени нахождения в состоянии $j$ равна отношению среднего времени одного визита в это состояние к среднему времени между циклами возвращения.
+\end{note}
+
+\section{Примеры решения задач}
+
+\begin{example}{Нахождение вероятностей состояний и переходной матрицы}
+    Рассмотрим непрерывную цепь Маркова с двумя состояниями $S = \{0, 1\}$. Граф интенсивностей переходов задан следующим образом:
+    \begin{center}
+        \begin{tikzpicture}[>=stealth, node distance=3cm, on grid, auto]
+            \node[state] (0) {0};
+            \node[state] (1) [right=of 0] {1};
+            \path[->] 
+                (0) edge [bend left] node {$\lambda$} (1)
+                (1) edge [bend left] node {$\mu$} (0);
+        \end{tikzpicture}
+    \end{center}
+    Где $\lambda > 0$ и $\mu > 0$ --- заданные интенсивности. Требуется найти вектор вероятностей состояний $\pi(t)$ и матрицу переходных вероятностей $P(t)$.
+\end{example}
+
+\begin{eproof}
+    \textbf{1. Формирование матрицы интенсивностей.}
+    Согласно определению матрицы $Q$, внедиагональные элементы $q_{ij}$ равны интенсивностям соответствующих переходов. Диагональные элементы $q_{ii}$ определяются из условия равенства нулю суммы элементов каждой строки:
+    \begin{equation}
+        Q = \mat{-\lambda & \lambda \\ \mu & -\mu}.
+    \end{equation}
+    Транспонированная матрица, необходимая для уравнений Колмогорова, имеет вид:
+    \begin{equation}
+        Q^T = \mat{-\lambda & \mu \\ \lambda & -\mu}.
+    \end{equation}
+
+    \textbf{2. Решение системы дифференциальных уравнений.}
+    Вектор вероятностей $\pi(t) = (\pi_0(t), \pi_1(t))^T$ удовлетворяет системе $\dot{\pi}(t) = Q^T \pi(t)$:
+    \begin{equation}
+        \begin{cases} 
+            \dot{\pi}_0(t) = -\lambda \pi_0(t) + \mu \pi_1(t) \\ 
+            \dot{\pi}_1(t) = \lambda \pi_0(t) - \mu \pi_1(t) 
+        \end{cases}
+    \end{equation}
+    Воспользуемся условием нормировки $\pi_0(t) + \pi_1(t) = 1$, откуда $\pi_1(t) = 1 - \pi_0(t)$. Подставим это в первое уравнение:
+    \begin{equation}
+        \dot{\pi}_0(t) = -\lambda \pi_0(t) + \mu (1 - \pi_0(t)) = -(\lambda + \mu)\pi_0(t) + \mu.
+    \end{equation}
+    Это линейное неоднородное уравнение первого порядка. Общее решение соответствующего однородного уравнения: $\pi_{0, \text{одн}}(t) = C e^{-(\lambda + \mu)t}$. Частное решение ищем в виде константы (стационарное состояние $\dot{\pi}_0 = 0$):
+    \begin{equation}
+        0 = -(\lambda + \mu)\pi_0^* + \mu \implies \pi_0^* = \frac{\mu}{\lambda + \mu}.
+    \end{equation}
+    Тогда общее решение:
+    \begin{equation}
+        \pi_0(t) = \frac{\mu}{\lambda + \mu} + C e^{-(\lambda + \mu)t}.
+    \end{equation}
+    Из начального условия при $t=0$ находим $C = \pi_0(0) - \frac{\mu}{\lambda + \mu}$. Окончательно:
+    \begin{equation}
+        \pi_0(t) = \frac{\mu}{\lambda + \mu} + \left( \pi_0(0) - \frac{\mu}{\lambda + \mu} \right) e^{-(\lambda + \mu)t}, \quad \pi_1(t) = 1 - \pi_0(t).
+    \end{equation}
+
+    \textbf{3. Нахождение переходной матрицы $P(t)$.}
+    Матрица $P(t)$ удовлетворяет уравнению $\dot{P}(t) = P(t)Q$ с начальным условием $P(0) = I$. Заметим, что каждая строка матрицы $P(t)$ — это вектор вероятностей состояний при специфическом начальном распределении (либо $(1, 0)$ или $(0, 1)$). 
+    
+    Для первой строки $(p_{00}(t), p_{01}(t))$ начальное условие $p_{00}(0) = 1$. Подставляя его в решение для $\pi_0(t)$:
+    \begin{equation}
+        p_{00}(t) = \frac{\mu}{\lambda + \mu} + \left( 1 - \frac{\mu}{\lambda + \mu} \right) e^{-(\lambda + \mu)t} = \frac{\mu}{\lambda + \mu} + \frac{\lambda}{\lambda + \mu} e^{-(\lambda + \mu)t}.
+    \end{equation}
+    Для второй строки $(p_{10}(t), p_{11}(t))$ начальное условие $p_{10}(0) = 0$:
+    \begin{equation}
+        p_{10}(t) = \frac{\mu}{\lambda + \mu} + \left( 0 - \frac{\mu}{\lambda + \mu} \right) e^{-(\lambda + \mu)t} = \frac{\mu}{\lambda + \mu} - \frac{\mu}{\lambda + \mu} e^{-(\lambda + \mu)t}.
+    \end{equation}
+    Остальные элементы находятся как $p_{01} = 1 - p_{00}$ и $p_{11} = 1 - p_{10}$.
+
+    \textbf{4. Стационарный режим.}
+    Поскольку цепь неразложима ($\lambda, \mu > 0$), существует единственное стационарное распределение $\pi$, которое является пределом $P(t)$ при $t \to \infty$. Решая алгебраическую систему $Q^T \pi = 0$:
+    \begin{equation}
+        \begin{cases} 
+            -\lambda \pi_0 + \mu \pi_1 = 0 \\ 
+            \pi_0 + \pi_1 = 1 
+        \end{cases} \implies
+        \pi_0 = \frac{\mu}{\lambda + \mu}, \quad \pi_1 = \frac{\lambda}{\lambda + \mu}.
+    \end{equation}
+    Этот результат полностью согласуется с пределом $t \to \infty$ в динамическом решении.
+\end{eproof}
+
+\begin{note}
+    В данном примере мы явно увидели проявление эргодичности: независимо от начального состояния (выбора строки в $P(t)$ или начального вектора $\pi(0)$), система стремится к одному и тому же распределению вероятностей.
+\end{note}
+
+\begin{example}{Процесс рождения и гибели}
+    Однородная непрерывная цепь Маркова называется процессом рождения — гибели, если её стохастический граф имеет линейную структуру, где переходы возможны только между соседними состояниями:
+    \begin{center}
+        \begin{tikzpicture}[>=Stealth, node distance=2.5cm, auto]
+            % Состояния
+            \node[state] (0) {0};
+            \node[state] (1) [right=of 0] {1};
+            \node[state] (2) [right=of 1] {2};
+            \node[right=of 2] (dots) {$\dots$};
+            \node[state] (N-1) [right=of dots] {$N-1$};
+
+            % Стрелки рождения (вверх)
+            \path[->] (0) edge [bend left] node {$\lambda_0$} (1);
+            \path[->] (1) edge [bend left] node {$\lambda_1$} (2);
+            \path[->] (2) edge [bend left] node {$\lambda_2$} (dots);
+            \path[->] (dots) edge [bend left] node {$\lambda_{N-2}$} (N-1);
+
+            % Стрелки гибели (вниз)
+            \path[->] (1) edge [bend left] node {$\mu_1$} (0);
+            \path[->] (2) edge [bend left] node {$\mu_2$} (1);
+            \path[->] (dots) edge [bend left] node {$\mu_3$} (2);
+            \path[->] (N-1) edge [bend left] node {$\mu_{N-1}$} (dots);
+        \end{tikzpicture}
+    \end{center}
+    Здесь $\lambda_i > 0$ — интенсивности рождения, $\mu_i > 0$ — интенсивности гибели, а количество состояний $N$ может быть как конечным, так и бесконечным. Процесс является непрерывным аналогом случайных блужданий. Найдем для него явный вид стационарных вероятностей состояний $\pi_i$.
+\end{example}
+
+\begin{eproof}
+    Прежде всего отметим, что стационарное распределение существует, является единственным и совпадает с предельным распределением вероятностей по эргодической теореме, поскольку рассматриваемая цепь образует замкнутый класс. Найдем стационарное распределение $\pi^\circ$. Матрица интенсивностей $Q$ для такого процесса является трехдиагональной:
+    \begin{equation}
+        Q = \begin{pmatrix}
+        -\lambda_0 & \lambda_0 & 0 & 0 & \dots \\
+        \mu_1 & -(\mu_1 + \lambda_1) & \lambda_1 & 0 & \dots \\
+        0 & \mu_2 & -(\mu_2 + \lambda_2) & \lambda_2 & \dots \\
+        \vdots & \vdots & \ddots & \ddots & \ddots
+        \end{pmatrix}
+    \end{equation}
+    Для нахождения $\pi^\circ$ решим уравнение $\pi^{\circ T} Q = 0$. Распишем систему по столбцам:
+    \begin{itemize}
+        \item[1)] $-\pi_0 \lambda_0 + \pi_1 \mu_1 = 0 \implies \pi_1 = \pi_0 \frac{\lambda_0}{\mu_1}$
+        \item[2)] $\pi_0 \lambda_0 - \pi_1 (\lambda_1 + \mu_1) + \pi_2 \mu_2 = 0$. Подставляя $\pi_0 \lambda_0 = \pi_1 \mu_1$, получаем:
+        \begin{equation}
+            \pi_1 \mu_1 - \pi_1 \lambda_1 - \pi_1 \mu_1 + \pi_2 \mu_2 = 0 \implies \pi_2 = \pi_1 \frac{\lambda_1}{\mu_2} = \pi_0 \frac{\lambda_0 \lambda_1}{\mu_1 \mu_2}
+        \end{equation}
+    \end{itemize}
+    По индукции для любого $k \ge 1$ получаем общее уравнение баланса $\pi_i \lambda_i = \pi_{i+1} \mu_{i+1}$, откуда:
+    \begin{equation}
+        \pi_k = \pi_0 \prod_{i=1}^k \frac{\lambda_{i-1}}{\mu_i}
+    \end{equation}
+    Вероятность $\pi_0$ находится из условия нормировки $\sum_{k=0}^{N-1} \pi_k = 1$:
+    \begin{equation}
+        \pi_0 \left( 1 + \sum_{k=1}^{N-1} \prod_{i=1}^k \frac{\lambda_{i-1}}{\mu_i} \right) = 1 \implies \pi_0 = \left[ 1 + \sum_{k=1}^{N-1} \prod_{i=1}^k \frac{\lambda_{i-1}}{\mu_i} \right]^{-1}
+    \end{equation}
+\end{eproof}
+
+
+
+\begin{definition}{Пуассоновский процесс (определение через процесс рождения)}
+    Пусть $K(t), t \ge 0$ — непрерывная цепь Маркова с $S = \{0, 1, 2, \dots \}$, непрерывными справа траекториями, являющаяся процессом чистого рождения с постоянными интенсивностями:
+    \begin{equation}
+        \lambda_i = \lambda > 0, \quad \mu_i = 0 \quad \forall i.
+    \end{equation}
+    Тогда $K(t)$ называется пуассоновским процессом с интенсивностью $\lambda$.
+\end{definition}
+
+\begin{note}
+    Поскольку пуассоновский процесс обладает независимыми приращениями, он автоматически удовлетворяет марковскому свойству. В данной интерпретации мы рассматриваем его как вырожденный случай процесса рождения-гибели, где «гибель» невозможна.
+\end{note}
+
+\section{Потоки событий}
+
+\begin{definition}{Поток событий}
+    \textit{Потоком событий} называется последовательность одинаково распределённых событий, происходящих одно за другим через случайные промежутки времени.
+\end{definition}
+
+\begin{center}
+    \begin{tikzpicture}
+        \draw[->, thick] (0,0) -- (10,0) node[right] {$t$};
+        \node at (0,-0.3) {0};
+        \draw[thick] (0,0.1) -- (0,-0.1);
+        % Имитация случайных моментов наступления событий
+        \foreach \x in {0.8, 1.5, 2.3, 2.5, 2.7, 3.8, 4.2, 4.8, 5.5, 6.7, 7.2, 8.4, 9.1}
+            \draw[thick, MAIN] (\x, 0.15) -- (\x, -0.15);
+    \end{tikzpicture}
+\end{center}
+
+Пусть $t_1, t_2 > 0$. Обозначим через $n(t_1, t_2)$ случайную величину, равную числу событий из потока, попавших в полуинтервал $[t_1, t_2)$.
+
+\begin{definition}{Свойства потоков}
+    \begin{enumerate}
+        \item Поток называется \textbf{однородным (стационарным)}, если распределения случайных величин $n(t_1, t_2)$ и $n(t_1 + s, t_2 + s)$ совпадают для любого $s > 0$. Для таких потоков вводится обозначение $n(t) \doteq n(0, t)$.
+        \item Рассмотрим моменты времени $0 = t_0 \le t_1 \le \dots \le t_{m+1}$ и соответствующие приращения $\xi_k = n(t_k, t_{k+1})$. Поток называется \textbf{потоком без последствия}, если совокупность случайных величин $\{\xi_0, \dots, \xi_m \}$ независима в совокупности.
+    \end{enumerate}
+\end{definition}
+
+
+
+Дополнительно введем ограничение: между любыми двумя событиями в потоке проходит конечное (но случайное) время. Это означает, что после наступления события наступает интервал положительной длительности, в течение которого новых событий не происходит, но по истечении которого событие обязательно наступит. Это допущение эквивалентно требованию \textbf{непрерывности справа} траекторий процесса $n(t)$.
+
+\subsection{Марковская природа потоков без последствия}
+
+Исследуем структуру такого потока. Заметим, что:
+\begin{enumerate}
+    \item $n(t_k, t_{k+1}) = n(t_{k+1}) - n(t_k)$ независимы в совокупности по определению отсутствия последствия.
+    \item Следовательно, $n(t)$ является процессом с \textbf{независимыми приращениями}.
+    \item Любой процесс с независимыми приращениями обладает марковским свойством.
+\end{enumerate}
+
+Так как процесс $n(t)$ определен на непрерывном времени $t \in [0, +\infty)$, а его фазовое пространство дискретно ($S = \mathbb{N}_0$), то $n(t)$ представляет собой \textbf{непрерывную цепь Маркова}. Если поток однороден, то и цепь Маркова является однородной.
+
+Тот факт, что траектории $n(t)$ непрерывны справа, делает эту цепь \textbf{стандартной}. Из этого вытекают фундаментальные аналитические свойства:
+\begin{equation}
+    P(t) \xrightarrow[t \to 0+]{} I, \quad P(t) \in C[0, +\infty).
+\end{equation}
+
+\subsection{Интенсивности переходов в потоке без последействия}
+
+Рассмотрим вопрос об интенсивностях переходов в марковской цепи, описывающей поток событий. Исходя из свойств траекторий процесса $n(t)$, мы можем сделать ряд важных выводов о структуре матрицы интенсивностей.
+
+\begin{statement}
+Для марковской цепи, соответствующей однородному потоку без последействия, интенсивности переходов $\lambda_{ij}$ не зависят от текущего состояния $i$ и отличны от нуля только для переходов в непосредственно следующее состояние ($j = i+1$). При этом диагональные элементы $\lambda_{ii}$ конечны и равны по модулю интенсивности потока.
+\end{statement}
+
+\begin{sproof}
+1. \textbf{Анализ переходных вероятностей.} 
+Так как траектории процесса $n(t)$ являются неубывающими по определению (количество событий не может уменьшаться), то переходные вероятности $p_{ij}(t)$ отличны от нуля только при $j \ge i$. Для стандартной цепи Маркова при $j > i$ существуют конечные интенсивности переходов:
+$$ \exists \lambda_{ij} = \dot{p}_{ij}(0), \quad 0 \le \lambda_{ij} < \infty. $$
+Для диагональных элементов $\lambda_{ii} = \dot{p}_{ii}(0)$ априори допускается значение $-\infty$, однако покажем, что в данном случае они конечны.
+
+2. \textbf{Строгая положительность интенсивности выхода.}
+Заметим, что $\lambda_{ii} < 0$ (так как $p_{ii}(t)$ убывает от 1). Предположим, что $\lambda_{ii} = 0$. Тогда, воспользовавшись мультипликативным свойством и перейдя к пределу, получим:
+$$ p_{ii}(t) = \left[ p_{ii}\left(\frac{t}{n}\right) \right]^n = \left( 1 + \dot{p}_{ii}(0) \frac{t}{n} + o\left(\frac{t}{n}\right) \right)^n = \left( 1 + 0 \cdot \frac{t}{n} + o\left(\frac{t}{n}\right) \right)^n \xrightarrow[n \to \infty]{} 1. $$
+Следовательно, $p_{ii}(t) \equiv 1$ для всех $t \ge 0$. Это означает, что система никогда не покидает состояние $i$, что прямо противоречит условию о том, что между событиями проходит конечное время. Таким образом, $\lambda_{ii} < 0$.
+
+3. \textbf{Независимость от состояния (однородность).}
+Предположим, что $\lambda_{ii}$ конечна. Рассмотрим вероятность того, что на интервале длины $h$ не произойдет ни одного события:
+$$ p_{ii}(h) = \mathbb{P}(n(t+h) = i \mid n(t) = i) = \mathbb{P}(n(t+h) - n(t) = 0 \mid n(t) = i). $$
+В силу свойства независимости приращений, данная вероятность совпадает с безусловной вероятностью того, что за время $h$ приращение процесса составит $0$:
+$$ p_{ii}(h) = \mathbb{P}(n(h) = 0). $$
+Отсюда следует, что величина $p_{ii}(h)$ (а значит, и её производная в нуле $\lambda_{ii}$) не зависит от индекса состояния $i$. Обозначим $-\lambda_{ii} \doteq \lambda$. Как было показано ранее, время пребывания в состоянии в таком случае распределено экс­по­нен­ци­аль­но: $\tau_i \sim \text{Exp}(\lambda)$.
+
+4. \textbf{Отсутствие групповых скачков.}
+Рассмотрим переход из $i$ в $i+1$. Аналогично предыдущему пункту:
+$$ p_{i, i+1}(h) = \mathbb{P}(n(t+h) - n(t) = 1 \mid n(t) = i) = \mathbb{P}(n(h) = 1). $$
+Это означает, что интенсивность перехода $\lambda_{i, i+1}$ также не зависит от $i$. Обозначим её за $\lambda$. Тогда:
+$$ \frac{p_{i, i+1}(h)}{h} \xrightarrow[h \to 0]{} \lambda. $$
+Рассмотрим переходы типа $i \to i+k$ при $k > 1$ (например, $0 \to 2$). По условию, между любыми двумя событиями проходит конечное время. Это исключает возможность мгновенного скачка через несколько состояний (групповое поступление событий). Следовательно, такие интенсивности равны нулю: $\lambda_{ij} = 0$ при $j > i+1$.
+\end{sproof}
+
+Визуально структуру переходов в такой цепи можно представить следующей диаграммой:
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[
+        scale=1.5,
+        >={Stealth[length=3mm]},
+        state/.style={circle, draw, minimum size=0.8cm, thick},
+        every node/.style={font=\small}
+    ]
+        % Состояния
+        \node[state] (s0) at (0,0) {0};
+        \node[state] (s1) at (2,0) {1};
+        \node[state] (s2) at (4,0) {2};
+        \node (dots) at (5.5,0) {\Large $\dots$};
+
+        % Разрешенные переходы (интенсивности в кружочках над стрелками)
+        \draw[->, thick] (s0) to [bend left=40] node[midway, circle, draw, inner sep=1.5pt, yshift=0.3cm] {$\lambda$} (s1);
+        \draw[->, thick] (s1) to [bend left=40] node[midway, circle, draw, inner sep=1.5pt, yshift=0.3cm] {$\lambda$} (s2);
+        \draw[->, thick] (s2) to [bend left=40] node[midway, circle, draw, inner sep=1.5pt, yshift=0.3cm] {$\lambda$} (dots);
+
+        % Запрещенный переход (пунктир снизу)
+        \path[draw, ->, dashed, thick, gray] (s0) to [bend right=45] coordinate[midway] (cross) (s2);
+        
+        % Классический красный крестик поверх линии
+        \draw[red, ultra thick] ($(cross)+(-0.15, -0.15)$) -- ($(cross)+(0.15, 0.15)$);
+        \draw[red, ultra thick] ($(cross)+(-0.15, 0.15)$) -- ($(cross)+(0.15, -0.15)$);
+
+    \end{tikzpicture}
+    \caption{Схема интенсивностей переходов пуассоновского процесса.}
+\end{figure}
+
+\begin{note}
+Таким образом, мы получили непрерывную цепь Маркова со счетным фазовым пространством $S = \mathbb{N}_0$, стартующую из нуля, имеющую независимые приращения и экспоненциальные времена между скачками. Данная конструкция (схема переходов $0 \to 1 \to 2 \to \dots$) полностью определяет \textbf{пуассоновский процесс}.
+\end{note}
+
+\subsection{Ординарность и эквивалентные определения пуассоновского процесса}
+
+В предыдущих рассуждениях мы существенно опирались на допущение о том, что между любыми двумя последовательными событиями в потоке проходит конечное время, и интенсивности выхода из состояний удовлетворяют условию $0 < \lambda_i < \infty$. Данные условия гарантируют \textit{стандартность} цепи Маркова, а также определяют структуру времени пребывания в состояниях и вероятности скачков.
+
+Если мы рассматриваем поток, в котором на любом конечном интервале времени происходит конечное число событий, условие $\lambda_i < \infty$ выполняется автоматически. При этом требование конечности межсобытийных интервалов эквивалентно требованию \textit{непрерывности справа} траекторий процесса $n(t)$.
+
+Формально условия на структуру приращений процесса можно переписать через свойство ординарности.
+
+\begin{statement}
+Для однородного потока событий с интенсивностью $0 < \lambda < \infty$ вероятности изменения состояния на малом интервале времени $h \to 0$ представимы в виде:
+\begin{equation}
+    \begin{cases}
+        \mathbb{P}(n(t, t+h) = 1) = \lambda h + o(h), \\
+        \mathbb{P}(n(t, t+h) = 0) = 1 - \lambda h + o(h).
+    \end{cases}
+\end{equation}
+Отсюда, в силу нормировки, следует, что вероятность наступления двух и более событий за малое время пренебрежимо мала:
+$$ \mathbb{P}(n(t, t+h) \ge 2) = o(h), \quad h \to 0. $$
+Данное свойство называется \textbf{ординарностью} потока и исключает возможность группового поступления событий.
+\end{statement}
+
+Теперь мы можем дать строгое определение рассматриваемому процессу.
+
+\begin{definition}{Пуассоновский процесс}
+Пусть дан однородный ординарный поток без последействия с интенсивностью $\lambda$. Тогда случайный процесс $K(t) \doteq n(0, t)$, равный числу событий, произошедших на полуинтервале $[0, t)$, называется \textbf{пуассоновским процессом} с интенсивностью $\lambda$ (или простейшим пуассоновским потоком).
+\end{definition}
+
+\begin{note}
+В случае отказа от условия однородности интенсивность становится функцией времени:
+$$ \lambda(t) \doteq \lim_{h \to 0} \frac{\mathbb{P}(n(t, t+h) > 0)}{h}. $$
+Тогда свойство ординарности принимает локальный вид:
+\begin{align*}
+    \mathbb{P}(n(t, t+h) = 1) &= \lambda(t)h + o(h), \\
+    \mathbb{P}(n(t, t+h) = 0) &= 1 - \lambda(t)h + o(h).
+\end{align*}
+Такой процесс называется \textit{неоднородным пуассоновским процессом}.
+\end{note}
+
+Подводя итог изучению данного класса процессов, перечислим четыре эквивалентных подхода к его определению, которые мы встретили в рамках курса:
+
+\begin{enumerate}
+    \item \textbf{Аксиоматическое определение:} через свойства независимых и стационарных приращений, распределенных по закону Пуассона.
+    \item \textbf{Явная конструкция:} как процесс, в котором времена между скачками независимы и распределены экспоненциально с параметром $\lambda$.
+    \item \textbf{Процесс гибели и размножения:} как частный случай (чистый процесс рождения) марковской цепи с непрерывным временем и линейной структурой переходов.
+    \item \textbf{Потоковое определение:} как однородный ординарный поток без последействия.
+\end{enumerate}
+[END OF lectures\lec2.tex]
+
+
+[FILE]: settings\colors.tex
+---------------------------
+% Colors
+% -------------------------------------------------------------------------
+\usepackage[x11names]{xcolor}
+
+\colorlet   {BG}    {Snow2}
+\colorlet   {TEXT}  {black}
+\colorlet   {MAIN}  {Red3}
+\colorlet   {SUB}   {DeepSkyBlue4}
+\colorlet   {DEF}   {SpringGreen4}
+\colorlet   {LEM}   {Tan1}
+
+\pagecolor{BG}
+\color{TEXT}
+% -------------------------------------------------------------------------
+[END OF settings\colors.tex]
+
+
+[FILE]: settings\graphics.tex
+-----------------------------
+% Graphics
+% -----------------------
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{tikz-cd}
+\usetikzlibrary{shadows, arrows.meta, patterns}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{automata, positioning}
+\usetikzlibrary{calc}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage[most]{tcolorbox}
+% -----------------------
+[END OF settings\graphics.tex]
+
+
+[FILE]: settings\layout.tex
+---------------------------
+% Layout
+% -------------------------------------------------------------------------
+\usepackage[
+    top=2cm,           % Увеличен отступ сверху, чтобы текст не налезал на колонтитул 
+    bottom=1.5cm,      % Увеличен отступ снизу для корректного отображения и печати 
+    left=1.5cm, 
+    right=1.5cm,
+    headheight=25pt,   % Фиксированная высота для устранения ворнингов fancyhdr 
+    includehead        % Включает колонтитул в расчет области печати 
+]{geometry}
+
+\usepackage{fancyhdr}
+\usepackage{multirow}
+\usepackage{lastpage}
+\usepackage{varwidth}
+
+\pagestyle{fancy}
+\fancyhf{} % Полная очистка текущих настроек 
+
+% Настройки для одностороннего документа (как в вашем main.pdf) [cite: 2, 3]
+\fancyhead[L]{\textit{\leftmark}} % Название главы слева 
+\fancyhead[R]{\thepage/\pageref{LastPage}} % Номер страницы справа 
+
+\fancyfoot[C]{} % Очистка центральной части футера 
+
+% Стиль для страниц, где начинаются главы (обычно там пустые колонтитулы) 
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+\usepackage{titlesec}
+\usepackage{ragged2e} % Пакет для правильного выравнивания без переносов
+
+% Настройка формата главы
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\RaggedRight} % Добавлено \RaggedRight для отмены переносов
+  {\vspace{-2.5cm}\chaptertitlename\ \thechapter} 
+  {10pt} 
+  {\Huge}
+
+% Настройка отступов главы
+\titlespacing*{\chapter}{0pt}{0pt}{20pt}
+% -------------------------------------------------------------------------
+[END OF settings\layout.tex]
+
+
+[FILE]: settings\links.tex
+--------------------------
+% Links
+% -------------------------------------------------------------------------
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks = true,
+    linkcolor = TEXT,
+    filecolor = magenta,
+    urlcolor = cyan,
+    citecolor = blue,
+    pdftitle = {Лекции по линейной алгебре},
+    pdfpagemode = FullScreen
+}
+% -------------------------------------------------------------------------
+[END OF settings\links.tex]
+
+
+[FILE]: settings\mainset.tex
+----------------------------
+% Main settings
+% -------------------------------------------------------------------------
+\documentclass[a4paper, 10pt]{report}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}      
+\usepackage[english, russian]{babel}
+% -------------------------------------------------------------------------
+
+
+[END OF settings\mainset.tex]
+
+
+[FILE]: settings\math.tex
+-------------------------
+% Math packages
+% -------------------------------------------------------------------------
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{mathtext}
+% -------------------------------------------------------------------------
+[END OF settings\math.tex]
+
+
+[FILE]: settings\other.tex
+--------------------------
+% Other
+% ------------------------------------------------------------------------
+\usepackage{wrapfig}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage[normalem]{ulem}
+\usepackage{cancel}
+\usepackage{arydshln}
+% ------------------------------------------------------------------------
+[END OF settings\other.tex]
+
+
+[FILE]: settings\text.tex
+-------------------------
+% Text settings
+% -------------------------------------------------------------------------
+\linespread{1.5}
+\usepackage{indentfirst}
+\setlength{\parskip}{0.2cm}
+% -------------------------------------------------------------------------
+[END OF settings\text.tex]
+
+
+[FILE]: settings\title.tex
+--------------------------
+\thispagestyle{empty}
+
+\begin{center}
+
+% Header
+% ------------------------------------------------------------------------
+{\large «Московский физико-технический институт» \\ Физтех-школа радиотехники и компьютерных технологий}\\
+% ------------------------------------------------------------------------
+
+\vspace*{6cm}
+
+% Title
+% ------------------------------------------------------------------------
+{\bfseries
+  {\Huge Конспект лекций \\ по теории массового обслуживания}
+}
+% ------------------------------------------------------------------------
+
+\end{center}
+
+
+\vspace*{1cm}
+\begin{flushright}
+
+% Authors and lector
+% ------------------------------------------------------------------------
+{\color{MAIN} 
+\textbf{Лектор:}} \\ Буртаков И.А.
+\\
+{\color{MAIN}
+\textbf{Верстка:}} \\ Лепин В.Д.
+% ------------------------------------------------------------------------
+
+\end{flushright}
+
+
+\vspace*{6cm}
+
+% Footer
+% ------------------------------------------------------------------------
+\begin{center}
+\includegraphics[scale=0.4]{logo.png} \\
+\small{г. Долгопрудный, 2026}
+\end{center}
+% ------------------------------------------------------------------------
+
+\newpage
+[END OF settings\title.tex]
