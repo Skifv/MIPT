@@ -15,18 +15,25 @@
     boxrule = 2pt,
     colframe = LEM, colback = BG,
     sharp corners,
+    drop shadow,
     %
     % Title
     attach boxed title to top left = {
-        xshift=1cm, yshift=-4mm
+        xshift=1.3cm, yshift=-4mm
     },
     boxed title style = {
         boxrule = 2pt,
-        colframe = LEM, colback = LEM,
-        sharp corners
+        colframe = LEM, colback = BG,
+        sharp corners,
+        underlay = {
+            \begin{scope}
+                \clip ([xshift=2pt, yshift=9.4pt]interior.south east) rectangle ([xshift=4pt]interior.north east);
+                \filldraw [white, opacity=0, drop shadow] (interior.south west) rectangle ([xshift=2pt, yshift=2pt]interior.north east);
+            \end{scope} 
+        },
     },
     boxed title size = title,
-    coltitle = TEXT,
+    coltitle = LEM,
     fonttitle = \bfseries,
     title={#2},
     %
@@ -35,7 +42,7 @@
     %
     % Border fixes for multiple pages
     overlay first={
-        \draw[color=BG, line width = 2pt] (frame.south east)--(frame.south west);
+        \draw[color=BG, line width = 4pt] ([yshift=-1pt]frame.south east)--([yshift=-1pt]frame.south west);
     },
     overlay middle={
         \draw[color=BG, line width = 2pt] (frame.south east)--(frame.south west);

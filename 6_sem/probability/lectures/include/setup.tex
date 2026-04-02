@@ -6,3 +6,10 @@
 \input{settings/math}
 \input{settings/other}
 \input{settings/text}
+
+\tcbset{
+    % Этот параметр заставит боксы уважать настройки абзацев документа
+    parbox=false, 
+    % Или принудительно задайте интервал, если parbox=false не помогает:
+    % before upper = {\setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}

@@ -1,188 +1,186 @@
 
-% ╔══════════════════════════════════════╗
-% ║  Statements and other constructions  ║
-% ╚══════════════════════════════════════╝
+    % ╔══════════════════════════════════════╗
+    % ║  Statements and other constructions  ║
+    % ╚══════════════════════════════════════╝
 
-% Note 
-% -------------------------------------------------------------------------------------
-\newtcolorbox{note}[1][] {
-    %
-    % Layout
-    enhanced, breakable, before skip=10pt, after skip=10pt,
-    before upper = {\vspace{2mm}},
-    %
-    % Box
-    boxrule = 1pt,
-    colframe = SUB, 
-    colback = BG,
-    sharp corners,
-    % borderline = {1.5pt}{0mm}{SUB, dashed},
-    %
-    % Title
-    attach boxed title to top left = {
-        xshift=1.5cm, yshift=-3mm
-    },
-    boxed title style = {
-        frame hidden,
-        colframe = SUB, colback = BG,
-        % Adjusting ends of border break
-        overlay = {
-            \draw[color=SUB, line width = 1pt] ([xshift=1.1pt, yshift=-.15pt]frame.west)--([xshift=7pt, yshift=-.15pt]frame.west);
-            \draw[color=SUB, line width = 1pt] ([xshift=-7pt, yshift=-.15pt]frame.east)--([xshift=-1pt, yshift=-.15pt]frame.east);
+    % Note 
+    % -------------------------------------------------------------------------------------
+    \newtcolorbox{note}[1][]{
+        enhanced, breakable, 
+        before skip=10pt, after skip=10pt,
+        before upper = {\vspace{2mm}},
+        %
+        % Box Style
+        boxrule = 1pt,
+        colframe = SUB, 
+        colback = BG,
+        sharp corners,
+        %
+        % Title Positioning
+        attach boxed title to top left = {
+            xshift=1.5cm, yshift=-3mm
         },
-    },
-    boxed title size = title,
-    coltitle = SUB,
-    fonttitle = \bfseries,
-    title={\text{!\ \ Замечание\ \ !}},
+        boxed title style = {
+            frame hidden, % Скрываем стандартную рамку, но оставляем фон
+            outer arc=0pt, arc=0pt,
+            colback=BG,
+            left=2pt, right=2pt, % Небольшие отступы, чтобы линии не липли к буквам
+            %
+            overlay = {
+                % 1. Левая линия: от края бокса до левого края подложки заголовка
+                \draw[color=SUB, line width = 1pt] 
+                    ([xshift=-1.5cm, yshift=0pt]frame.west) -- (frame.west);
+                
+                % 2. Правая линия: от правого края подложки до правого края бокса
+                \draw[color=SUB, line width = 1pt] 
+                    (frame.east) -- ([xshift=\linewidth-1.5cm, yshift=0pt]frame.west);
+            },
+        },
+        boxed title size = title,
+        coltitle = SUB,
+        fonttitle = \bfseries,
+        title={!\ \ Замечание\ifstrempty{#1}{}{\ #1}\ \ !},
+        %
+        % Content
+        colupper = TEXT,
+        %
+        % Отрисовка разрывов (без изменений)
+        overlay first={ \draw[color=BG, line width = 2pt] (frame.south west)--(frame.south east); },
+        overlay middle={
+            \draw[color=BG, line width = 2pt] (frame.south west)--(frame.south east);
+            \draw[color=BG, line width=2pt] (frame.north west)--(frame.north east);
+        },
+        overlay last={ \draw[color=BG, line width=2pt] (frame.north west)--(frame.north east); },
+    }
     %
-    % Text
-    colupper = TEXT,
-    %
-    % Border fixes for multiple pages
-    overlay first={
-        \draw[color=BG, line width = 2pt] (frame.south west)--(frame.south east);
-    },
-    overlay middle={
-        \draw[color=BG, line width = 2pt] (frame.south west)--(frame.south east);
-        \draw[color=BG, line width=2pt] (frame.north west)--(frame.north east);
-    },
-    overlay last={
-        \draw[color=BG, line width=2pt] (frame.north west)--(frame.north east);
-    },
-    %
-    % User input parameters
-    #1
-}
-%
-% Usage:
-% \begin{note} [tcolorbox params]
-%     definition
-% \end{definition}
-% -------------------------------------------------------------------------------------
+    % Usage:
+    % \begin{note} [tcolorbox params]
+    %     definition
+    % \end{definition}
+    % -------------------------------------------------------------------------------------
 
 
-% Consequence
-% -------------------------------------------------------------------------------------
-\newtcolorbox{conseq}[1][] {
+    % Consequence
+    % -------------------------------------------------------------------------------------
+    \newtcolorbox{conseq}[1][] {
+        %
+        % Layout
+        enhanced, breakable, before skip=10pt, after skip=10pt,
+        before upper = {\vspace{2mm}},
+        %
+        % Box
+        opacityback = 0,
+        frame hidden,
+        %
+        % Consequence title
+        title = {Следствие.},
+        attach title to upper = {\ },
+        coltitle = SUB,
+        fonttitle = \bfseries,
+        %
+        % Text
+        colupper = TEXT,
+        %
+        % Arrow
+        overlay unbroken = {
+            % \draw [SUB, line width=2.5pt] ([xshift=1pt, yshift=-2pt]frame.north west) -- ([xshift=1pt, yshift=3pt]frame.north west);
+            \draw [SUB, line width=1pt, {Bracket[angle=70:4pt, reversed, round]}-{Turned Square[length=8pt, open, round]}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
+        },
+        overlay first = {
+            \draw [SUB, line width=1pt, {Bracket[angle=70:4pt, reversed, round]}-{}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
+        },
+        overlay middle = {
+            \draw [SUB, line width=1pt, -] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
+        },
+        overlay last = {
+            \draw [SUB, line width=1pt, -{Turned Square[length=8pt, open, round]}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
+        },
+        %
+        % User input parameters
+        #1
+    }
     %
-    % Layout
-    enhanced, breakable, before skip=10pt, after skip=10pt,
-    before upper = {\vspace{2mm}},
-    %
-    % Box
-    opacityback = 0,
-    frame hidden,
-    %
-    % Consequence title
-    title = {Следствие.},
-    attach title to upper = {\ },
-    coltitle = SUB,
-    fonttitle = \bfseries,
-    %
-    % Text
-    colupper = TEXT,
-    %
-    % Arrow
-    overlay unbroken = {
-        % \draw [SUB, line width=2.5pt] ([xshift=1pt, yshift=-2pt]frame.north west) -- ([xshift=1pt, yshift=3pt]frame.north west);
-        \draw [SUB, line width=1pt, {Bracket[angle=70:4pt, reversed, round]}-{Turned Square[length=8pt, open, round]}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
-    },
-    overlay first = {
-        \draw [SUB, line width=1pt, {Bracket[angle=70:4pt, reversed, round]}-{}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
-    },
-    overlay middle = {
-        \draw [SUB, line width=1pt, -] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
-    },
-    overlay last = {
-        \draw [SUB, line width=1pt, -{Turned Square[length=8pt, open, round]}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
-    },
-    %
-    % User input parameters
-    #1
-}
-%
-% Usage:
-% \begin{conseq}[tcolorbox params] 
-%    Text 
-% \end{conseq}
-% -------------------------------------------------------------------------------------
+    % Usage:
+    % \begin{conseq}[tcolorbox params] 
+    %    Text 
+    % \end{conseq}
+    % -------------------------------------------------------------------------------------
 
 
-% Statement
-% -------------------------------------------------------------------------------------
-\newtcolorbox{statement}[1][] {
+    % Statement
+    % -------------------------------------------------------------------------------------
+    \newtcolorbox{statement}[1][] {
+        %
+        % Layout
+        enhanced, breakable, before skip=10pt, after skip=0pt,
+        before upper = {\vspace{2mm}},
+        %
+        % Box
+        opacityback = 0,
+        frame hidden,
+        %
+        % Динамический заголовок:
+        % Если аргумент #1 пустой, пишет просто "Утв."
+        % Если аргумент #1 передан, пишет "Утв. [ #1 ]" с твоим оформлением
+        title = {Утв.\ifstrempty{#1}{}{~\textbf{[}~#1~\textbf{]}}},
+        %
+        attach title to upper = {\ },
+        coltitle = MAIN,
+        fonttitle = \bfseries,
+        %
+        % Text
+        colupper = TEXT,
+        %
+        % Твой значок (треугольник/молния)
+        overlay unbroken and first = {
+            \draw[MAIN, line width=1.2pt] ([yshift=-18pt, xshift=1pt]frame.north west) -- ++(-4pt, 8pt) -- ++(8pt, 0pt) -- ++(-4pt, -8pt) -- ++(-4pt, 8pt);
+        }
+    }
     %
-    % Layout
-    enhanced, breakable, before skip=10pt, after skip=0pt,
-    before upper = {\vspace{2mm}},
-    %
-    % Box
-    opacityback = 0,
-    frame hidden,
-    %
-    % Statement title
-    title = {Утв.},
-    attach title to upper = {\ },
-    coltitle = MAIN,
-    fonttitle = \bfseries,
-    %
-    % Text
-    colupper = TEXT,
-    %
-    % Circle
-    overlay unbroken and first = {
-        \draw[MAIN, line width=1.2pt] ([yshift=-18pt, xshift=1pt]frame.north west) -- ++(-4pt, 8pt) -- ++(8pt, 0pt) -- ++(-4pt, -8pt) -- ++(-4pt, 8pt);
-    },
-    %
-    % User input parameters
-    #1
-}
-%
-% Usage:
-% \begin{statement}[tcolorbox params] 
-%    Text 
-% \end{statement}
-% -------------------------------------------------------------------------------------
+    % Usage:
+    % \begin{statement}[tcolorbox params] 
+    %    Text 
+    % \end{statement}
+    % -------------------------------------------------------------------------------------
 
-% Statement proof
-% -------------------------------------------------------------------------------------
-\newtcolorbox{sproof}[1][] {
+    % Statement proof
+    % -------------------------------------------------------------------------------------
+    \newtcolorbox{sproof}[1][] {
+        %
+        % Layout
+        enhanced, breakable, before skip=0pt, after skip=10pt,
+        after upper = {\vspace{-2mm}},
+        %
+        % Box
+        opacityback = 0,
+        frame hidden,
+        %
+        % Proof title
+        title = {Доказательство.},
+        attach title to upper = {\ },
+        coltitle = MAIN,
+        fonttitle = \bfseries,
+        %
+        % Text
+        colupper = TEXT,
+        %
+        % Line
+        borderline west = {1.5pt}{0pt}{MAIN},
+        %
+        % Square
+        underlay unbroken and last = {
+            \fill[color=MAIN] ([yshift=1.5mm]frame.south east) rectangle ++(-3mm, 3mm);
+        },
+        %
+        % User input parameters
+        #1
+    }
     %
-    % Layout
-    enhanced, breakable, before skip=0pt, after skip=10pt,
-    after upper = {\vspace{-2mm}},
-    %
-    % Box
-    opacityback = 0,
-    frame hidden,
-    %
-    % Proof title
-    title = {Доказательство.},
-    attach title to upper = {\ },
-    coltitle = MAIN,
-    fonttitle = \bfseries,
-    %
-    % Text
-    colupper = TEXT,
-    %
-    % Line
-    borderline west = {1.5pt}{0pt}{MAIN},
-    %
-    % Square
-    underlay unbroken and last = {
-        \fill[color=MAIN] ([yshift=1.5mm]frame.south east) rectangle ++(-3mm, 3mm);
-    },
-    %
-    % User input parameters
-    #1
-}
-%
-% Usage:
-% \begin{sproof} [tcolorbox params] 
-%    Proof 
-% \end{sproof}
-% -------------------------------------------------------------------------------------
+    % Usage:
+    % \begin{sproof} [tcolorbox params] 
+    %    Proof 
+    % \end{sproof}
+    % -------------------------------------------------------------------------------------
 
 
 
