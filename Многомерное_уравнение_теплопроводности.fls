@@ -1,6 +1,0 @@
-PWD D:/git/MIPT
-INPUT d:/texlive/2025/texmf.cnf
-INPUT d:/texlive/2025/texmf-dist/web2c/texmf.cnf
-INPUT d:/texlive/2025/texmf-var/web2c/pdftex/latex.fmt
-INPUT d:/git/MIPT/6_sem/probability/lectures/lectures/Многомерное_уравнение_теплопроводности.tex
-OUTPUT Многомерное_уравнение_теплопроводности.log
