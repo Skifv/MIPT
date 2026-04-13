@@ -61,19 +61,17 @@
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
-
-    "latex-workshop.latex.autoBuild.run": "onSave",
+  "latex-workshop.latex.autoBuild.run": "onSave",
   "latex-workshop.view.pdf.viewer": "tab",
-
-  // Рецепт сборки: сначала latexmk, затем копирование PDF
   "latex-workshop.latex.recipes": [
     {
       "name": "latexmk (build dir) + copy PDF to root",
-      "tools": ["latexmk", "copy-pdf"]
+      "tools": [
+        "latexmk",
+        "copy-pdf"
+      ]
     }
   ],
-
-  // Инструменты сборки
   "latex-workshop.latex.tools": [
     {
       "name": "latexmk",
@@ -97,9 +95,12 @@
       ]
     }
   ],
-
-  // 🔇 Игнорирование предупреждений вида Underfull \hbox
+  "python.analysis.extraPaths": [
+    "D:/git/MIPT/tools"
+  ],
   "latex-workshop.latex.log.ignoreRegExp": [
     "Underfull \\\\hbox"
-  ]
+  ],
+  "python-envs.defaultEnvManager": "ms-python.python:conda",
+  "python-envs.defaultPackageManager": "ms-python.python:conda"
 }

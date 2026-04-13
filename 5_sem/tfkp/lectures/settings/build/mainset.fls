@@ -1,8 +1,8 @@
-PWD d:/git/MIPT/5_sem/calculus_math/Kozhemyachenko/lectures/settings
+PWD d:/git/MIPT/5_sem/tfkp/lectures/settings
 INPUT d:/texlive/2025/texmf.cnf
 INPUT d:/texlive/2025/texmf-dist/web2c/texmf.cnf
 INPUT d:/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT d:/git/MIPT/5_sem/calculus_math/Kozhemyachenko/lectures/settings/mainset.tex
+INPUT d:/git/MIPT/5_sem/tfkp/lectures/settings/mainset.tex
 OUTPUT build/mainset.log
 INPUT d:/texlive/2025/texmf-dist/tex/latex/base/report.cls
 INPUT d:/texlive/2025/texmf-dist/tex/latex/base/report.cls
@@ -21,7 +21,7 @@ INPUT d:/texlive/2025/texmf-dist/tex/latex/cyrillic/t2acmr.fd
 INPUT d:/texlive/2025/texmf-dist/tex/latex/cyrillic/t2acmr.fd
 INPUT d:/texlive/2025/texmf-dist/tex/latex/cyrillic/t2acmr.fd
 INPUT d:/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map
-INPUT c:/Users/Skif/.texlive2025/texmf-var/fonts/tfm/lh/lh-t2a/larm1000.tfm
+INPUT c:/Users/Skifv/.texlive2025/texmf-var/fonts/tfm/lh/lh-t2a/larm1000.tfm
 INPUT d:/texlive/2025/texmf-dist/tex/latex/base/inputenc.sty
 INPUT d:/texlive/2025/texmf-dist/tex/latex/base/inputenc.sty
 INPUT d:/texlive/2025/texmf-dist/tex/generic/babel/babel.sty

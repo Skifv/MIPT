@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.7.24)  16 DEC 2025 22:26
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.7.24)  3 APR 2026 00:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**d:/git/MIPT/5_sem/calculus_math/Kozhemyachenko/lectures/settings/mainset.tex
-(d:/git/MIPT/5_sem/calculus_math/Kozhemyachenko/lectures/settings/mainset.tex
+**d:/git/MIPT/5_sem/tfkp/lectures/settings/mainset.tex
+(d:/git/MIPT/5_sem/tfkp/lectures/settings/mainset.tex
 LaTeX2e <2025-06-01> patch level 1
 L3 programming layer <2025-07-19>
 (d:/texlive/2025/texmf-dist/tex/latex/base/report.cls
@@ -275,17 +275,17 @@ Package babel Info: Making " an active character on input line 124.
 Package babel Info: Default for \cyrdash is provided on input line 163.
 )))
 ! Emergency stop.
-<*> ...ozhemyachenko/lectures/settings/mainset.tex
+<*> ...PT/5_sem/tfkp/lectures/settings/mainset.tex
                                                   
 *** (job aborted, no legal \end found)
 
  
 Here is how much of TeX's memory you used:
  2105 strings out of 467816
- 31436 string characters out of 5436431
+ 31364 string characters out of 5436431
  441383 words of memory out of 5000000
  30779 multiletter control sequences out of 15000+600000
  627622 words of font info for 41 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 48i,0n,56p,324b,110s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 48i,0n,56p,300b,110s stack positions out of 10000i,1000n,20000p,200000b,200000s
 !  ==> Fatal error occurred, no output PDF file produced!

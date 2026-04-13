@@ -1,8 +1,8 @@
 # Fdb version 4
-["pdflatex"] 1765913188.38916 "d:/git/MIPT/5_sem/calculus_math/Kozhemyachenko/lectures/settings/mainset.tex" "build/mainset.pdf" "mainset" 1765913189.02903 2
+["pdflatex"] 1775167086.38096 "d:/git/MIPT/5_sem/tfkp/lectures/settings/mainset.tex" "build/mainset.pdf" "mainset" 1775167088.0262 2
   "build/mainset.aux" 1765913180 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
-  "c:/Users/Skif/.texlive2025/texmf-var/fonts/tfm/lh/lh-t2a/larm1000.tfm" 1753460363 3220 0e417eaf233b160335902e97259a6c77 ""
-  "d:/git/MIPT/5_sem/calculus_math/Kozhemyachenko/lectures/settings/mainset.tex" 1765912183 307 66437629b602477f70e30add7e4c99bf ""
+  "c:/Users/Skifv/.texlive2025/texmf-var/fonts/tfm/lh/lh-t2a/larm1000.tfm" 1771457354 3220 0e417eaf233b160335902e97259a6c77 ""
+  "d:/git/MIPT/5_sem/tfkp/lectures/settings/mainset.tex" 1765912183 307 66437629b602477f70e30add7e4c99bf ""
   "d:/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1753368725 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "d:/texlive/2025/texmf-dist/tex/generic/babel-english/english.ldf" 1753366523 7008 9ff5fdcc865b01beca2b0fe4a46231d4 ""
   "d:/texlive/2025/texmf-dist/tex/generic/babel-russian/russianb.ldf" 1753366574 27193 cd3440b122aaa8e30416378ef38b3173 ""

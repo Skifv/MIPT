@@ -1,0 +1,272 @@
+diff --git a/gg1-simulator/src/scenario.cpp b/my_simulator_upgraded/src/scenario.cpp
+index 008bb63..75ac9d8 100644
+--- a/gg1-simulator/src/scenario.cpp
++++ b/my_simulator_upgraded/src/scenario.cpp
+@@ -1,37 +1,56 @@
+ #include <iostream>
+ #include <memory>
++#include <random>
+ #include "packet-generator.h"
+ #include "simulator.h"
+ 
+ int main(int argc, char **argv)
+ {
+-    if (argc < 5)
++    if (argc < 6)
+     {
+-        std::cout << "Usage: ./scenario seed lambda mu simTime [verbose]" << std::endl;
++        std::cout << "Usage: ./scenario seed lambda mu simTime mode [c] [verbose]" << std::endl;
++        std::cout << "Modes: 0 = M/M/1, 1 = M/U/1, 2 = M/M/c/c" << std::endl;
+         return -1;
+     }
+     int seed = atoi(argv[1]);
+     double lambda = atof(argv[2]);
+     double mu = atof(argv[3]);
+     time_t simTime = atof(argv[4]);
++    int mode = atoi(argv[5]);
+ 
++    int c = 1;
+     bool verbose = false;
+-    if (argc == 6)
+-        verbose = bool(atoi(argv[5]));
+-
+-    std::exponential_distribution<double>::param_type params1(lambda);
+-    std::exponential_distribution<double>::param_type params2(mu);
+-    PacketGenerator<std::exponential_distribution<double>, std::exponential_distribution<double>> packetGen(params1, params2);
+-
++    if (argc >= 7) 
++        c = atoi(argv[6]);
++    if (argc == 8) 
++        verbose = bool(atoi(argv[7]));
+ 
+     std::shared_ptr<Server> server(new Server());
+     server->SetVerbose(verbose);
+-    packetGen.SetServer(server);
++    server->SetMode(mode, c);
+ 
+     Simulator sim;
+     sim.SetStop(simTime);
+     sim.SetSeed(seed);
+ 
++    std::exponential_distribution<double>::param_type params1(lambda);
++
++    if (mode == 0 || mode == 2)
++    {
++        std::exponential_distribution<double>::param_type params2(mu);
++        PacketGenerator<std::exponential_distribution<double>, std::exponential_distribution<double>> packetGen(params1, params2);
++        packetGen.SetServer(server);
+         packetGen.Start();
+         sim.Run();
+     }
++    else if (mode == 1)
++    {
++        std::uniform_real_distribution<double>::param_type params2(0.0, 2.0 / mu);
++        PacketGenerator<std::exponential_distribution<double>, std::uniform_real_distribution<double>> packetGen(params1, params2);
++        packetGen.SetServer(server);
++        packetGen.Start();
++        sim.Run();
++    }
++    
++    return 0;
++}
+\ No newline at end of file
+diff --git a/gg1-simulator/src/server.cpp b/my_simulator_upgraded/src/server.cpp
+index 34e22d2..074ad42 100644
+--- a/gg1-simulator/src/server.cpp
++++ b/my_simulator_upgraded/src/server.cpp
+@@ -13,3 +13,8 @@ void Server::SetVerbose(bool verbose)
+ {
+     m_system.SetVerbose(verbose);
+ }
++
++void Server::SetMode(int mode, int c)
++{
++    m_system.SetMode(mode, c);
++}
+\ No newline at end of file
+diff --git a/gg1-simulator/src/server.h b/my_simulator_upgraded/src/server.h
+index c0ded22..b0ed763 100644
+--- a/gg1-simulator/src/server.h
++++ b/my_simulator_upgraded/src/server.h
+@@ -9,6 +9,7 @@ public:
+     Server();
+     void AddPacket(std::shared_ptr<Packet> packet);
+     void SetVerbose(bool verbose);
++    void SetMode(int mode, int c);
+ 
+ private:
+     System m_system;
+diff --git a/gg1-simulator/src/system.cpp b/my_simulator_upgraded/src/system.cpp
+index 1aaf190..64eeebb 100644
+--- a/gg1-simulator/src/system.cpp
++++ b/my_simulator_upgraded/src/system.cpp
+@@ -5,6 +5,9 @@
+ System::System()
+ {
+     m_verbose = false;
++    m_mode = 0;
++    m_c = 1;
++    m_busyServers = 0;
+ }
+ 
+ int System::GetSystemSize()
+@@ -17,7 +20,17 @@ void System::SetVerbose(bool verbose)
+     m_verbose = verbose;
+ }
+ 
++void System::SetMode(int mode, int c)
++{
++    m_mode = mode;
++    m_c = c;
++}
++
+ void System::AddPacket(std::shared_ptr<Packet> packet)
++{
++    m_stats.totalArrivedPackets++;
++
++    if (m_mode == 0 || m_mode == 1) // M/M/1 and M/U/1
+     {
+         m_stats.systemSizeHist[m_system.size()] += Simulator::Now() - m_stats.lastSystemChange;
+         m_stats.totalBusyTime += (!m_system.empty()) ? (Simulator::Now() - m_stats.lastSystemChange) : 0;
+@@ -30,6 +43,35 @@ void System::AddPacket(std::shared_ptr<Packet> packet)
+             Simulator::Schedule(packet->GetServiceTime(), callback);
+         }
+     }
++    else if (m_mode == 2) // M/M/c/c. Теперь у нас не FIFO, поэтому использовать RemoveFirstPacket будет некорректно
++    {   
++        if (m_busyServers < m_c)
++        {
++            m_stats.systemSizeHist[m_busyServers] += Simulator::Now() - m_stats.lastSystemChange;
++            m_stats.totalBusyTime += (m_busyServers > 0) ? (Simulator::Now() - m_stats.lastSystemChange) : 0;
++            m_stats.lastSystemChange = Simulator::Now();
++
++            m_busyServers++;
++            m_stats.sumSojournTime += packet->GetServiceTime();
++            m_stats.totalServedPackets++;
++            
++            std::function<void()> callback = [this]() {
++                
++                this->m_stats.systemSizeHist[this->m_busyServers] += Simulator::Now() - this->m_stats.lastSystemChange;
++                this->m_stats.totalBusyTime += (this->m_busyServers > 0) ? (Simulator::Now() - this->m_stats.lastSystemChange) : 0;
++                this->m_stats.lastSystemChange = Simulator::Now();
++
++                this->m_busyServers--;
++            };
++            Simulator::Schedule(packet->GetServiceTime(), callback);
++        }
++        else
++        {
++            // Мест нет, заявка отбрасывается
++            m_stats.totalDroppedPackets++;
++        }
++    }
++}
+ 
+ void System::RemoveFirstPacket()
+ {
+@@ -49,9 +91,17 @@ void System::RemoveFirstPacket()
+ }
+ 
+ System::~System()
++{
++    if (m_mode == 0 || m_mode == 1)
+     {
+         m_stats.systemSizeHist[m_system.size()] += Simulator::Now() - m_stats.lastSystemChange;
+         m_stats.totalBusyTime += (!m_system.empty()) ? (Simulator::Now() - m_stats.lastSystemChange) : 0;
++    }
++    else if (m_mode == 2)
++    {
++        m_stats.systemSizeHist[m_busyServers] += Simulator::Now() - m_stats.lastSystemChange;
++        m_stats.totalBusyTime += (m_busyServers > 0) ? (Simulator::Now() - m_stats.lastSystemChange) : 0;
++    }
+ 
+     double avgSystemSize = 0;
+     for (const auto &it : m_stats.systemSizeHist)
+@@ -59,20 +109,35 @@ System::~System()
+         avgSystemSize += it.first * it.second / Simulator::Now();
+     }
+ 
++    double dropProb = (double)m_stats.totalDroppedPackets / m_stats.totalArrivedPackets;
++
++    double avgSojournTime = m_stats.totalServedPackets > 0 ? m_stats.sumSojournTime / m_stats.totalServedPackets : 0;
++    double avgWaitTime = m_stats.totalServedPackets > 0 ? m_stats.sumWaitingTime / m_stats.totalServedPackets : 0;
++    
++    // Для многоканальной системы логичнее считать загрузку серверов как (среднее число заявок / число каналов)
++    double util = (m_mode == 2) ? (avgSystemSize / m_c) : (m_stats.totalBusyTime / Simulator::Now());
++
+     if (m_verbose)
+     {
+         std::cout << "===================PRINT SYSTEM STATS======================" << std::endl;
+         std::cout << "Total served packets: " << m_stats.totalServedPackets << std::endl;
+-        std::cout << "Average Sojourn time: " << m_stats.sumSojournTime / m_stats.totalServedPackets << std::endl;
+-        std::cout << "Average waiting time: " << m_stats.sumWaitingTime / m_stats.totalServedPackets << std::endl;
++        std::cout << "Total dropped packets: " << m_stats.totalDroppedPackets << std::endl;
++        std::cout << "Total arrived packets: " << m_stats.totalArrivedPackets << std::endl;
++        std::cout << "Average Sojourn time: " << avgSojournTime << std::endl;
++        std::cout << "Average waiting time: " << avgWaitTime << std::endl;
+         std::cout << "Average system size: " << avgSystemSize << std::endl;
+-        std::cout << "Utilization: " << m_stats.totalBusyTime / Simulator::Now() << std::endl;
++        std::cout << "Utilization: " << util << std::endl;
++        std::cout << "Drop Probability: " << dropProb << std::endl;
+         std::cout << "===========================================================" << std::endl;
+     }
+     else
+     {
+-        std::cout << m_stats.totalServedPackets << ' ' << m_stats.sumSojournTime / m_stats.totalServedPackets << ' '
+-                  << m_stats.sumWaitingTime / m_stats.totalServedPackets << ' ' << avgSystemSize << ' ' << m_stats.totalBusyTime / Simulator::Now() << std::endl;
++        std::cout << m_stats.totalServedPackets << ' ' 
++                  << avgSojournTime << ' '
++                  << avgWaitTime << ' ' 
++                  << avgSystemSize << ' ' 
++                  << util << ' ' 
++                  << dropProb << std::endl;
+     }
+ 
+     m_system.clear();
+diff --git a/gg1-simulator/src/system.h b/my_simulator_upgraded/src/system.h
+index 8e50056..662c492 100644
+--- a/gg1-simulator/src/system.h
++++ b/my_simulator_upgraded/src/system.h
+@@ -4,6 +4,7 @@
+ #include "simulator.h"
+ #include <memory>
+ #include <vector>
++#include <map>
+ 
+ class System
+ {
+@@ -11,6 +12,7 @@ public:
+     System();
+     int GetSystemSize();
+     void SetVerbose(bool verbose);
++    void SetMode(int mode, int c);
+     void AddPacket(std::shared_ptr<Packet>);
+     void RemoveFirstPacket();
+     ~System();
+@@ -19,6 +21,8 @@ public:
+     {
+         double sumSojournTime;
+         int totalServedPackets;
++        int totalArrivedPackets;
++        int totalDroppedPackets;
+         double sumWaitingTime;
+         double lastSystemChange;
+         std::map<int, double> systemSizeHist;
+@@ -27,6 +31,8 @@ public:
+         stats_t()
+             : sumSojournTime(0),
+               totalServedPackets(0),
++              totalArrivedPackets(0),
++              totalDroppedPackets(0),
+               sumWaitingTime(0),
+               lastSystemChange(0),
+               totalBusyTime(0)
+@@ -38,4 +44,7 @@ private:
+     std::vector<std::shared_ptr<Packet>> m_system;
+     stats_t m_stats;
+     bool m_verbose;
++    int m_mode;
++    int m_c;
++    int m_busyServers;
+ };
+\ No newline at end of file

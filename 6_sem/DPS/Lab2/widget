@@ -1,0 +1,3079 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "2525eb4f",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "c:\\Users\\Skifv\\miniconda3\\python.exe\n",
+      "e976ee50-99ed-4aba-9b6b-9dcd5634d07d:IPyWidgets:8.1.8\n"
+     ]
+    }
+   ],
+   "source": [
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import scipy as sp\n",
+    "import sys\n",
+    "\n",
+    "sys.path.append(r\"D:\\git\\MIPT\\tools\")\n",
+    "\n",
+    "import plot_tools"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "4a77c938",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Nv = 3  # номер варианта\n",
+    "\n",
+    "N_var = 6\n",
+    "L_var = 4      \n",
+    "nu0_var = 0.1   "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "0bd71ec7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def analytical_rect_dtft(freq_vec, n_len):\n",
+    "    \n",
+    "    magnitude = np.sin(np.pi * freq_vec * n_len) / np.sin(np.pi * freq_vec)\n",
+    "    # Заменяем значение в нуле (где freq_vec == 0) на n_len\n",
+    "    magnitude = np.where(np.abs(freq_vec) < 1e-10, n_len, magnitude)\n",
+    "    \n",
+    "    phase_term = np.exp(-1j * np.pi * freq_vec * (n_len - 1))\n",
+    "    return magnitude * phase_term"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "24b42894",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\Skifv\\AppData\\Local\\Temp\\ipykernel_11052\\162970527.py:3: RuntimeWarning: invalid value encountered in divide\n",
+      "  magnitude = np.sin(np.pi * freq_vec * n_len) / np.sin(np.pi * freq_vec)\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "X(0): 6.00\n",
+      "Энергия (Интеграл): 6.0000\n",
+      "Энергия (Парсеваль): 6.00\n",
+      "Совпадают ли FFT и аналитика? True\n",
+      "Локальные минимумы [-0.33349609 -0.16650391  0.16650391  0.33349609]\n"
+     ]
+    }
+   ],
+   "source": [
+    "x_n_vec = np.ones(N_var)\n",
+    "\n",
+    "nu_vec, X_n_numeric = plot_tools.compute_dtft_analysis(x_n_vec, plot_results=False)\n",
+    "X_n_analytic = analytical_rect_dtft(nu_vec, N_var)\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_vec, [X_n_analytic, X_n_numeric], labels=['Аналитический расчет', 'FFT'], linestyles=[\"-\", \":\"], plot_phase=True)\n",
+    "\n",
+    "energy_val = sp.integrate.simpson(y=np.abs(X_n_numeric)**2, x=nu_vec)\n",
+    "print(f\"X(0): {np.abs(X_n_numeric[len(nu_vec)//2]):.2f}\")\n",
+    "print(f\"Энергия (Интеграл): {energy_val:.4f}\")\n",
+    "print(f\"Энергия (Парсеваль): {np.sum(x_n_vec**2):.2f}\")\n",
+    "\n",
+    "print(f\"Совпадают ли FFT и аналитика? {np.isclose(X_n_analytic, X_n_numeric).all()}\")\n",
+    "\n",
+    "indicies, _ = sp.signal.find_peaks(-np.abs(X_n_numeric))\n",
+    "\n",
+    "print(f\"Локальные минимумы {nu_vec[indicies]}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "4690424c",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\Skifv\\AppData\\Local\\Temp\\ipykernel_11052\\162970527.py:3: RuntimeWarning: invalid value encountered in divide\n",
+      "  magnitude = np.sin(np.pi * freq_vec * n_len) / np.sin(np.pi * freq_vec)\n"
+     ]
+    }
+   ],
+   "source": [
+    "x_l_vec = np.zeros(N_var + (N_var - 1) * (L_var - 1))\n",
+    "x_l_vec[::L_var] = x_n_vec\n",
+    "\n",
+    "nu_l_vec, X_l_numeric = plot_tools.compute_dtft_analysis(x_l_vec, plot_results=False, dtft_points=2048)\n",
+    "X_l_theoretical = analytical_rect_dtft(nu_l_vec * L_var, N_var)\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_l_vec, [X_l_theoretical, X_l_numeric], labels=['Аналитический расчет', 'FFT'], linestyles=[\"-\", \":\"], plot_phase=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "bb33cfd1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals([x_l_vec, x_n_vec], linestyles=[\"-\", \":\"], as_stem=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "f6382485",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "np.True_"
+      ]
+     },
+     "execution_count": 7,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "np.isclose(X_l_theoretical, X_l_numeric).all()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "03d6738e",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Совпадают? False\n"
+     ]
+    }
+   ],
+   "source": [
+    "k_indices = np.arange(N_var)\n",
+    "x_d_vec = k_indices * x_n_vec\n",
+    "\n",
+    "nu_d_vec, X_d_numeric = plot_tools.compute_dtft_analysis(x_d_vec)\n",
+    "\n",
+    "# dX/d_nu ≈ (X[i+1] - X[i-1]) / (2 * delta_nu)\n",
+    "dX_dnu = np.gradient(X_n_numeric, nu_d_vec[1] - nu_d_vec[0])\n",
+    "X_d_theoretical = (1j / (2 * np.pi)) * dX_dnu\n",
+    "\n",
+    "print(f\"Совпадают? {np.isclose(X_d_numeric, X_d_theoretical).all()}\")\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_d_vec, [X_d_theoretical, X_d_numeric], labels=['Аналитический расчет', 'FFT'], linestyles=[\"-\", \":\"], plot_phase=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "83c6acd5",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "x_s_vec = x_n_vec * np.exp(1j * 2 * np.pi * nu0_var * k_indices)\n",
+    "\n",
+    "# Вычисление ДВПФ\n",
+    "nu_s_vec, X_s_numeric = plot_tools.compute_dtft_analysis(x_s_vec, labels=r\"${{x}_{S}}[k]={{x}_{N}}[k]\\exp (j2\\pi {{\\nu }_{0}}k)$\", plot_results=True, plot_phase=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "17f065ab",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Совпадают? True\n",
+      "X_conv(0): 36.00\n",
+      "Энергия (Парсеваль): 146.00\n",
+      "Энергия (Интеграл): 146.0000\n",
+      "Локальные минимумы [-0.33349609 -0.16650391  0.16650391  0.33349609]\n"
+     ]
+    }
+   ],
+   "source": [
+    "x_conv_vec = np.convolve(x_n_vec, x_n_vec)\n",
+    "\n",
+    "nu_conv, [X_conv_num, X_n_for_conv] = plot_tools.compute_dtft_analysis([x_conv_vec, x_n_vec])\n",
+    "\n",
+    "X_conv_theory = X_n_for_conv ** 2\n",
+    "\n",
+    "print(f\"Совпадают? {np.isclose(X_conv_theory, X_conv_num).all()}\")\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_conv, [X_conv_theory, X_conv_num], labels=[r'Теорема о свертке: $X_N(\\nu)^2$', 'ДВПФ свертки (численно)'], linestyles=[\"-\", \":\"], plot_phase=True)\n",
+    "\n",
+    "print(f\"X_conv(0): {np.abs(X_conv_num[len(nu_conv)//2]):.2f}\")\n",
+    "print(f\"Энергия (Парсеваль): {np.sum(x_conv_vec**2):.2f}\")\n",
+    "print(f\"Энергия (Интеграл): {sp.integrate.simpson(y=np.abs(X_conv_num)**2, x=nu_conv):.4f}\")\n",
+    "\n",
+    "indicies = sp.signal.argrelmin(np.abs(X_n_numeric))\n",
+    "print(f\"Локальные минимумы {nu_vec[indicies]}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "7569c0a2",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([-0.45998733,  0.36640309,  0.28366389,  0.43237922, -0.39939532,\n",
+       "        0.24052522,  0.02838547, -0.46441975, -0.28093597,  0.1983607 ,\n",
+       "        0.1681971 , -0.24986912,  0.23008401,  0.47032961,  0.01396736,\n",
+       "        0.17679568, -0.449113  ,  0.2462528 , -0.49583634, -0.29797145,\n",
+       "       -0.28954873, -0.05539536, -0.42936338,  0.37498015, -0.03006659,\n",
+       "        0.34879073,  0.05770024,  0.28412213,  0.21283596,  0.45788993,\n",
+       "       -0.38094941, -0.22936452,  0.24095459,  0.07710428, -0.06911968])"
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Nv - номер варианта\n",
+    "x = np.random.rand(Nv+32)-0.5\n",
+    "x"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "38e6c8f7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals(x, as_stem=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "54925d92",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def dft(x):\n",
+    "    M_points = len(x)\n",
+    "    n_arr = np.arange(M_points)\n",
+    "    k_arr = np.arange(len(x))\n",
+    "    n_k_mat = np.outer(n_arr, k_arr)\n",
+    "    W_nk_mat = np.exp(-1j * 2 * np.pi / M_points * n_k_mat)\n",
+    "\n",
+    "    return W_nk_mat @ x\n",
+    "    "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "id": "1d6eb6d6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "M_points = len(x)\n",
+    "\n",
+    "# а) матричная форма\n",
+    "\n",
+    "X_arr_my = dft(x)\n",
+    "\n",
+    "# б) БПФ\n",
+    "\n",
+    "nu_vec, X_arr_FFT = plot_tools.compute_dtft_analysis(x, dtft_points=M_points, should_shift=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "id": "38abc820",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "nu_vec = np.fft.fftshift(nu_vec)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "id": "f28fe3a7",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "np.True_"
+      ]
+     },
+     "execution_count": 16,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "np.isclose(X_arr_FFT, X_arr_my).all()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "3247aa00",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals([np.abs(X_arr_FFT), np.abs(X_arr_my)], labels=['FFT', 'Через матричную запись'], linestyles=['-', '--'], as_stem=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "id": "aa7e1d0a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals(np.real(X_arr_FFT), labels=r'$\\text{Re}(X[n])$', as_stem=True)\n",
+    "plot_tools.plot_signals(np.imag(X_arr_FFT), labels=r'$\\text{Im}(X[n])$', as_stem=True)\n",
+    "plot_tools.plot_signals(np.abs(X_arr_FFT), labels=r'$|X[n]|$', as_stem=True)\n",
+    "plot_tools.plot_signals(np.angle(X_arr_FFT), labels=r'$\\angle X[n]$', as_stem=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "7d1a5119",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "m = 3\n"
+     ]
+    }
+   ],
+   "source": [
+    "Nv = 3 # Nv - номер варианта\n",
+    "m = max(Nv % 8, 1)\n",
+    "print(\"m =\", m)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "id": "b41c4bf3",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "m = 3, Nv = 3\n",
+      "q[k]: [1 2 3]\n",
+      "y[k]: [1. 2. 3.]\n"
+     ]
+    }
+   ],
+   "source": [
+    "N_seq = Nv\n",
+    "\n",
+    "k_arr = np.arange(N_seq)\n",
+    "q_k = k_arr + 1\n",
+    "\n",
+    "Q_n = np.fft.fft(q_k)\n",
+    "\n",
+    "n_arr = np.arange(N_seq)\n",
+    "Y_n = Q_n * np.exp(-1j * 2 * np.pi / N_seq * m * n_arr)\n",
+    "\n",
+    "y_k = np.fft.ifft(Y_n).real\n",
+    "\n",
+    "print(f\"m = {m}, Nv = {N_seq}\")\n",
+    "print(f\"q[k]: {q_k}\")\n",
+    "print(f\"y[k]: {np.round(y_k, 4)}\")\n",
+    "\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[q_k, y_k],\n",
+    "    x=k_arr,\n",
+    "    labels=['q[k]', 'y[k]'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title=f'Сравнение q[k] и y[k] при циклическом сдвиге на m={m}',\n",
+    "    xlabel='Отсчеты k',\n",
+    "    ylabel='Амплитуда',\n",
+    "    as_stem=True\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "804308b1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "N = 32\n",
+    "m0 = 3\n",
+    "k_arr = np.arange(N)\n",
+    "\n",
+    "x_k = np.sin(2 * np.pi / N * m0 * k_arr) + np.sin(2 * np.pi / N * (m0 + 0.25) * k_arr)\n",
+    "\n",
+    "nu_dtft, X_dtft = plot_tools.compute_dtft_analysis(x_k, dtft_points=2048, plot_results=False)\n",
+    "\n",
+    "nu_dft = np.fft.fftshift(np.fft.fftfreq(N))\n",
+    "X_dft = np.fft.fftshift(np.fft.fft(x_k))\n",
+    "\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft)],\n",
+    "    x=[nu_dtft, nu_dft],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| (N={N})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='ДВПФ и ДПФ исходного сигнала',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")\n",
+    "\n",
+    "# Частоты синусоид: f1 = m0/N = 3/32 = 12/128; f2 = (m0+0.25)/N = 3.25/32 = 13/128.\n",
+    "# Чтобы частоты точно попадали на бины ДПФ, размер ДПФ M должен быть кратен 128.\n",
+    "M = 128\n",
+    "x_k_padded = np.pad(x_k, (0, M - N))\n",
+    "\n",
+    "# Вычисление ДПФ интерполированного сигнала\n",
+    "nu_dft_padded = np.fft.fftshift(np.fft.fftfreq(M))\n",
+    "X_dft_padded = np.fft.fftshift(np.fft.fft(x_k_padded))\n",
+    "\n",
+    "# Визуализация 2: Модули ДВПФ и интерполированного ДПФ на одном графике\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft_padded)],\n",
+    "    x=[nu_dtft, nu_dft_padded],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| нуль-дополненного (M={M})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='Интерполяция ДПФ добавлением нулевых отсчетов',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "2b9a6a51",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "n=m: (15.999999999999993-16.00000000000001j)\n",
+      "n=N-m: (15.999999999999993+16.00000000000001j)\n"
+     ]
+    }
+   ],
+   "source": [
+    "N = 32\n",
+    "m0 = 3\n",
+    "m1 = -0.25\n",
+    "k_arr = np.arange(N)\n",
+    "\n",
+    "def analyze_periodic_signal(m, N_size):\n",
+    "    \n",
+    "    x_k = np.cos(2 * np.pi / N_size * m * k_arr) + np.sin(2 * np.pi / N_size * m * k_arr)\n",
+    "\n",
+    "    X_n = np.fft.fft(x_k)\n",
+    "    n_arr = np.arange(N_size)\n",
+    "    \n",
+    "    if float(m).is_integer():\n",
+    "        print(f\"n=m: {X_n[m]}\")\n",
+    "        print(f\"n=N-m: {X_n[N_size - m]}\")\n",
+    "\n",
+    "    plot_tools.plot_signals(np.real(X_n), x=n_arr, title=f'Re X[n] при m = {m}', xlabel='n (бин ДПФ)', ylabel='Amplitude', as_stem=True)\n",
+    "    plot_tools.plot_signals(np.imag(X_n), x=n_arr, title=f'Im X[n] при m = {m}', xlabel='n (бин ДПФ)', ylabel='Amplitude', as_stem=True)\n",
+    "    plot_tools.plot_signals(np.abs(X_n), x=n_arr, title=f'|X[n]| (Модуль) при m = {m}', xlabel='n (бин ДПФ)', ylabel='Magnitude', as_stem=True)\n",
+    "    plot_tools.plot_signals(np.angle(X_n), x=n_arr, title=f'arg X[n] (Фаза) при m = {m}', xlabel='n (бин ДПФ)', ylabel='Phase [rad]', as_stem=True)\n",
+    "\n",
+    "# Запуск анализа для m0 (целое)\n",
+    "analyze_periodic_signal(m0, N)\n",
+    "\n",
+    "# Запуск анализа для m0 + m1 (нецелое: 3 - 0.25 = 2.75)\n",
+    "analyze_periodic_signal(m0 + m1, N)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "033f8d64",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(array([-0.5       , -0.49951172, -0.49902344, ...,  0.49853516,\n",
+       "         0.49902344,  0.49951172], shape=(2048,)),\n",
+       " [array([-2.        +0.j        , -1.99990588+0.01840745j,\n",
+       "         -1.99962352+0.036813j  , ..., -1.99915295-0.05521473j,\n",
+       "         -1.99962352-0.036813j  , -1.99990588-0.01840745j], shape=(2048,)),\n",
+       "  array([-6.        +0.j        , -5.99968939+0.06135821j,\n",
+       "         -5.9987576 +0.1227103j , ..., -5.99720472-0.18405015j,\n",
+       "         -5.9987576 -0.1227103j , -5.99968939-0.06135821j], shape=(2048,)),\n",
+       "  array([-20.        +0.j        , -19.99900229+0.20248226j,\n",
+       "         -19.99600927+0.40494529j, ..., -19.9910212 -0.60736985j,\n",
+       "         -19.99600927-0.40494529j, -19.99900229-0.20248226j], shape=(2048,)),\n",
+       "  array([-66.        +0.j        , -65.9968657 +0.65039794j,\n",
+       "         -65.98746307+1.30073639j, ..., -65.97179296-1.95095588j,\n",
+       "         -65.98746307-1.30073639j, -65.9968657 -0.65039794j], shape=(2048,))])"
+      ]
+     },
+     "execution_count": 23,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# 1.4\n",
+    "\n",
+    "N = 4\n",
+    "\n",
+    "k_arr = np.arange(N)\n",
+    "\n",
+    "x_arr = k_arr\n",
+    "\n",
+    "k1_x_arr = k_arr * x_arr\n",
+    "\n",
+    "k2_x_arr = k_arr ** 2 * x_arr\n",
+    "\n",
+    "k3_x_arr = k_arr ** 3 * x_arr\n",
+    "\n",
+    "plot_tools.plot_signals([x_arr, k1_x_arr, k2_x_arr, k3_x_arr], labels=['$x[k]$', '$k x[k]$', '$k^2 x[k]$', '$k^3 x[k]$'], as_stem=True)\n",
+    "\n",
+    "plot_tools.compute_dtft_analysis([x_arr, k1_x_arr, k2_x_arr, k3_x_arr], labels=['$x[k]$', '$k x[k]$', '$k^2 x[k]$', '$k^3 x[k]$'], plot_results=True, figsize=(14, 9))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "2206cf7c",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Совпадают? True\n",
+      "X_conv(0): 36.00\n",
+      "Энергия (Парсеваль): 146.00\n",
+      "Энергия (Интеграл): 146.0000\n"
+     ]
+    },
+    {
+     "ename": "IndexError",
+     "evalue": "index 341 is out of bounds for axis 0 with size 35",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[31m---------------------------------------------------------------------------\u001b[39m",
+      "\u001b[31mIndexError\u001b[39m                                Traceback (most recent call last)",
+      "\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[24]\u001b[39m\u001b[32m, line 16\u001b[39m\n\u001b[32m     13\u001b[39m \u001b[38;5;28mprint\u001b[39m(\u001b[33mf\u001b[39m\u001b[33m\"\u001b[39m\u001b[33mЭнергия (Интеграл): \u001b[39m\u001b[38;5;132;01m{\u001b[39;00msp.integrate.simpson(y=np.abs(X_conv_num)**\u001b[32m2\u001b[39m,\u001b[38;5;250m \u001b[39mx=nu_conv)\u001b[38;5;132;01m:\u001b[39;00m\u001b[33m.4f\u001b[39m\u001b[38;5;132;01m}\u001b[39;00m\u001b[33m\"\u001b[39m)\n\u001b[32m     15\u001b[39m indicies = sp.signal.argrelmin(np.abs(X_n_numeric))\n\u001b[32m---> \u001b[39m\u001b[32m16\u001b[39m \u001b[38;5;28mprint\u001b[39m(\u001b[33mf\u001b[39m\u001b[33m\"\u001b[39m\u001b[33mЛокальные минимумы \u001b[39m\u001b[38;5;132;01m{\u001b[39;00m\u001b[43mnu_vec\u001b[49m\u001b[43m[\u001b[49m\u001b[43mindicies\u001b[49m\u001b[43m]\u001b[49m\u001b[38;5;132;01m}\u001b[39;00m\u001b[33m\"\u001b[39m)\n",
+      "\u001b[31mIndexError\u001b[39m: index 341 is out of bounds for axis 0 with size 35"
+     ]
+    }
+   ],
+   "source": [
+    "x_conv_vec = np.convolve(x_n_vec, x_n_vec)\n",
+    "\n",
+    "nu_conv, [X_conv_num, X_n_for_conv] = plot_tools.compute_dtft_analysis([x_conv_vec, x_n_vec])\n",
+    "\n",
+    "X_conv_theory = X_n_for_conv ** 2\n",
+    "\n",
+    "print(f\"Совпадают? {np.isclose(X_conv_theory, X_conv_num).all()}\")\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_conv, [X_conv_theory, X_conv_num], labels=[r'Теорема о свертке: $X_N(\\nu)^2$', 'ДВПФ свертки (численно)'], linestyles=[\"-\", \":\"], plot_phase=True)\n",
+    "\n",
+    "print(f\"X_conv(0): {np.abs(X_conv_num[len(nu_conv)//2]):.2f}\")\n",
+    "print(f\"Энергия (Парсеваль): {np.sum(x_conv_vec**2):.2f}\")\n",
+    "print(f\"Энергия (Интеграл): {sp.integrate.simpson(y=np.abs(X_conv_num)**2, x=nu_conv):.4f}\")\n",
+    "\n",
+    "indicies = sp.signal.argrelmin(np.abs(X_n_numeric))\n",
+    "print(f\"Локальные минимумы {nu_vec[indicies]}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "id": "f7778b64",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import scipy as sp\n",
+    "import sys\n",
+    "\n",
+    "sys.path.append(r\"D:\\git\\MIPT\\tools\")\n",
+    "\n",
+    "import plot_tools"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "dc50f774",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Nv = 3  # номер варианта\n",
+    "\n",
+    "N_var = 6\n",
+    "L_var = 4      \n",
+    "nu0_var = 0.1   "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "id": "82d7019c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def analytical_rect_dtft(freq_vec, n_len):\n",
+    "    \n",
+    "    magnitude = np.sin(np.pi * freq_vec * n_len) / np.sin(np.pi * freq_vec)\n",
+    "    # Заменяем значение в нуле (где freq_vec == 0) на n_len\n",
+    "    magnitude = np.where(np.abs(freq_vec) < 1e-10, n_len, magnitude)\n",
+    "    \n",
+    "    phase_term = np.exp(-1j * np.pi * freq_vec * (n_len - 1))\n",
+    "    return magnitude * phase_term"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "id": "6d89f1c1",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\Skifv\\AppData\\Local\\Temp\\ipykernel_11052\\162970527.py:3: RuntimeWarning: invalid value encountered in divide\n",
+      "  magnitude = np.sin(np.pi * freq_vec * n_len) / np.sin(np.pi * freq_vec)\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "X(0): 6.00\n",
+      "Энергия (Интеграл): 6.0000\n",
+      "Энергия (Парсеваль): 6.00\n",
+      "Совпадают ли FFT и аналитика? True\n",
+      "Локальные минимумы [-0.33349609 -0.16650391  0.16650391  0.33349609]\n"
+     ]
+    }
+   ],
+   "source": [
+    "x_n_vec = np.ones(N_var)\n",
+    "\n",
+    "nu_vec, X_n_numeric = plot_tools.compute_dtft_analysis(x_n_vec, plot_results=False)\n",
+    "X_n_analytic = analytical_rect_dtft(nu_vec, N_var)\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_vec, [X_n_analytic, X_n_numeric], labels=['Аналитический расчет', 'FFT'], linestyles=[\"-\", \":\"], plot_phase=True)\n",
+    "\n",
+    "energy_val = sp.integrate.simpson(y=np.abs(X_n_numeric)**2, x=nu_vec)\n",
+    "print(f\"X(0): {np.abs(X_n_numeric[len(nu_vec)//2]):.2f}\")\n",
+    "print(f\"Энергия (Интеграл): {energy_val:.4f}\")\n",
+    "print(f\"Энергия (Парсеваль): {np.sum(x_n_vec**2):.2f}\")\n",
+    "\n",
+    "print(f\"Совпадают ли FFT и аналитика? {np.isclose(X_n_analytic, X_n_numeric).all()}\")\n",
+    "\n",
+    "indicies, _ = sp.signal.find_peaks(-np.abs(X_n_numeric))\n",
+    "\n",
+    "print(f\"Локальные минимумы {nu_vec[indicies]}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "id": "975538a9",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\Skifv\\AppData\\Local\\Temp\\ipykernel_11052\\162970527.py:3: RuntimeWarning: invalid value encountered in divide\n",
+      "  magnitude = np.sin(np.pi * freq_vec * n_len) / np.sin(np.pi * freq_vec)\n"
+     ]
+    }
+   ],
+   "source": [
+    "x_l_vec = np.zeros(N_var + (N_var - 1) * (L_var - 1))\n",
+    "x_l_vec[::L_var] = x_n_vec\n",
+    "\n",
+    "nu_l_vec, X_l_numeric = plot_tools.compute_dtft_analysis(x_l_vec, plot_results=False, dtft_points=2048)\n",
+    "X_l_theoretical = analytical_rect_dtft(nu_l_vec * L_var, N_var)\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_l_vec, [X_l_theoretical, X_l_numeric], labels=['Аналитический расчет', 'FFT'], linestyles=[\"-\", \":\"], plot_phase=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "id": "a3fa1592",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals([x_l_vec, x_n_vec], linestyles=[\"-\", \":\"], as_stem=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "id": "10a1fccc",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "np.True_"
+      ]
+     },
+     "execution_count": 31,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "np.isclose(X_l_theoretical, X_l_numeric).all()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "id": "6d565843",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Совпадают? False\n"
+     ]
+    }
+   ],
+   "source": [
+    "k_indices = np.arange(N_var)\n",
+    "x_d_vec = k_indices * x_n_vec\n",
+    "\n",
+    "nu_d_vec, X_d_numeric = plot_tools.compute_dtft_analysis(x_d_vec)\n",
+    "\n",
+    "# dX/d_nu ≈ (X[i+1] - X[i-1]) / (2 * delta_nu)\n",
+    "dX_dnu = np.gradient(X_n_numeric, nu_d_vec[1] - nu_d_vec[0])\n",
+    "X_d_theoretical = (1j / (2 * np.pi)) * dX_dnu\n",
+    "\n",
+    "print(f\"Совпадают? {np.isclose(X_d_numeric, X_d_theoretical).all()}\")\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_d_vec, [X_d_theoretical, X_d_numeric], labels=['Аналитический расчет', 'FFT'], linestyles=[\"-\", \":\"], plot_phase=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "id": "e1a87ebc",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "x_s_vec = x_n_vec * np.exp(1j * 2 * np.pi * nu0_var * k_indices)\n",
+    "\n",
+    "# Вычисление ДВПФ\n",
+    "nu_s_vec, X_s_numeric = plot_tools.compute_dtft_analysis(x_s_vec, labels=r\"${{x}_{S}}[k]={{x}_{N}}[k]\\exp (j2\\pi {{\\nu }_{0}}k)$\", plot_results=True, plot_phase=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 34,
+   "id": "e5eca0b2",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Совпадают? True\n",
+      "X_conv(0): 36.00\n",
+      "Энергия (Парсеваль): 146.00\n",
+      "Энергия (Интеграл): 146.0000\n",
+      "Локальные минимумы [-0.33349609 -0.16650391  0.16650391  0.33349609]\n"
+     ]
+    }
+   ],
+   "source": [
+    "x_conv_vec = np.convolve(x_n_vec, x_n_vec)\n",
+    "\n",
+    "nu_conv, [X_conv_num, X_n_for_conv] = plot_tools.compute_dtft_analysis([x_conv_vec, x_n_vec])\n",
+    "\n",
+    "X_conv_theory = X_n_for_conv ** 2\n",
+    "\n",
+    "print(f\"Совпадают? {np.isclose(X_conv_theory, X_conv_num).all()}\")\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_conv, [X_conv_theory, X_conv_num], labels=[r'Теорема о свертке: $X_N(\\nu)^2$', 'ДВПФ свертки (численно)'], linestyles=[\"-\", \":\"], plot_phase=True)\n",
+    "\n",
+    "print(f\"X_conv(0): {np.abs(X_conv_num[len(nu_conv)//2]):.2f}\")\n",
+    "print(f\"Энергия (Парсеваль): {np.sum(x_conv_vec**2):.2f}\")\n",
+    "print(f\"Энергия (Интеграл): {sp.integrate.simpson(y=np.abs(X_conv_num)**2, x=nu_conv):.4f}\")\n",
+    "\n",
+    "indicies = sp.signal.argrelmin(np.abs(X_n_numeric))\n",
+    "print(f\"Локальные минимумы {nu_vec[indicies]}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 35,
+   "id": "ae382dab",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "c:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\cbook.py:1719: ComplexWarning: Casting complex values to real discards the imaginary part\n",
+      "  return math.isfinite(val)\n",
+      "c:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\cbook.py:1355: ComplexWarning: Casting complex values to real discards the imaginary part\n",
+      "  return np.asarray(x, float)\n"
+     ]
+    }
+   ],
+   "source": [
+    "plot_tools.plot_signals(X_conv_num)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 36,
+   "id": "84da3e9e",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([ 0.17903625,  0.38735161,  0.19945651, -0.22809365, -0.26361907,\n",
+       "       -0.15255539,  0.06132664, -0.23415805, -0.48550266,  0.11778191,\n",
+       "       -0.35039976,  0.17493463,  0.46380306, -0.19016332, -0.12213726,\n",
+       "       -0.39997191, -0.38825385, -0.47136046, -0.07711006, -0.38145254,\n",
+       "       -0.0724155 , -0.08440316, -0.25817949, -0.03852942, -0.38685274,\n",
+       "        0.36839618, -0.42502447, -0.13729439, -0.38679216, -0.14788227,\n",
+       "        0.49096429, -0.23670555, -0.45105552, -0.24878658, -0.18285066])"
+      ]
+     },
+     "execution_count": 36,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Nv - номер варианта\n",
+    "x = np.random.rand(Nv+32)-0.5\n",
+    "x"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "id": "c4033f74",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals(x, as_stem=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 38,
+   "id": "23291d44",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def dft(x):\n",
+    "    M_points = len(x)\n",
+    "    n_arr = np.arange(M_points)\n",
+    "    k_arr = np.arange(len(x))\n",
+    "    n_k_mat = np.outer(n_arr, k_arr)\n",
+    "    W_nk_mat = np.exp(-1j * 2 * np.pi / M_points * n_k_mat)\n",
+    "\n",
+    "    return W_nk_mat @ x\n",
+    "    "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "id": "39e794e8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "M_points = len(x)\n",
+    "\n",
+    "# а) матричная форма\n",
+    "\n",
+    "X_arr_my = dft(x)\n",
+    "\n",
+    "# б) БПФ\n",
+    "\n",
+    "nu_vec, X_arr_FFT = plot_tools.compute_dtft_analysis(x, dtft_points=M_points, should_shift=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "id": "a7cd6b63",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "nu_vec = np.fft.fftshift(nu_vec)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "id": "86763169",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "np.True_"
+      ]
+     },
+     "execution_count": 41,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "np.isclose(X_arr_FFT, X_arr_my).all()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 42,
+   "id": "91e971c0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals([np.abs(X_arr_FFT), np.abs(X_arr_my)], labels=['FFT', 'Через матричную запись'], linestyles=['-', '--'], as_stem=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "id": "f3f569e4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals(np.real(X_arr_FFT), labels=r'$\\text{Re}(X[n])$', as_stem=True)\n",
+    "plot_tools.plot_signals(np.imag(X_arr_FFT), labels=r'$\\text{Im}(X[n])$', as_stem=True)\n",
+    "plot_tools.plot_signals(np.abs(X_arr_FFT), labels=r'$|X[n]|$', as_stem=True)\n",
+    "plot_tools.plot_signals(np.angle(X_arr_FFT), labels=r'$\\angle X[n]$', as_stem=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 44,
+   "id": "2825e2e0",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "m = 3\n"
+     ]
+    }
+   ],
+   "source": [
+    "Nv = 3 # Nv - номер варианта\n",
+    "m = max(Nv % 8, 1)\n",
+    "print(\"m =\", m)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "id": "c16849de",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "m = 3, Nv = 3\n",
+      "q[k]: [1 2 3]\n",
+      "y[k]: [1. 2. 3.]\n"
+     ]
+    }
+   ],
+   "source": [
+    "N_seq = Nv\n",
+    "\n",
+    "k_arr = np.arange(N_seq)\n",
+    "q_k = k_arr + 1\n",
+    "\n",
+    "Q_n = np.fft.fft(q_k)\n",
+    "\n",
+    "n_arr = np.arange(N_seq)\n",
+    "Y_n = Q_n * np.exp(-1j * 2 * np.pi / N_seq * m * n_arr)\n",
+    "\n",
+    "y_k = np.fft.ifft(Y_n).real\n",
+    "\n",
+    "print(f\"m = {m}, Nv = {N_seq}\")\n",
+    "print(f\"q[k]: {q_k}\")\n",
+    "print(f\"y[k]: {np.round(y_k, 4)}\")\n",
+    "\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[q_k, y_k],\n",
+    "    x=k_arr,\n",
+    "    labels=['q[k]', 'y[k]'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title=f'Сравнение q[k] и y[k] при циклическом сдвиге на m={m}',\n",
+    "    xlabel='Отсчеты k',\n",
+    "    ylabel='Амплитуда',\n",
+    "    as_stem=True\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "id": "153b8d3f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "N = 32\n",
+    "m0 = 3\n",
+    "k_arr = np.arange(N)\n",
+    "\n",
+    "x_k = np.sin(2 * np.pi / N * m0 * k_arr) + np.sin(2 * np.pi / N * (m0 + 0.25) * k_arr)\n",
+    "\n",
+    "nu_dtft, X_dtft = plot_tools.compute_dtft_analysis(x_k, dtft_points=2048, plot_results=False)\n",
+    "\n",
+    "nu_dft = np.fft.fftshift(np.fft.fftfreq(N))\n",
+    "X_dft = np.fft.fftshift(np.fft.fft(x_k))\n",
+    "\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft)],\n",
+    "    x=[nu_dtft, nu_dft],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| (N={N})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='ДВПФ и ДПФ исходного сигнала',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")\n",
+    "\n",
+    "# Частоты синусоид: f1 = m0/N = 3/32 = 12/128; f2 = (m0+0.25)/N = 3.25/32 = 13/128.\n",
+    "# Чтобы частоты точно попадали на бины ДПФ, размер ДПФ M должен быть кратен 128.\n",
+    "M = 128\n",
+    "x_k_padded = np.pad(x_k, (0, M - N))\n",
+    "\n",
+    "# Вычисление ДПФ интерполированного сигнала\n",
+    "nu_dft_padded = np.fft.fftshift(np.fft.fftfreq(M))\n",
+    "X_dft_padded = np.fft.fftshift(np.fft.fft(x_k_padded))\n",
+    "\n",
+    "# Визуализация 2: Модули ДВПФ и интерполированного ДПФ на одном графике\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft_padded)],\n",
+    "    x=[nu_dtft, nu_dft_padded],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| нуль-дополненного (M={M})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='Интерполяция ДПФ добавлением нулевых отсчетов',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 47,
+   "id": "cb90e5f0",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "n=m: (15.999999999999993-16.00000000000001j)\n",
+      "n=N-m: (15.999999999999993+16.00000000000001j)\n"
+     ]
+    }
+   ],
+   "source": [
+    "N = 32\n",
+    "m0 = 3\n",
+    "m1 = -0.25\n",
+    "k_arr = np.arange(N)\n",
+    "\n",
+    "def analyze_periodic_signal(m, N_size):\n",
+    "    \n",
+    "    x_k = np.cos(2 * np.pi / N_size * m * k_arr) + np.sin(2 * np.pi / N_size * m * k_arr)\n",
+    "\n",
+    "    X_n = np.fft.fft(x_k)\n",
+    "    n_arr = np.arange(N_size)\n",
+    "    \n",
+    "    if float(m).is_integer():\n",
+    "        print(f\"n=m: {X_n[m]}\")\n",
+    "        print(f\"n=N-m: {X_n[N_size - m]}\")\n",
+    "\n",
+    "    plot_tools.plot_signals(np.real(X_n), x=n_arr, title=f'Re X[n] при m = {m}', xlabel='n (бин ДПФ)', ylabel='Amplitude', as_stem=True)\n",
+    "    plot_tools.plot_signals(np.imag(X_n), x=n_arr, title=f'Im X[n] при m = {m}', xlabel='n (бин ДПФ)', ylabel='Amplitude', as_stem=True)\n",
+    "    plot_tools.plot_signals(np.abs(X_n), x=n_arr, title=f'|X[n]| (Модуль) при m = {m}', xlabel='n (бин ДПФ)', ylabel='Magnitude', as_stem=True)\n",
+    "    plot_tools.plot_signals(np.angle(X_n), x=n_arr, title=f'arg X[n] (Фаза) при m = {m}', xlabel='n (бин ДПФ)', ylabel='Phase [rad]', as_stem=True)\n",
+    "\n",
+    "# Запуск анализа для m0 (целое)\n",
+    "analyze_periodic_signal(m0, N)\n",
+    "\n",
+    "# Запуск анализа для m0 + m1 (нецелое: 3 - 0.25 = 2.75)\n",
+    "analyze_periodic_signal(m0 + m1, N)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 48,
+   "id": "14f0f2ef",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(array([-0.5       , -0.49951172, -0.49902344, ...,  0.49853516,\n",
+       "         0.49902344,  0.49951172], shape=(2048,)),\n",
+       " [array([-2.        +0.j        , -1.99990588+0.01840745j,\n",
+       "         -1.99962352+0.036813j  , ..., -1.99915295-0.05521473j,\n",
+       "         -1.99962352-0.036813j  , -1.99990588-0.01840745j], shape=(2048,)),\n",
+       "  array([-6.        +0.j        , -5.99968939+0.06135821j,\n",
+       "         -5.9987576 +0.1227103j , ..., -5.99720472-0.18405015j,\n",
+       "         -5.9987576 -0.1227103j , -5.99968939-0.06135821j], shape=(2048,)),\n",
+       "  array([-20.        +0.j        , -19.99900229+0.20248226j,\n",
+       "         -19.99600927+0.40494529j, ..., -19.9910212 -0.60736985j,\n",
+       "         -19.99600927-0.40494529j, -19.99900229-0.20248226j], shape=(2048,)),\n",
+       "  array([-66.        +0.j        , -65.9968657 +0.65039794j,\n",
+       "         -65.98746307+1.30073639j, ..., -65.97179296-1.95095588j,\n",
+       "         -65.98746307-1.30073639j, -65.9968657 -0.65039794j], shape=(2048,))])"
+      ]
+     },
+     "execution_count": 48,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# 1.4\n",
+    "\n",
+    "N = 4\n",
+    "\n",
+    "k_arr = np.arange(N)\n",
+    "\n",
+    "x_arr = k_arr\n",
+    "\n",
+    "k1_x_arr = k_arr * x_arr\n",
+    "\n",
+    "k2_x_arr = k_arr ** 2 * x_arr\n",
+    "\n",
+    "k3_x_arr = k_arr ** 3 * x_arr\n",
+    "\n",
+    "plot_tools.plot_signals([x_arr, k1_x_arr, k2_x_arr, k3_x_arr], labels=['$x[k]$', '$k x[k]$', '$k^2 x[k]$', '$k^3 x[k]$'], as_stem=True)\n",
+    "\n",
+    "plot_tools.compute_dtft_analysis([x_arr, k1_x_arr, k2_x_arr, k3_x_arr], labels=['$x[k]$', '$k x[k]$', '$k^2 x[k]$', '$k^3 x[k]$'], plot_results=True, figsize=(14, 9))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 49,
+   "id": "b64ea2bc",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals(x_conv_vec)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 50,
+   "id": "353bb229",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "NameError",
+     "evalue": "name 'W_nk_mat' is not defined",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[31m---------------------------------------------------------------------------\u001b[39m",
+      "\u001b[31mNameError\u001b[39m                                 Traceback (most recent call last)",
+      "\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[50]\u001b[39m\u001b[32m, line 1\u001b[39m\n\u001b[32m----> \u001b[39m\u001b[32m1\u001b[39m \u001b[43mW_nk_mat\u001b[49m\n",
+      "\u001b[31mNameError\u001b[39m: name 'W_nk_mat' is not defined"
+     ]
+    }
+   ],
+   "source": [
+    "W_nk_mat"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 51,
+   "id": "2b841034",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import scipy as sp\n",
+    "import sys\n",
+    "\n",
+    "sys.path.append(r\"D:\\git\\MIPT\\tools\")\n",
+    "\n",
+    "import plot_tools"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "id": "cd129c4f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Nv = 3  # номер варианта\n",
+    "\n",
+    "N_var = 6\n",
+    "L_var = 4      \n",
+    "nu0_var = 0.1   "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "id": "e370874f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def analytical_rect_dtft(freq_vec, n_len):\n",
+    "    \n",
+    "    magnitude = np.sin(np.pi * freq_vec * n_len) / np.sin(np.pi * freq_vec)\n",
+    "    # Заменяем значение в нуле (где freq_vec == 0) на n_len\n",
+    "    magnitude = np.where(np.abs(freq_vec) < 1e-10, n_len, magnitude)\n",
+    "    \n",
+    "    phase_term = np.exp(-1j * np.pi * freq_vec * (n_len - 1))\n",
+    "    return magnitude * phase_term"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "id": "08f7f8af",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\Skifv\\AppData\\Local\\Temp\\ipykernel_11052\\162970527.py:3: RuntimeWarning: invalid value encountered in divide\n",
+      "  magnitude = np.sin(np.pi * freq_vec * n_len) / np.sin(np.pi * freq_vec)\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "X(0): 6.00\n",
+      "Энергия (Интеграл): 6.0000\n",
+      "Энергия (Парсеваль): 6.00\n",
+      "Совпадают ли FFT и аналитика? True\n",
+      "Локальные минимумы [-0.33349609 -0.16650391  0.16650391  0.33349609]\n"
+     ]
+    }
+   ],
+   "source": [
+    "x_n_vec = np.ones(N_var)\n",
+    "\n",
+    "nu_vec, X_n_numeric = plot_tools.compute_dtft_analysis(x_n_vec, plot_results=False)\n",
+    "X_n_analytic = analytical_rect_dtft(nu_vec, N_var)\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_vec, [X_n_analytic, X_n_numeric], labels=['Аналитический расчет', 'FFT'], linestyles=[\"-\", \":\"], plot_phase=True)\n",
+    "\n",
+    "energy_val = sp.integrate.simpson(y=np.abs(X_n_numeric)**2, x=nu_vec)\n",
+    "print(f\"X(0): {np.abs(X_n_numeric[len(nu_vec)//2]):.2f}\")\n",
+    "print(f\"Энергия (Интеграл): {energy_val:.4f}\")\n",
+    "print(f\"Энергия (Парсеваль): {np.sum(x_n_vec**2):.2f}\")\n",
+    "\n",
+    "print(f\"Совпадают ли FFT и аналитика? {np.isclose(X_n_analytic, X_n_numeric).all()}\")\n",
+    "\n",
+    "indicies, _ = sp.signal.find_peaks(-np.abs(X_n_numeric))\n",
+    "\n",
+    "print(f\"Локальные минимумы {nu_vec[indicies]}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 55,
+   "id": "9761e1a7",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\Skifv\\AppData\\Local\\Temp\\ipykernel_11052\\162970527.py:3: RuntimeWarning: invalid value encountered in divide\n",
+      "  magnitude = np.sin(np.pi * freq_vec * n_len) / np.sin(np.pi * freq_vec)\n"
+     ]
+    }
+   ],
+   "source": [
+    "x_l_vec = np.zeros(N_var + (N_var - 1) * (L_var - 1))\n",
+    "x_l_vec[::L_var] = x_n_vec\n",
+    "\n",
+    "nu_l_vec, X_l_numeric = plot_tools.compute_dtft_analysis(x_l_vec, plot_results=False, dtft_points=2048)\n",
+    "X_l_theoretical = analytical_rect_dtft(nu_l_vec * L_var, N_var)\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_l_vec, [X_l_theoretical, X_l_numeric], labels=['Аналитический расчет', 'FFT'], linestyles=[\"-\", \":\"], plot_phase=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 56,
+   "id": "1d0d6501",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals([x_l_vec, x_n_vec], linestyles=[\"-\", \":\"], as_stem=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 57,
+   "id": "9e270e52",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "np.True_"
+      ]
+     },
+     "execution_count": 57,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "np.isclose(X_l_theoretical, X_l_numeric).all()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 58,
+   "id": "e982ad35",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Совпадают? False\n"
+     ]
+    }
+   ],
+   "source": [
+    "k_indices = np.arange(N_var)\n",
+    "x_d_vec = k_indices * x_n_vec\n",
+    "\n",
+    "nu_d_vec, X_d_numeric = plot_tools.compute_dtft_analysis(x_d_vec)\n",
+    "\n",
+    "# dX/d_nu ≈ (X[i+1] - X[i-1]) / (2 * delta_nu)\n",
+    "dX_dnu = np.gradient(X_n_numeric, nu_d_vec[1] - nu_d_vec[0])\n",
+    "X_d_theoretical = (1j / (2 * np.pi)) * dX_dnu\n",
+    "\n",
+    "print(f\"Совпадают? {np.isclose(X_d_numeric, X_d_theoretical).all()}\")\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_d_vec, [X_d_theoretical, X_d_numeric], labels=['Аналитический расчет', 'FFT'], linestyles=[\"-\", \":\"], plot_phase=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 59,
+   "id": "d806be4f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "x_s_vec = x_n_vec * np.exp(1j * 2 * np.pi * nu0_var * k_indices)\n",
+    "\n",
+    "# Вычисление ДВПФ\n",
+    "nu_s_vec, X_s_numeric = plot_tools.compute_dtft_analysis(x_s_vec, labels=r\"${{x}_{S}}[k]={{x}_{N}}[k]\\exp (j2\\pi {{\\nu }_{0}}k)$\", plot_results=True, plot_phase=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 60,
+   "id": "7b078eb0",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Совпадают? True\n",
+      "X_conv(0): 36.00\n",
+      "Энергия (Парсеваль): 146.00\n",
+      "Энергия (Интеграл): 146.0000\n",
+      "Локальные минимумы [-0.33349609 -0.16650391  0.16650391  0.33349609]\n"
+     ]
+    }
+   ],
+   "source": [
+    "x_conv_vec = np.convolve(x_n_vec, x_n_vec)\n",
+    "\n",
+    "nu_conv, [X_conv_num, X_n_for_conv] = plot_tools.compute_dtft_analysis([x_conv_vec, x_n_vec])\n",
+    "\n",
+    "X_conv_theory = X_n_for_conv ** 2\n",
+    "\n",
+    "print(f\"Совпадают? {np.isclose(X_conv_theory, X_conv_num).all()}\")\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_conv, [X_conv_theory, X_conv_num], labels=[r'Теорема о свертке: $X_N(\\nu)^2$', 'ДВПФ свертки (численно)'], linestyles=[\"-\", \":\"], plot_phase=True)\n",
+    "\n",
+    "print(f\"X_conv(0): {np.abs(X_conv_num[len(nu_conv)//2]):.2f}\")\n",
+    "print(f\"Энергия (Парсеваль): {np.sum(x_conv_vec**2):.2f}\")\n",
+    "print(f\"Энергия (Интеграл): {sp.integrate.simpson(y=np.abs(X_conv_num)**2, x=nu_conv):.4f}\")\n",
+    "\n",
+    "indicies = sp.signal.argrelmin(np.abs(X_n_numeric))\n",
+    "print(f\"Локальные минимумы {nu_vec[indicies]}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 61,
+   "id": "fe322365",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals(x_conv_vec)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 62,
+   "id": "02a79220",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([-0.31475001, -0.10870151,  0.15338246, -0.37837677,  0.38311017,\n",
+       "       -0.09142312, -0.2592834 ,  0.29744665, -0.05329501,  0.102641  ,\n",
+       "       -0.3796724 ,  0.20226479, -0.02295883,  0.0961479 ,  0.3953296 ,\n",
+       "        0.06505528, -0.29894322, -0.4184703 , -0.43335724, -0.07586149,\n",
+       "       -0.39773487, -0.06107302, -0.01735524,  0.19470525,  0.27968826,\n",
+       "        0.17936257,  0.2121104 ,  0.0068211 ,  0.08315009,  0.14587623,\n",
+       "        0.01373991,  0.09592647,  0.10789335,  0.2013262 , -0.48884457])"
+      ]
+     },
+     "execution_count": 62,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Nv - номер варианта\n",
+    "x = np.random.rand(Nv+32)-0.5\n",
+    "x"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 63,
+   "id": "b4fe1b21",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals(x, as_stem=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 64,
+   "id": "2494483b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def dft(x):\n",
+    "    M_points = len(x)\n",
+    "    n_arr = np.arange(M_points)\n",
+    "    k_arr = np.arange(len(x))\n",
+    "    n_k_mat = np.outer(n_arr, k_arr)\n",
+    "    W_nk_mat = np.exp(-1j * 2 * np.pi / M_points * n_k_mat)\n",
+    "\n",
+    "    return W_nk_mat @ x\n",
+    "    "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 65,
+   "id": "33c6ffac",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "NameError",
+     "evalue": "name 'W_nk_mat' is not defined",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[31m---------------------------------------------------------------------------\u001b[39m",
+      "\u001b[31mNameError\u001b[39m                                 Traceback (most recent call last)",
+      "\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[65]\u001b[39m\u001b[32m, line 1\u001b[39m\n\u001b[32m----> \u001b[39m\u001b[32m1\u001b[39m \u001b[43mW_nk_mat\u001b[49m\n",
+      "\u001b[31mNameError\u001b[39m: name 'W_nk_mat' is not defined"
+     ]
+    }
+   ],
+   "source": [
+    "W_nk_mat"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 66,
+   "id": "a03647b2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "    M_points = len(x)\n",
+    "    n_arr = np.arange(M_points)\n",
+    "    k_arr = np.arange(len(x))\n",
+    "    n_k_mat = np.outer(n_arr, k_arr)\n",
+    "    W_nk_mat = np.exp(-1j * 2 * np.pi / M_points * n_k_mat)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 67,
+   "id": "0c91cb85",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "    M_points = len(x)\n",
+    "    n_arr = np.arange(M_points)\n",
+    "    k_arr = np.arange(len(x))\n",
+    "    n_k_mat = np.outer(n_arr, k_arr)\n",
+    "    W_nk_mat = np.exp(-1j * 2 * np.pi / M_points * n_k_mat)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 68,
+   "id": "40a008b4",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[ 1.        +0.j        ,  1.        +0.j        ,\n",
+       "         1.        +0.j        , ...,  1.        +0.j        ,\n",
+       "         1.        +0.j        ,  1.        +0.j        ],\n",
+       "       [ 1.        +0.j        ,  0.98392959-0.17855689j,\n",
+       "         0.93623487-0.35137482j, ...,  0.85844879+0.51289928j,\n",
+       "         0.93623487+0.35137482j,  0.98392959+0.17855689j],\n",
+       "       [ 1.        +0.j        ,  0.93623487-0.35137482j,\n",
+       "         0.75307147-0.65793873j, ...,  0.47386866+0.88059553j,\n",
+       "         0.75307147+0.65793873j,  0.93623487+0.35137482j],\n",
+       "       ...,\n",
+       "       [ 1.        +0.j        ,  0.85844879+0.51289928j,\n",
+       "         0.47386866+0.88059553j, ..., -0.04486483-0.99899307j,\n",
+       "         0.47386866-0.88059553j,  0.85844879-0.51289928j],\n",
+       "       [ 1.        +0.j        ,  0.93623487+0.35137482j,\n",
+       "         0.75307147+0.65793873j, ...,  0.47386866-0.88059553j,\n",
+       "         0.75307147-0.65793873j,  0.93623487-0.35137482j],\n",
+       "       [ 1.        +0.j        ,  0.98392959+0.17855689j,\n",
+       "         0.93623487+0.35137482j, ...,  0.85844879-0.51289928j,\n",
+       "         0.93623487-0.35137482j,  0.98392959-0.17855689j]], shape=(35, 35))"
+      ]
+     },
+     "execution_count": 68,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "W_nk_mat"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 69,
+   "id": "e88d8715",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[   0,    0,    0, ...,    0,    0,    0],\n",
+       "       [   0,    1,    2, ...,   32,   33,   34],\n",
+       "       [   0,    2,    4, ...,   64,   66,   68],\n",
+       "       ...,\n",
+       "       [   0,   32,   64, ..., 1024, 1056, 1088],\n",
+       "       [   0,   33,   66, ..., 1056, 1089, 1122],\n",
+       "       [   0,   34,   68, ..., 1088, 1122, 1156]], shape=(35, 35))"
+      ]
+     },
+     "execution_count": 69,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "n_k_mat"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 70,
+   "id": "8f27f8e0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import scipy as sp\n",
+    "import sys\n",
+    "\n",
+    "sys.path.append(r\"D:\\git\\MIPT\\tools\")\n",
+    "\n",
+    "import plot_tools"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 71,
+   "id": "7f7fdc0d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Nv = 3  # номер варианта\n",
+    "\n",
+    "N_var = 6\n",
+    "L_var = 4      \n",
+    "nu0_var = 0.1   "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 72,
+   "id": "df335e1a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def analytical_rect_dtft(freq_vec, n_len):\n",
+    "    \n",
+    "    magnitude = np.sin(np.pi * freq_vec * n_len) / np.sin(np.pi * freq_vec)\n",
+    "    # Заменяем значение в нуле (где freq_vec == 0) на n_len\n",
+    "    magnitude = np.where(np.abs(freq_vec) < 1e-10, n_len, magnitude)\n",
+    "    \n",
+    "    phase_term = np.exp(-1j * np.pi * freq_vec * (n_len - 1))\n",
+    "    return magnitude * phase_term"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 73,
+   "id": "4499f82a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\Skifv\\AppData\\Local\\Temp\\ipykernel_11052\\162970527.py:3: RuntimeWarning: invalid value encountered in divide\n",
+      "  magnitude = np.sin(np.pi * freq_vec * n_len) / np.sin(np.pi * freq_vec)\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "X(0): 6.00\n",
+      "Энергия (Интеграл): 6.0000\n",
+      "Энергия (Парсеваль): 6.00\n",
+      "Совпадают ли FFT и аналитика? True\n",
+      "Локальные минимумы [-0.33349609 -0.16650391  0.16650391  0.33349609]\n"
+     ]
+    }
+   ],
+   "source": [
+    "x_n_vec = np.ones(N_var)\n",
+    "\n",
+    "nu_vec, X_n_numeric = plot_tools.compute_dtft_analysis(x_n_vec, plot_results=False)\n",
+    "X_n_analytic = analytical_rect_dtft(nu_vec, N_var)\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_vec, [X_n_analytic, X_n_numeric], labels=['Аналитический расчет', 'FFT'], linestyles=[\"-\", \":\"], plot_phase=True)\n",
+    "\n",
+    "energy_val = sp.integrate.simpson(y=np.abs(X_n_numeric)**2, x=nu_vec)\n",
+    "print(f\"X(0): {np.abs(X_n_numeric[len(nu_vec)//2]):.2f}\")\n",
+    "print(f\"Энергия (Интеграл): {energy_val:.4f}\")\n",
+    "print(f\"Энергия (Парсеваль): {np.sum(x_n_vec**2):.2f}\")\n",
+    "\n",
+    "print(f\"Совпадают ли FFT и аналитика? {np.isclose(X_n_analytic, X_n_numeric).all()}\")\n",
+    "\n",
+    "indicies, _ = sp.signal.find_peaks(-np.abs(X_n_numeric))\n",
+    "\n",
+    "print(f\"Локальные минимумы {nu_vec[indicies]}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 74,
+   "id": "a79dd858",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\Skifv\\AppData\\Local\\Temp\\ipykernel_11052\\162970527.py:3: RuntimeWarning: invalid value encountered in divide\n",
+      "  magnitude = np.sin(np.pi * freq_vec * n_len) / np.sin(np.pi * freq_vec)\n"
+     ]
+    }
+   ],
+   "source": [
+    "x_l_vec = np.zeros(N_var + (N_var - 1) * (L_var - 1))\n",
+    "x_l_vec[::L_var] = x_n_vec\n",
+    "\n",
+    "nu_l_vec, X_l_numeric = plot_tools.compute_dtft_analysis(x_l_vec, plot_results=False, dtft_points=2048)\n",
+    "X_l_theoretical = analytical_rect_dtft(nu_l_vec * L_var, N_var)\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_l_vec, [X_l_theoretical, X_l_numeric], labels=['Аналитический расчет', 'FFT'], linestyles=[\"-\", \":\"], plot_phase=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 75,
+   "id": "9fa3c3bc",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals([x_l_vec, x_n_vec], linestyles=[\"-\", \":\"], as_stem=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 76,
+   "id": "16950a14",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "np.True_"
+      ]
+     },
+     "execution_count": 76,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "np.isclose(X_l_theoretical, X_l_numeric).all()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 77,
+   "id": "f621f80b",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Совпадают? False\n"
+     ]
+    }
+   ],
+   "source": [
+    "k_indices = np.arange(N_var)\n",
+    "x_d_vec = k_indices * x_n_vec\n",
+    "\n",
+    "nu_d_vec, X_d_numeric = plot_tools.compute_dtft_analysis(x_d_vec)\n",
+    "\n",
+    "# dX/d_nu ≈ (X[i+1] - X[i-1]) / (2 * delta_nu)\n",
+    "dX_dnu = np.gradient(X_n_numeric, nu_d_vec[1] - nu_d_vec[0])\n",
+    "X_d_theoretical = (1j / (2 * np.pi)) * dX_dnu\n",
+    "\n",
+    "print(f\"Совпадают? {np.isclose(X_d_numeric, X_d_theoretical).all()}\")\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_d_vec, [X_d_theoretical, X_d_numeric], labels=['Аналитический расчет', 'FFT'], linestyles=[\"-\", \":\"], plot_phase=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 78,
+   "id": "023a5aac",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "x_s_vec = x_n_vec * np.exp(1j * 2 * np.pi * nu0_var * k_indices)\n",
+    "\n",
+    "# Вычисление ДВПФ\n",
+    "nu_s_vec, X_s_numeric = plot_tools.compute_dtft_analysis(x_s_vec, labels=r\"${{x}_{S}}[k]={{x}_{N}}[k]\\exp (j2\\pi {{\\nu }_{0}}k)$\", plot_results=True, plot_phase=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 79,
+   "id": "8cea11e5",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Совпадают? True\n",
+      "X_conv(0): 36.00\n",
+      "Энергия (Парсеваль): 146.00\n",
+      "Энергия (Интеграл): 146.0000\n",
+      "Локальные минимумы [-0.33349609 -0.16650391  0.16650391  0.33349609]\n"
+     ]
+    }
+   ],
+   "source": [
+    "x_conv_vec = np.convolve(x_n_vec, x_n_vec)\n",
+    "\n",
+    "nu_conv, [X_conv_num, X_n_for_conv] = plot_tools.compute_dtft_analysis([x_conv_vec, x_n_vec])\n",
+    "\n",
+    "X_conv_theory = X_n_for_conv ** 2\n",
+    "\n",
+    "print(f\"Совпадают? {np.isclose(X_conv_theory, X_conv_num).all()}\")\n",
+    "\n",
+    "plot_tools.plot_dtft_analysis(nu_conv, [X_conv_theory, X_conv_num], labels=[r'Теорема о свертке: $X_N(\\nu)^2$', 'ДВПФ свертки (численно)'], linestyles=[\"-\", \":\"], plot_phase=True)\n",
+    "\n",
+    "print(f\"X_conv(0): {np.abs(X_conv_num[len(nu_conv)//2]):.2f}\")\n",
+    "print(f\"Энергия (Парсеваль): {np.sum(x_conv_vec**2):.2f}\")\n",
+    "print(f\"Энергия (Интеграл): {sp.integrate.simpson(y=np.abs(X_conv_num)**2, x=nu_conv):.4f}\")\n",
+    "\n",
+    "indicies = sp.signal.argrelmin(np.abs(X_n_numeric))\n",
+    "print(f\"Локальные минимумы {nu_vec[indicies]}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 80,
+   "id": "90aec158",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals(x_conv_vec)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 81,
+   "id": "7867b652",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([-0.44962938,  0.24373281,  0.33478708, -0.33096155,  0.29798518,\n",
+       "       -0.49595202, -0.41688495, -0.44535714,  0.44870835, -0.05170054,\n",
+       "       -0.2786355 , -0.43194612,  0.23653161, -0.19948721,  0.0994873 ,\n",
+       "        0.4857958 ,  0.2368395 , -0.01424066, -0.33026315, -0.3354971 ,\n",
+       "       -0.34976272, -0.02878539,  0.35612543,  0.41586579, -0.22690838,\n",
+       "       -0.42087743,  0.12005833, -0.22203718, -0.43131374,  0.46610093,\n",
+       "       -0.49681657, -0.29413528,  0.47087089, -0.07152402, -0.14653395])"
+      ]
+     },
+     "execution_count": 81,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Nv - номер варианта\n",
+    "x = np.random.rand(Nv+32)-0.5\n",
+    "x"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 82,
+   "id": "01f3d92c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals(x, as_stem=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 83,
+   "id": "bfb18a3e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def dft(x):\n",
+    "    M_points = len(x)\n",
+    "    n_arr = np.arange(M_points)\n",
+    "    k_arr = np.arange(len(x))\n",
+    "    n_k_mat = np.outer(n_arr, k_arr)\n",
+    "    W_nk_mat = np.exp(-1j * 2 * np.pi / M_points * n_k_mat)\n",
+    "\n",
+    "    return W_nk_mat @ x\n",
+    "    "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 84,
+   "id": "c450cd38",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "    M_points = len(x)\n",
+    "    n_arr = np.arange(M_points)\n",
+    "    k_arr = np.arange(len(x))\n",
+    "    n_k_mat = np.outer(n_arr, k_arr)\n",
+    "    W_nk_mat = np.exp(-1j * 2 * np.pi / M_points * n_k_mat)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 85,
+   "id": "38b39653",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "M_points = len(x)\n",
+    "\n",
+    "# а) матричная форма\n",
+    "\n",
+    "X_arr_my = dft(x)\n",
+    "\n",
+    "# б) БПФ\n",
+    "\n",
+    "nu_vec, X_arr_FFT = plot_tools.compute_dtft_analysis(x, dtft_points=M_points, should_shift=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 86,
+   "id": "5c40ef20",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "nu_vec = np.fft.fftshift(nu_vec)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 87,
+   "id": "acd8c77d",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "np.True_"
+      ]
+     },
+     "execution_count": 87,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "np.isclose(X_arr_FFT, X_arr_my).all()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 88,
+   "id": "ca1e3c57",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals([np.abs(X_arr_FFT), np.abs(X_arr_my)], labels=['FFT', 'Через матричную запись'], linestyles=['-', '--'], as_stem=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 89,
+   "id": "eec04fee",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plot_tools.plot_signals(np.real(X_arr_FFT), labels=r'$\\text{Re}(X[n])$', as_stem=True)\n",
+    "plot_tools.plot_signals(np.imag(X_arr_FFT), labels=r'$\\text{Im}(X[n])$', as_stem=True)\n",
+    "plot_tools.plot_signals(np.abs(X_arr_FFT), labels=r'$|X[n]|$', as_stem=True)\n",
+    "plot_tools.plot_signals(np.angle(X_arr_FFT), labels=r'$\\angle X[n]$', as_stem=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 90,
+   "id": "86511637",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "m = 3\n"
+     ]
+    }
+   ],
+   "source": [
+    "Nv = 3 # Nv - номер варианта\n",
+    "m = max(Nv % 8, 1)\n",
+    "print(\"m =\", m)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 91,
+   "id": "55c91dbf",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "m = 3, Nv = 3\n",
+      "q[k]: [1 2 3]\n",
+      "y[k]: [1. 2. 3.]\n"
+     ]
+    }
+   ],
+   "source": [
+    "N_seq = Nv\n",
+    "\n",
+    "k_arr = np.arange(N_seq)\n",
+    "q_k = k_arr + 1\n",
+    "\n",
+    "Q_n = np.fft.fft(q_k)\n",
+    "\n",
+    "n_arr = np.arange(N_seq)\n",
+    "Y_n = Q_n * np.exp(-1j * 2 * np.pi / N_seq * m * n_arr)\n",
+    "\n",
+    "y_k = np.fft.ifft(Y_n).real\n",
+    "\n",
+    "print(f\"m = {m}, Nv = {N_seq}\")\n",
+    "print(f\"q[k]: {q_k}\")\n",
+    "print(f\"y[k]: {np.round(y_k, 4)}\")\n",
+    "\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[q_k, y_k],\n",
+    "    x=k_arr,\n",
+    "    labels=['q[k]', 'y[k]'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title=f'Сравнение q[k] и y[k] при циклическом сдвиге на m={m}',\n",
+    "    xlabel='Отсчеты k',\n",
+    "    ylabel='Амплитуда',\n",
+    "    as_stem=True\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 92,
+   "id": "b84994c5",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "N = 32\n",
+    "m0 = 3\n",
+    "k_arr = np.arange(N)\n",
+    "\n",
+    "x_k = np.sin(2 * np.pi / N * m0 * k_arr) + np.sin(2 * np.pi / N * (m0 + 0.25) * k_arr)\n",
+    "\n",
+    "nu_dtft, X_dtft = plot_tools.compute_dtft_analysis(x_k, dtft_points=2048, plot_results=False)\n",
+    "\n",
+    "nu_dft = np.fft.fftshift(np.fft.fftfreq(N))\n",
+    "X_dft = np.fft.fftshift(np.fft.fft(x_k))\n",
+    "\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft)],\n",
+    "    x=[nu_dtft, nu_dft],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| (N={N})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='ДВПФ и ДПФ исходного сигнала',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")\n",
+    "\n",
+    "# Частоты синусоид: f1 = m0/N = 3/32 = 12/128; f2 = (m0+0.25)/N = 3.25/32 = 13/128.\n",
+    "# Чтобы частоты точно попадали на бины ДПФ, размер ДПФ M должен быть кратен 128.\n",
+    "M = 128\n",
+    "x_k_padded = np.pad(x_k, (0, M - N))\n",
+    "\n",
+    "# Вычисление ДПФ интерполированного сигнала\n",
+    "nu_dft_padded = np.fft.fftshift(np.fft.fftfreq(M))\n",
+    "X_dft_padded = np.fft.fftshift(np.fft.fft(x_k_padded))\n",
+    "\n",
+    "# Визуализация 2: Модули ДВПФ и интерполированного ДПФ на одном графике\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft_padded)],\n",
+    "    x=[nu_dtft, nu_dft_padded],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| нуль-дополненного (M={M})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='Интерполяция ДПФ добавлением нулевых отсчетов',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 93,
+   "id": "e47f0f1e",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "n=m: (15.999999999999993-16.00000000000001j)\n",
+      "n=N-m: (15.999999999999993+16.00000000000001j)\n"
+     ]
+    }
+   ],
+   "source": [
+    "N = 32\n",
+    "m0 = 3\n",
+    "m1 = -0.25\n",
+    "k_arr = np.arange(N)\n",
+    "\n",
+    "def analyze_periodic_signal(m, N_size):\n",
+    "    \n",
+    "    x_k = np.cos(2 * np.pi / N_size * m * k_arr) + np.sin(2 * np.pi / N_size * m * k_arr)\n",
+    "\n",
+    "    X_n = np.fft.fft(x_k)\n",
+    "    n_arr = np.arange(N_size)\n",
+    "    \n",
+    "    if float(m).is_integer():\n",
+    "        print(f\"n=m: {X_n[m]}\")\n",
+    "        print(f\"n=N-m: {X_n[N_size - m]}\")\n",
+    "\n",
+    "    plot_tools.plot_signals(np.real(X_n), x=n_arr, title=f'Re X[n] при m = {m}', xlabel='n (бин ДПФ)', ylabel='Amplitude', as_stem=True)\n",
+    "    plot_tools.plot_signals(np.imag(X_n), x=n_arr, title=f'Im X[n] при m = {m}', xlabel='n (бин ДПФ)', ylabel='Amplitude', as_stem=True)\n",
+    "    plot_tools.plot_signals(np.abs(X_n), x=n_arr, title=f'|X[n]| (Модуль) при m = {m}', xlabel='n (бин ДПФ)', ylabel='Magnitude', as_stem=True)\n",
+    "    plot_tools.plot_signals(np.angle(X_n), x=n_arr, title=f'arg X[n] (Фаза) при m = {m}', xlabel='n (бин ДПФ)', ylabel='Phase [rad]', as_stem=True)\n",
+    "\n",
+    "# Запуск анализа для m0 (целое)\n",
+    "analyze_periodic_signal(m0, N)\n",
+    "\n",
+    "# Запуск анализа для m0 + m1 (нецелое: 3 - 0.25 = 2.75)\n",
+    "analyze_periodic_signal(m0 + m1, N)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 94,
+   "id": "004a0daa",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(array([-0.5       , -0.49951172, -0.49902344, ...,  0.49853516,\n",
+       "         0.49902344,  0.49951172], shape=(2048,)),\n",
+       " [array([-2.        +0.j        , -1.99990588+0.01840745j,\n",
+       "         -1.99962352+0.036813j  , ..., -1.99915295-0.05521473j,\n",
+       "         -1.99962352-0.036813j  , -1.99990588-0.01840745j], shape=(2048,)),\n",
+       "  array([-6.        +0.j        , -5.99968939+0.06135821j,\n",
+       "         -5.9987576 +0.1227103j , ..., -5.99720472-0.18405015j,\n",
+       "         -5.9987576 -0.1227103j , -5.99968939-0.06135821j], shape=(2048,)),\n",
+       "  array([-20.        +0.j        , -19.99900229+0.20248226j,\n",
+       "         -19.99600927+0.40494529j, ..., -19.9910212 -0.60736985j,\n",
+       "         -19.99600927-0.40494529j, -19.99900229-0.20248226j], shape=(2048,)),\n",
+       "  array([-66.        +0.j        , -65.9968657 +0.65039794j,\n",
+       "         -65.98746307+1.30073639j, ..., -65.97179296-1.95095588j,\n",
+       "         -65.98746307-1.30073639j, -65.9968657 -0.65039794j], shape=(2048,))])"
+      ]
+     },
+     "execution_count": 94,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# 1.4\n",
+    "\n",
+    "N = 4\n",
+    "\n",
+    "k_arr = np.arange(N)\n",
+    "\n",
+    "x_arr = k_arr\n",
+    "\n",
+    "k1_x_arr = k_arr * x_arr\n",
+    "\n",
+    "k2_x_arr = k_arr ** 2 * x_arr\n",
+    "\n",
+    "k3_x_arr = k_arr ** 3 * x_arr\n",
+    "\n",
+    "plot_tools.plot_signals([x_arr, k1_x_arr, k2_x_arr, k3_x_arr], labels=['$x[k]$', '$k x[k]$', '$k^2 x[k]$', '$k^3 x[k]$'], as_stem=True)\n",
+    "\n",
+    "plot_tools.compute_dtft_analysis([x_arr, k1_x_arr, k2_x_arr, k3_x_arr], labels=['$x[k]$', '$k x[k]$', '$k^2 x[k]$', '$k^3 x[k]$'], plot_results=True, figsize=(14, 9))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 95,
+   "id": "b129b222",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "TypeError",
+     "evalue": "'tuple' object is not callable",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[31m---------------------------------------------------------------------------\u001b[39m",
+      "\u001b[31mTypeError\u001b[39m                                 Traceback (most recent call last)",
+      "\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[95]\u001b[39m\u001b[32m, line 1\u001b[39m\n\u001b[32m----> \u001b[39m\u001b[32m1\u001b[39m \u001b[43mx\u001b[49m\u001b[43m.\u001b[49m\u001b[43mshape\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\n",
+      "\u001b[31mTypeError\u001b[39m: 'tuple' object is not callable"
+     ]
+    }
+   ],
+   "source": [
+    "x.shape()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 96,
+   "id": "d518c2c0",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(35,)"
+      ]
+     },
+     "execution_count": 96,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 97,
+   "id": "905b51f3",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "x_arr = np.array([0, 1, 2])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 98,
+   "id": "f78bbc9a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "m = 3, Nv = 3\n",
+      "q[k]: [1 2 3]\n",
+      "y[k]: [1. 2. 3.]\n"
+     ]
+    }
+   ],
+   "source": [
+    "N_seq = Nv\n",
+    "\n",
+    "k_arr = np.arange(N_seq)\n",
+    "q_k = k_arr + 1\n",
+    "\n",
+    "Q_n = np.fft.fft(q_k)\n",
+    "\n",
+    "n_arr = np.arange(N_seq)\n",
+    "Y_n = Q_n * np.exp(-1j * 2 * np.pi / N_seq * m * n_arr)\n",
+    "\n",
+    "y_k = np.fft.ifft(Y_n).real\n",
+    "\n",
+    "print(f\"m = {m}, Nv = {N_seq}\")\n",
+    "print(f\"q[k]: {q_k}\")\n",
+    "print(f\"y[k]: {np.round(y_k, 4)}\")\n",
+    "\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[q_k, y_k],\n",
+    "    x=k_arr,\n",
+    "    labels=['q[k]', 'y[k]'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title=f'Сравнение q[k] и y[k] при циклическом сдвиге на m={m}',\n",
+    "    xlabel='Отсчеты k',\n",
+    "    ylabel='Амплитуда',\n",
+    "    as_stem=True\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 99,
+   "id": "58d25421",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([2, 0, 1])"
+      ]
+     },
+     "execution_count": 99,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_arr = np.array([0, 1, 2])\n",
+    "\n",
+    "np.roll(x_arr, shift=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 100,
+   "id": "7ed6fa14",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "m = 6\n"
+     ]
+    }
+   ],
+   "source": [
+    "Nv = 14 # Nv - номер варианта\n",
+    "m = max(Nv % 8, 1)\n",
+    "print(\"m =\", m)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 101,
+   "id": "f9e23ee3",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([2, 0, 1])"
+      ]
+     },
+     "execution_count": 101,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "x_arr = np.array([0, 1, 2])\n",
+    "\n",
+    "np.roll(x_arr, shift=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 102,
+   "id": "772ad715",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "m = 6, Nv = 14\n",
+      "q[k]: [ 1  2  3  4  5  6  7  8  9 10 11 12 13 14]\n",
+      "y[k]: [ 9. 10. 11. 12. 13. 14.  1.  2.  3.  4.  5.  6.  7.  8.]\n"
+     ]
+    }
+   ],
+   "source": [
+    "N_seq = Nv\n",
+    "\n",
+    "k_arr = np.arange(N_seq)\n",
+    "q_k = k_arr + 1\n",
+    "\n",
+    "Q_n = np.fft.fft(q_k)\n",
+    "\n",
+    "n_arr = np.arange(N_seq)\n",
+    "Y_n = Q_n * np.exp(-1j * 2 * np.pi / N_seq * m * n_arr)\n",
+    "\n",
+    "y_k = np.fft.ifft(Y_n).real\n",
+    "\n",
+    "print(f\"m = {m}, Nv = {N_seq}\")\n",
+    "print(f\"q[k]: {q_k}\")\n",
+    "print(f\"y[k]: {np.round(y_k, 4)}\")\n",
+    "\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[q_k, y_k],\n",
+    "    x=k_arr,\n",
+    "    labels=['q[k]', 'y[k]'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title=f'Сравнение q[k] и y[k] при циклическом сдвиге на m={m}',\n",
+    "    xlabel='Отсчеты k',\n",
+    "    ylabel='Амплитуда',\n",
+    "    as_stem=True\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 103,
+   "id": "ec3c122f",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "ValueError",
+     "evalue": "could not broadcast input array from shape (128,) into shape (32,)",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[31m---------------------------------------------------------------------------\u001b[39m",
+      "\u001b[31mValueError\u001b[39m                                Traceback (most recent call last)",
+      "\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[103]\u001b[39m\u001b[32m, line 12\u001b[39m\n\u001b[32m      9\u001b[39m nu_dft = np.fft.fftshift(np.fft.fftfreq(N))\n\u001b[32m     10\u001b[39m X_dft = np.fft.fftshift(np.fft.fft(x_k))\n\u001b[32m---> \u001b[39m\u001b[32m12\u001b[39m \u001b[43mplot_tools\u001b[49m\u001b[43m.\u001b[49m\u001b[43mplot_signals\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m     13\u001b[39m \u001b[43m    \u001b[49m\u001b[43my\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[43mnp\u001b[49m\u001b[43m.\u001b[49m\u001b[43mabs\u001b[49m\u001b[43m(\u001b[49m\u001b[43mX_dtft\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mnp\u001b[49m\u001b[43m.\u001b[49m\u001b[43mabs\u001b[49m\u001b[43m(\u001b[49m\u001b[43mX_dft\u001b[49m\u001b[43m)\u001b[49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     14\u001b[39m \u001b[43m    \u001b[49m\u001b[43mx\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[43mnu_dtft\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mnu_dft\u001b[49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     15\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlabels\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mДВПФ |X(ν)|\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[33;43mf\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mДПФ |X[n]| (N=\u001b[39;49m\u001b[38;5;132;43;01m{\u001b[39;49;00m\u001b[43mN\u001b[49m\u001b[38;5;132;43;01m}\u001b[39;49;00m\u001b[33;43m)\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     16\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlinestyles\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43m-\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43m--\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     17\u001b[39m \u001b[43m    \u001b[49m\u001b[43mtitle\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mДВПФ и ДПФ исходного сигнала\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\n\u001b[32m     18\u001b[39m \u001b[43m    \u001b[49m\u001b[43mxlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mНормированная частота ν\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\n\u001b[32m     19\u001b[39m \u001b[43m    \u001b[49m\u001b[43mas_stem\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[38;5;28;43;01mFalse\u001b[39;49;00m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mTrue\u001b[39;49;00m\u001b[43m]\u001b[49m\n\u001b[32m     20\u001b[39m \u001b[43m)\u001b[49m\n\u001b[32m     22\u001b[39m \u001b[38;5;66;03m# Частоты синусоид: f1 = m0/N = 3/32 = 12/128; f2 = (m0+0.25)/N = 3.25/32 = 13/128.\u001b[39;00m\n\u001b[32m     23\u001b[39m \u001b[38;5;66;03m# Чтобы частоты точно попадали на бины ДПФ, размер ДПФ M должен быть кратен 128.\u001b[39;00m\n\u001b[32m     24\u001b[39m M = \u001b[32m128\u001b[39m\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mD:\\git\\MIPT\\tools\\plot_tools.py:133\u001b[39m, in \u001b[36mplot_signals\u001b[39m\u001b[34m(y, x, figsize, errors, labels, colors, linestyles, title, xlabel, ylabel, as_stem, show_err)\u001b[39m\n\u001b[32m    131\u001b[39m \u001b[38;5;66;03m# Priority 2: Discrete stem plotting\u001b[39;00m\n\u001b[32m    132\u001b[39m \u001b[38;5;28;01melif\u001b[39;00m current_as_stem:\n\u001b[32m--> \u001b[39m\u001b[32m133\u001b[39m     markerline, stemlines, baseline = \u001b[43max\u001b[49m\u001b[43m.\u001b[49m\u001b[43mstem\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m    134\u001b[39m \u001b[43m        \u001b[49m\u001b[43mcurr_x\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mcurr_y\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlinefmt\u001b[49m\u001b[43m=\u001b[49m\u001b[43mcolor\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mbasefmt\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m\"\u001b[39;49m\u001b[33;43m \u001b[39;49m\u001b[33;43m\"\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[43mfinal_labels\u001b[49m\u001b[43m[\u001b[49m\u001b[43mi\u001b[49m\u001b[43m]\u001b[49m\n\u001b[32m    135\u001b[39m \u001b[43m    \u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m    136\u001b[39m     plt.setp(markerline, marker=\u001b[33m\"\u001b[39m\u001b[33mo\u001b[39m\u001b[33m\"\u001b[39m, markersize=\u001b[32m4\u001b[39m, color=color)\n\u001b[32m    137\u001b[39m     plt.setp(stemlines, linewidth=\u001b[32m1.2\u001b[39m, color=color, linestyle=l_style)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\__init__.py:1524\u001b[39m, in \u001b[36m_preprocess_data.<locals>.inner\u001b[39m\u001b[34m(ax, data, *args, **kwargs)\u001b[39m\n\u001b[32m   1521\u001b[39m \u001b[38;5;129m@functools\u001b[39m.wraps(func)\n\u001b[32m   1522\u001b[39m \u001b[38;5;28;01mdef\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[34minner\u001b[39m(ax, *args, data=\u001b[38;5;28;01mNone\u001b[39;00m, **kwargs):\n\u001b[32m   1523\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m data \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[32m-> \u001b[39m\u001b[32m1524\u001b[39m         \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   1525\u001b[39m \u001b[43m            \u001b[49m\u001b[43max\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1526\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[38;5;28;43mmap\u001b[39;49m\u001b[43m(\u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43margs\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1527\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43m{\u001b[49m\u001b[43mk\u001b[49m\u001b[43m:\u001b[49m\u001b[43m \u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m(\u001b[49m\u001b[43mv\u001b[49m\u001b[43m)\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mfor\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mk\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mv\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;129;43;01min\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m.\u001b[49m\u001b[43mitems\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\u001b[43m}\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m   1529\u001b[39m     bound = new_sig.bind(ax, *args, **kwargs)\n\u001b[32m   1530\u001b[39m     auto_label = (bound.arguments.get(label_namer)\n\u001b[32m   1531\u001b[39m                   \u001b[38;5;129;01mor\u001b[39;00m bound.kwargs.get(label_namer))\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\axes\\_axes.py:3207\u001b[39m, in \u001b[36mAxes.stem\u001b[39m\u001b[34m(self, linefmt, markerfmt, basefmt, bottom, label, orientation, *args)\u001b[39m\n\u001b[32m   3205\u001b[39m     linestyle = mpl.rcParams[\u001b[33m'\u001b[39m\u001b[33mlines.linestyle\u001b[39m\u001b[33m'\u001b[39m]\n\u001b[32m   3206\u001b[39m xlines = \u001b[38;5;28mself\u001b[39m.vlines \u001b[38;5;28;01mif\u001b[39;00m orientation == \u001b[33m\"\u001b[39m\u001b[33mvertical\u001b[39m\u001b[33m\"\u001b[39m \u001b[38;5;28;01melse\u001b[39;00m \u001b[38;5;28mself\u001b[39m.hlines\n\u001b[32m-> \u001b[39m\u001b[32m3207\u001b[39m stemlines = \u001b[43mxlines\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   3208\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlocs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mbottom\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mheads\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   3209\u001b[39m \u001b[43m    \u001b[49m\u001b[43mcolors\u001b[49m\u001b[43m=\u001b[49m\u001b[43mlinecolor\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlinestyles\u001b[49m\u001b[43m=\u001b[49m\u001b[43mlinestyle\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m\"\u001b[39;49m\u001b[33;43m_nolegend_\u001b[39;49m\u001b[33;43m\"\u001b[39;49m\u001b[43m)\u001b[49m\n\u001b[32m   3211\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m orientation == \u001b[33m'\u001b[39m\u001b[33mhorizontal\u001b[39m\u001b[33m'\u001b[39m:\n\u001b[32m   3212\u001b[39m     marker_x = heads\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\_api\\deprecation.py:453\u001b[39m, in \u001b[36mmake_keyword_only.<locals>.wrapper\u001b[39m\u001b[34m(*args, **kwargs)\u001b[39m\n\u001b[32m    447\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mlen\u001b[39m(args) > name_idx:\n\u001b[32m    448\u001b[39m     warn_deprecated(\n\u001b[32m    449\u001b[39m         since, message=\u001b[33m\"\u001b[39m\u001b[33mPassing the \u001b[39m\u001b[38;5;132;01m%(name)s\u001b[39;00m\u001b[33m \u001b[39m\u001b[38;5;132;01m%(obj_type)s\u001b[39;00m\u001b[33m \u001b[39m\u001b[33m\"\u001b[39m\n\u001b[32m    450\u001b[39m         \u001b[33m\"\u001b[39m\u001b[33mpositionally is deprecated since Matplotlib \u001b[39m\u001b[38;5;132;01m%(since)s\u001b[39;00m\u001b[33m; the \u001b[39m\u001b[33m\"\u001b[39m\n\u001b[32m    451\u001b[39m         \u001b[33m\"\u001b[39m\u001b[33mparameter will become keyword-only in \u001b[39m\u001b[38;5;132;01m%(removal)s\u001b[39;00m\u001b[33m.\u001b[39m\u001b[33m\"\u001b[39m,\n\u001b[32m    452\u001b[39m         name=name, obj_type=\u001b[33mf\u001b[39m\u001b[33m\"\u001b[39m\u001b[33mparameter of \u001b[39m\u001b[38;5;132;01m{\u001b[39;00mfunc.\u001b[34m__name__\u001b[39m\u001b[38;5;132;01m}\u001b[39;00m\u001b[33m()\u001b[39m\u001b[33m\"\u001b[39m)\n\u001b[32m--> \u001b[39m\u001b[32m453\u001b[39m \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\u001b[43m*\u001b[49m\u001b[43margs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m)\u001b[49m\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\__init__.py:1524\u001b[39m, in \u001b[36m_preprocess_data.<locals>.inner\u001b[39m\u001b[34m(ax, data, *args, **kwargs)\u001b[39m\n\u001b[32m   1521\u001b[39m \u001b[38;5;129m@functools\u001b[39m.wraps(func)\n\u001b[32m   1522\u001b[39m \u001b[38;5;28;01mdef\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[34minner\u001b[39m(ax, *args, data=\u001b[38;5;28;01mNone\u001b[39;00m, **kwargs):\n\u001b[32m   1523\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m data \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[32m-> \u001b[39m\u001b[32m1524\u001b[39m         \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   1525\u001b[39m \u001b[43m            \u001b[49m\u001b[43max\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1526\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[38;5;28;43mmap\u001b[39;49m\u001b[43m(\u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43margs\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1527\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43m{\u001b[49m\u001b[43mk\u001b[49m\u001b[43m:\u001b[49m\u001b[43m \u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m(\u001b[49m\u001b[43mv\u001b[49m\u001b[43m)\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mfor\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mk\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mv\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;129;43;01min\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m.\u001b[49m\u001b[43mitems\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\u001b[43m}\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m   1529\u001b[39m     bound = new_sig.bind(ax, *args, **kwargs)\n\u001b[32m   1530\u001b[39m     auto_label = (bound.arguments.get(label_namer)\n\u001b[32m   1531\u001b[39m                   \u001b[38;5;129;01mor\u001b[39;00m bound.kwargs.get(label_namer))\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\axes\\_axes.py:1250\u001b[39m, in \u001b[36mAxes.vlines\u001b[39m\u001b[34m(self, x, ymin, ymax, colors, linestyles, label, **kwargs)\u001b[39m\n\u001b[32m   1248\u001b[39m masked_verts[:, \u001b[32m0\u001b[39m, \u001b[32m1\u001b[39m] = ymin\n\u001b[32m   1249\u001b[39m masked_verts[:, \u001b[32m1\u001b[39m, \u001b[32m0\u001b[39m] = x\n\u001b[32m-> \u001b[39m\u001b[32m1250\u001b[39m \u001b[43mmasked_verts\u001b[49m\u001b[43m[\u001b[49m\u001b[43m:\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[32;43m1\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[32;43m1\u001b[39;49m\u001b[43m]\u001b[49m = ymax\n\u001b[32m   1252\u001b[39m lines = mcoll.LineCollection(masked_verts, colors=colors,\n\u001b[32m   1253\u001b[39m                              linestyles=linestyles, label=label)\n\u001b[32m   1254\u001b[39m \u001b[38;5;28mself\u001b[39m.add_collection(lines, autolim=\u001b[38;5;28;01mFalse\u001b[39;00m)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\numpy\\_core\\_ufunc_config.py:511\u001b[39m, in \u001b[36merrstate.__call__.<locals>.inner\u001b[39m\u001b[34m(*args, **kwargs)\u001b[39m\n\u001b[32m    508\u001b[39m _token = _extobj_contextvar.set(extobj)\n\u001b[32m    509\u001b[39m \u001b[38;5;28;01mtry\u001b[39;00m:\n\u001b[32m    510\u001b[39m     \u001b[38;5;66;03m# Call the original, decorated, function:\u001b[39;00m\n\u001b[32m--> \u001b[39m\u001b[32m511\u001b[39m     \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\u001b[43m*\u001b[49m\u001b[43margs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m    512\u001b[39m \u001b[38;5;28;01mfinally\u001b[39;00m:\n\u001b[32m    513\u001b[39m     _extobj_contextvar.reset(_token)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\numpy\\ma\\core.py:3452\u001b[39m, in \u001b[36mMaskedArray.__setitem__\u001b[39m\u001b[34m(self, indx, value)\u001b[39m\n\u001b[32m   3449\u001b[39m     mval = \u001b[38;5;28mtuple\u001b[39m([\u001b[38;5;28;01mFalse\u001b[39;00m] * \u001b[38;5;28mlen\u001b[39m(_dtype.names))\n\u001b[32m   3450\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m _mask \u001b[38;5;129;01mis\u001b[39;00m nomask:\n\u001b[32m   3451\u001b[39m     \u001b[38;5;66;03m# Set the data, then the mask\u001b[39;00m\n\u001b[32m-> \u001b[39m\u001b[32m3452\u001b[39m     \u001b[43m_data\u001b[49m\u001b[43m[\u001b[49m\u001b[43mindx\u001b[49m\u001b[43m]\u001b[49m = dval\n\u001b[32m   3453\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m mval \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m nomask:\n\u001b[32m   3454\u001b[39m         _mask = \u001b[38;5;28mself\u001b[39m._mask = make_mask_none(\u001b[38;5;28mself\u001b[39m.shape, _dtype)\n",
+      "\u001b[31mValueError\u001b[39m: could not broadcast input array from shape (128,) into shape (32,)"
+     ]
+    }
+   ],
+   "source": [
+    "N = 32\n",
+    "m0 = 3\n",
+    "k_arr = np.arange(4*N)\n",
+    "\n",
+    "x_k = np.sin(2 * np.pi / N * m0 * k_arr) + np.sin(2 * np.pi / N * (m0 + 0.25) * k_arr)\n",
+    "\n",
+    "nu_dtft, X_dtft = plot_tools.compute_dtft_analysis(x_k, dtft_points=2048, plot_results=False)\n",
+    "\n",
+    "nu_dft = np.fft.fftshift(np.fft.fftfreq(N))\n",
+    "X_dft = np.fft.fftshift(np.fft.fft(x_k))\n",
+    "\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft)],\n",
+    "    x=[nu_dtft, nu_dft],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| (N={N})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='ДВПФ и ДПФ исходного сигнала',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")\n",
+    "\n",
+    "# Частоты синусоид: f1 = m0/N = 3/32 = 12/128; f2 = (m0+0.25)/N = 3.25/32 = 13/128.\n",
+    "# Чтобы частоты точно попадали на бины ДПФ, размер ДПФ M должен быть кратен 128.\n",
+    "M = 128\n",
+    "x_k_padded = np.pad(x_k, (0, M - N))\n",
+    "\n",
+    "# Вычисление ДПФ интерполированного сигнала\n",
+    "nu_dft_padded = np.fft.fftshift(np.fft.fftfreq(M))\n",
+    "X_dft_padded = np.fft.fftshift(np.fft.fft(x_k_padded))\n",
+    "\n",
+    "# Визуализация 2: Модули ДВПФ и интерполированного ДПФ на одном графике\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft_padded)],\n",
+    "    x=[nu_dtft, nu_dft_padded],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| нуль-дополненного (M={M})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='Интерполяция ДПФ добавлением нулевых отсчетов',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 104,
+   "id": "412db5e6",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "ValueError",
+     "evalue": "could not broadcast input array from shape (128,) into shape (32,)",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[31m---------------------------------------------------------------------------\u001b[39m",
+      "\u001b[31mValueError\u001b[39m                                Traceback (most recent call last)",
+      "\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[104]\u001b[39m\u001b[32m, line 12\u001b[39m\n\u001b[32m      9\u001b[39m nu_dft = np.fft.fftshift(np.fft.fftfreq(N))\n\u001b[32m     10\u001b[39m X_dft = np.fft.fftshift(np.fft.fft(x_k))\n\u001b[32m---> \u001b[39m\u001b[32m12\u001b[39m \u001b[43mplot_tools\u001b[49m\u001b[43m.\u001b[49m\u001b[43mplot_signals\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m     13\u001b[39m \u001b[43m    \u001b[49m\u001b[43my\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[43mnp\u001b[49m\u001b[43m.\u001b[49m\u001b[43mabs\u001b[49m\u001b[43m(\u001b[49m\u001b[43mX_dtft\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mnp\u001b[49m\u001b[43m.\u001b[49m\u001b[43mabs\u001b[49m\u001b[43m(\u001b[49m\u001b[43mX_dft\u001b[49m\u001b[43m)\u001b[49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     14\u001b[39m \u001b[43m    \u001b[49m\u001b[43mx\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[43mnu_dtft\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mnu_dft\u001b[49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     15\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlabels\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mДВПФ |X(ν)|\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[33;43mf\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mДПФ |X[n]| (N=\u001b[39;49m\u001b[38;5;132;43;01m{\u001b[39;49;00m\u001b[43mN\u001b[49m\u001b[38;5;132;43;01m}\u001b[39;49;00m\u001b[33;43m)\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     16\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlinestyles\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43m-\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43m--\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     17\u001b[39m \u001b[43m    \u001b[49m\u001b[43mtitle\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mДВПФ и ДПФ исходного сигнала\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\n\u001b[32m     18\u001b[39m \u001b[43m    \u001b[49m\u001b[43mxlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mНормированная частота ν\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\n\u001b[32m     19\u001b[39m \u001b[43m    \u001b[49m\u001b[43mas_stem\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[38;5;28;43;01mFalse\u001b[39;49;00m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mTrue\u001b[39;49;00m\u001b[43m]\u001b[49m\n\u001b[32m     20\u001b[39m \u001b[43m)\u001b[49m\n\u001b[32m     22\u001b[39m \u001b[38;5;66;03m# Частоты синусоид: f1 = m0/N = 3/32 = 12/128; f2 = (m0+0.25)/N = 3.25/32 = 13/128.\u001b[39;00m\n\u001b[32m     23\u001b[39m \u001b[38;5;66;03m# Чтобы частоты точно попадали на бины ДПФ, размер ДПФ M должен быть кратен 128.\u001b[39;00m\n\u001b[32m     24\u001b[39m M = \u001b[32m128\u001b[39m\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mD:\\git\\MIPT\\tools\\plot_tools.py:133\u001b[39m, in \u001b[36mplot_signals\u001b[39m\u001b[34m(y, x, figsize, errors, labels, colors, linestyles, title, xlabel, ylabel, as_stem, show_err)\u001b[39m\n\u001b[32m    131\u001b[39m \u001b[38;5;66;03m# Priority 2: Discrete stem plotting\u001b[39;00m\n\u001b[32m    132\u001b[39m \u001b[38;5;28;01melif\u001b[39;00m current_as_stem:\n\u001b[32m--> \u001b[39m\u001b[32m133\u001b[39m     markerline, stemlines, baseline = \u001b[43max\u001b[49m\u001b[43m.\u001b[49m\u001b[43mstem\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m    134\u001b[39m \u001b[43m        \u001b[49m\u001b[43mcurr_x\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mcurr_y\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlinefmt\u001b[49m\u001b[43m=\u001b[49m\u001b[43mcolor\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mbasefmt\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m\"\u001b[39;49m\u001b[33;43m \u001b[39;49m\u001b[33;43m\"\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[43mfinal_labels\u001b[49m\u001b[43m[\u001b[49m\u001b[43mi\u001b[49m\u001b[43m]\u001b[49m\n\u001b[32m    135\u001b[39m \u001b[43m    \u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m    136\u001b[39m     plt.setp(markerline, marker=\u001b[33m\"\u001b[39m\u001b[33mo\u001b[39m\u001b[33m\"\u001b[39m, markersize=\u001b[32m4\u001b[39m, color=color)\n\u001b[32m    137\u001b[39m     plt.setp(stemlines, linewidth=\u001b[32m1.2\u001b[39m, color=color, linestyle=l_style)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\__init__.py:1524\u001b[39m, in \u001b[36m_preprocess_data.<locals>.inner\u001b[39m\u001b[34m(ax, data, *args, **kwargs)\u001b[39m\n\u001b[32m   1521\u001b[39m \u001b[38;5;129m@functools\u001b[39m.wraps(func)\n\u001b[32m   1522\u001b[39m \u001b[38;5;28;01mdef\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[34minner\u001b[39m(ax, *args, data=\u001b[38;5;28;01mNone\u001b[39;00m, **kwargs):\n\u001b[32m   1523\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m data \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[32m-> \u001b[39m\u001b[32m1524\u001b[39m         \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   1525\u001b[39m \u001b[43m            \u001b[49m\u001b[43max\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1526\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[38;5;28;43mmap\u001b[39;49m\u001b[43m(\u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43margs\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1527\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43m{\u001b[49m\u001b[43mk\u001b[49m\u001b[43m:\u001b[49m\u001b[43m \u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m(\u001b[49m\u001b[43mv\u001b[49m\u001b[43m)\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mfor\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mk\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mv\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;129;43;01min\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m.\u001b[49m\u001b[43mitems\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\u001b[43m}\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m   1529\u001b[39m     bound = new_sig.bind(ax, *args, **kwargs)\n\u001b[32m   1530\u001b[39m     auto_label = (bound.arguments.get(label_namer)\n\u001b[32m   1531\u001b[39m                   \u001b[38;5;129;01mor\u001b[39;00m bound.kwargs.get(label_namer))\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\axes\\_axes.py:3207\u001b[39m, in \u001b[36mAxes.stem\u001b[39m\u001b[34m(self, linefmt, markerfmt, basefmt, bottom, label, orientation, *args)\u001b[39m\n\u001b[32m   3205\u001b[39m     linestyle = mpl.rcParams[\u001b[33m'\u001b[39m\u001b[33mlines.linestyle\u001b[39m\u001b[33m'\u001b[39m]\n\u001b[32m   3206\u001b[39m xlines = \u001b[38;5;28mself\u001b[39m.vlines \u001b[38;5;28;01mif\u001b[39;00m orientation == \u001b[33m\"\u001b[39m\u001b[33mvertical\u001b[39m\u001b[33m\"\u001b[39m \u001b[38;5;28;01melse\u001b[39;00m \u001b[38;5;28mself\u001b[39m.hlines\n\u001b[32m-> \u001b[39m\u001b[32m3207\u001b[39m stemlines = \u001b[43mxlines\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   3208\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlocs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mbottom\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mheads\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   3209\u001b[39m \u001b[43m    \u001b[49m\u001b[43mcolors\u001b[49m\u001b[43m=\u001b[49m\u001b[43mlinecolor\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlinestyles\u001b[49m\u001b[43m=\u001b[49m\u001b[43mlinestyle\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m\"\u001b[39;49m\u001b[33;43m_nolegend_\u001b[39;49m\u001b[33;43m\"\u001b[39;49m\u001b[43m)\u001b[49m\n\u001b[32m   3211\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m orientation == \u001b[33m'\u001b[39m\u001b[33mhorizontal\u001b[39m\u001b[33m'\u001b[39m:\n\u001b[32m   3212\u001b[39m     marker_x = heads\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\_api\\deprecation.py:453\u001b[39m, in \u001b[36mmake_keyword_only.<locals>.wrapper\u001b[39m\u001b[34m(*args, **kwargs)\u001b[39m\n\u001b[32m    447\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mlen\u001b[39m(args) > name_idx:\n\u001b[32m    448\u001b[39m     warn_deprecated(\n\u001b[32m    449\u001b[39m         since, message=\u001b[33m\"\u001b[39m\u001b[33mPassing the \u001b[39m\u001b[38;5;132;01m%(name)s\u001b[39;00m\u001b[33m \u001b[39m\u001b[38;5;132;01m%(obj_type)s\u001b[39;00m\u001b[33m \u001b[39m\u001b[33m\"\u001b[39m\n\u001b[32m    450\u001b[39m         \u001b[33m\"\u001b[39m\u001b[33mpositionally is deprecated since Matplotlib \u001b[39m\u001b[38;5;132;01m%(since)s\u001b[39;00m\u001b[33m; the \u001b[39m\u001b[33m\"\u001b[39m\n\u001b[32m    451\u001b[39m         \u001b[33m\"\u001b[39m\u001b[33mparameter will become keyword-only in \u001b[39m\u001b[38;5;132;01m%(removal)s\u001b[39;00m\u001b[33m.\u001b[39m\u001b[33m\"\u001b[39m,\n\u001b[32m    452\u001b[39m         name=name, obj_type=\u001b[33mf\u001b[39m\u001b[33m\"\u001b[39m\u001b[33mparameter of \u001b[39m\u001b[38;5;132;01m{\u001b[39;00mfunc.\u001b[34m__name__\u001b[39m\u001b[38;5;132;01m}\u001b[39;00m\u001b[33m()\u001b[39m\u001b[33m\"\u001b[39m)\n\u001b[32m--> \u001b[39m\u001b[32m453\u001b[39m \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\u001b[43m*\u001b[49m\u001b[43margs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m)\u001b[49m\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\__init__.py:1524\u001b[39m, in \u001b[36m_preprocess_data.<locals>.inner\u001b[39m\u001b[34m(ax, data, *args, **kwargs)\u001b[39m\n\u001b[32m   1521\u001b[39m \u001b[38;5;129m@functools\u001b[39m.wraps(func)\n\u001b[32m   1522\u001b[39m \u001b[38;5;28;01mdef\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[34minner\u001b[39m(ax, *args, data=\u001b[38;5;28;01mNone\u001b[39;00m, **kwargs):\n\u001b[32m   1523\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m data \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[32m-> \u001b[39m\u001b[32m1524\u001b[39m         \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   1525\u001b[39m \u001b[43m            \u001b[49m\u001b[43max\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1526\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[38;5;28;43mmap\u001b[39;49m\u001b[43m(\u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43margs\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1527\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43m{\u001b[49m\u001b[43mk\u001b[49m\u001b[43m:\u001b[49m\u001b[43m \u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m(\u001b[49m\u001b[43mv\u001b[49m\u001b[43m)\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mfor\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mk\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mv\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;129;43;01min\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m.\u001b[49m\u001b[43mitems\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\u001b[43m}\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m   1529\u001b[39m     bound = new_sig.bind(ax, *args, **kwargs)\n\u001b[32m   1530\u001b[39m     auto_label = (bound.arguments.get(label_namer)\n\u001b[32m   1531\u001b[39m                   \u001b[38;5;129;01mor\u001b[39;00m bound.kwargs.get(label_namer))\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\axes\\_axes.py:1250\u001b[39m, in \u001b[36mAxes.vlines\u001b[39m\u001b[34m(self, x, ymin, ymax, colors, linestyles, label, **kwargs)\u001b[39m\n\u001b[32m   1248\u001b[39m masked_verts[:, \u001b[32m0\u001b[39m, \u001b[32m1\u001b[39m] = ymin\n\u001b[32m   1249\u001b[39m masked_verts[:, \u001b[32m1\u001b[39m, \u001b[32m0\u001b[39m] = x\n\u001b[32m-> \u001b[39m\u001b[32m1250\u001b[39m \u001b[43mmasked_verts\u001b[49m\u001b[43m[\u001b[49m\u001b[43m:\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[32;43m1\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[32;43m1\u001b[39;49m\u001b[43m]\u001b[49m = ymax\n\u001b[32m   1252\u001b[39m lines = mcoll.LineCollection(masked_verts, colors=colors,\n\u001b[32m   1253\u001b[39m                              linestyles=linestyles, label=label)\n\u001b[32m   1254\u001b[39m \u001b[38;5;28mself\u001b[39m.add_collection(lines, autolim=\u001b[38;5;28;01mFalse\u001b[39;00m)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\numpy\\_core\\_ufunc_config.py:511\u001b[39m, in \u001b[36merrstate.__call__.<locals>.inner\u001b[39m\u001b[34m(*args, **kwargs)\u001b[39m\n\u001b[32m    508\u001b[39m _token = _extobj_contextvar.set(extobj)\n\u001b[32m    509\u001b[39m \u001b[38;5;28;01mtry\u001b[39;00m:\n\u001b[32m    510\u001b[39m     \u001b[38;5;66;03m# Call the original, decorated, function:\u001b[39;00m\n\u001b[32m--> \u001b[39m\u001b[32m511\u001b[39m     \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\u001b[43m*\u001b[49m\u001b[43margs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m    512\u001b[39m \u001b[38;5;28;01mfinally\u001b[39;00m:\n\u001b[32m    513\u001b[39m     _extobj_contextvar.reset(_token)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\numpy\\ma\\core.py:3452\u001b[39m, in \u001b[36mMaskedArray.__setitem__\u001b[39m\u001b[34m(self, indx, value)\u001b[39m\n\u001b[32m   3449\u001b[39m     mval = \u001b[38;5;28mtuple\u001b[39m([\u001b[38;5;28;01mFalse\u001b[39;00m] * \u001b[38;5;28mlen\u001b[39m(_dtype.names))\n\u001b[32m   3450\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m _mask \u001b[38;5;129;01mis\u001b[39;00m nomask:\n\u001b[32m   3451\u001b[39m     \u001b[38;5;66;03m# Set the data, then the mask\u001b[39;00m\n\u001b[32m-> \u001b[39m\u001b[32m3452\u001b[39m     \u001b[43m_data\u001b[49m\u001b[43m[\u001b[49m\u001b[43mindx\u001b[49m\u001b[43m]\u001b[49m = dval\n\u001b[32m   3453\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m mval \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m nomask:\n\u001b[32m   3454\u001b[39m         _mask = \u001b[38;5;28mself\u001b[39m._mask = make_mask_none(\u001b[38;5;28mself\u001b[39m.shape, _dtype)\n",
+      "\u001b[31mValueError\u001b[39m: could not broadcast input array from shape (128,) into shape (32,)"
+     ]
+    }
+   ],
+   "source": [
+    "N = 32\n",
+    "m0 = 3\n",
+    "k_arr = np.arange(4*N)\n",
+    "\n",
+    "x_k = np.sin(2 * np.pi / N * m0 * k_arr) + np.sin(2 * np.pi / N * (m0 + 0.25) * k_arr)\n",
+    "\n",
+    "nu_dtft, X_dtft = plot_tools.compute_dtft_analysis(x_k, dtft_points=2048, plot_results=False)\n",
+    "\n",
+    "nu_dft = np.fft.fftshift(np.fft.fftfreq(N))\n",
+    "X_dft = np.fft.fftshift(np.fft.fft(x_k))\n",
+    "\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft)],\n",
+    "    x=[nu_dtft, nu_dft],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| (N={N})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='ДВПФ и ДПФ исходного сигнала',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")\n",
+    "\n",
+    "# Частоты синусоид: f1 = m0/N = 3/32 = 12/128; f2 = (m0+0.25)/N = 3.25/32 = 13/128.\n",
+    "# Чтобы частоты точно попадали на бины ДПФ, размер ДПФ M должен быть кратен 128.\n",
+    "M = 128\n",
+    "x_k_padded = np.pad(x_k, (0, M - N*4))\n",
+    "\n",
+    "# Вычисление ДПФ интерполированного сигнала\n",
+    "nu_dft_padded = np.fft.fftshift(np.fft.fftfreq(M))\n",
+    "X_dft_padded = np.fft.fftshift(np.fft.fft(x_k_padded))\n",
+    "\n",
+    "# Визуализация 2: Модули ДВПФ и интерполированного ДПФ на одном графике\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft_padded)],\n",
+    "    x=[nu_dtft, nu_dft_padded],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| нуль-дополненного (M={M})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='Интерполяция ДПФ добавлением нулевых отсчетов',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 105,
+   "id": "a22a5850",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "ValueError",
+     "evalue": "could not broadcast input array from shape (128,) into shape (32,)",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[31m---------------------------------------------------------------------------\u001b[39m",
+      "\u001b[31mValueError\u001b[39m                                Traceback (most recent call last)",
+      "\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[105]\u001b[39m\u001b[32m, line 12\u001b[39m\n\u001b[32m      9\u001b[39m nu_dft = np.fft.fftshift(np.fft.fftfreq(N))\n\u001b[32m     10\u001b[39m X_dft = np.fft.fftshift(np.fft.fft(x_k))\n\u001b[32m---> \u001b[39m\u001b[32m12\u001b[39m \u001b[43mplot_tools\u001b[49m\u001b[43m.\u001b[49m\u001b[43mplot_signals\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m     13\u001b[39m \u001b[43m    \u001b[49m\u001b[43my\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[43mnp\u001b[49m\u001b[43m.\u001b[49m\u001b[43mabs\u001b[49m\u001b[43m(\u001b[49m\u001b[43mX_dtft\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mnp\u001b[49m\u001b[43m.\u001b[49m\u001b[43mabs\u001b[49m\u001b[43m(\u001b[49m\u001b[43mX_dft\u001b[49m\u001b[43m)\u001b[49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     14\u001b[39m \u001b[43m    \u001b[49m\u001b[43mx\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[43mnu_dtft\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mnu_dft\u001b[49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     15\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlabels\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mДВПФ |X(ν)|\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[33;43mf\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mДПФ |X[n]| (N=\u001b[39;49m\u001b[38;5;132;43;01m{\u001b[39;49;00m\u001b[43mN\u001b[49m\u001b[38;5;132;43;01m}\u001b[39;49;00m\u001b[33;43m)\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     16\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlinestyles\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43m-\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43m--\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     17\u001b[39m \u001b[43m    \u001b[49m\u001b[43mtitle\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mДВПФ и ДПФ исходного сигнала\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\n\u001b[32m     18\u001b[39m \u001b[43m    \u001b[49m\u001b[43mxlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mНормированная частота ν\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\n\u001b[32m     19\u001b[39m \u001b[43m    \u001b[49m\u001b[43mas_stem\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[38;5;28;43;01mFalse\u001b[39;49;00m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mTrue\u001b[39;49;00m\u001b[43m]\u001b[49m\n\u001b[32m     20\u001b[39m \u001b[43m)\u001b[49m\n\u001b[32m     22\u001b[39m \u001b[38;5;66;03m# Частоты синусоид: f1 = m0/N = 3/32 = 12/128; f2 = (m0+0.25)/N = 3.25/32 = 13/128.\u001b[39;00m\n\u001b[32m     23\u001b[39m \u001b[38;5;66;03m# Чтобы частоты точно попадали на бины ДПФ, размер ДПФ M должен быть кратен 128.\u001b[39;00m\n\u001b[32m     24\u001b[39m M = \u001b[32m128\u001b[39m\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mD:\\git\\MIPT\\tools\\plot_tools.py:133\u001b[39m, in \u001b[36mplot_signals\u001b[39m\u001b[34m(y, x, figsize, errors, labels, colors, linestyles, title, xlabel, ylabel, as_stem, show_err)\u001b[39m\n\u001b[32m    131\u001b[39m \u001b[38;5;66;03m# Priority 2: Discrete stem plotting\u001b[39;00m\n\u001b[32m    132\u001b[39m \u001b[38;5;28;01melif\u001b[39;00m current_as_stem:\n\u001b[32m--> \u001b[39m\u001b[32m133\u001b[39m     markerline, stemlines, baseline = \u001b[43max\u001b[49m\u001b[43m.\u001b[49m\u001b[43mstem\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m    134\u001b[39m \u001b[43m        \u001b[49m\u001b[43mcurr_x\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mcurr_y\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlinefmt\u001b[49m\u001b[43m=\u001b[49m\u001b[43mcolor\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mbasefmt\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m\"\u001b[39;49m\u001b[33;43m \u001b[39;49m\u001b[33;43m\"\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[43mfinal_labels\u001b[49m\u001b[43m[\u001b[49m\u001b[43mi\u001b[49m\u001b[43m]\u001b[49m\n\u001b[32m    135\u001b[39m \u001b[43m    \u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m    136\u001b[39m     plt.setp(markerline, marker=\u001b[33m\"\u001b[39m\u001b[33mo\u001b[39m\u001b[33m\"\u001b[39m, markersize=\u001b[32m4\u001b[39m, color=color)\n\u001b[32m    137\u001b[39m     plt.setp(stemlines, linewidth=\u001b[32m1.2\u001b[39m, color=color, linestyle=l_style)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\__init__.py:1524\u001b[39m, in \u001b[36m_preprocess_data.<locals>.inner\u001b[39m\u001b[34m(ax, data, *args, **kwargs)\u001b[39m\n\u001b[32m   1521\u001b[39m \u001b[38;5;129m@functools\u001b[39m.wraps(func)\n\u001b[32m   1522\u001b[39m \u001b[38;5;28;01mdef\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[34minner\u001b[39m(ax, *args, data=\u001b[38;5;28;01mNone\u001b[39;00m, **kwargs):\n\u001b[32m   1523\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m data \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[32m-> \u001b[39m\u001b[32m1524\u001b[39m         \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   1525\u001b[39m \u001b[43m            \u001b[49m\u001b[43max\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1526\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[38;5;28;43mmap\u001b[39;49m\u001b[43m(\u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43margs\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1527\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43m{\u001b[49m\u001b[43mk\u001b[49m\u001b[43m:\u001b[49m\u001b[43m \u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m(\u001b[49m\u001b[43mv\u001b[49m\u001b[43m)\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mfor\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mk\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mv\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;129;43;01min\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m.\u001b[49m\u001b[43mitems\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\u001b[43m}\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m   1529\u001b[39m     bound = new_sig.bind(ax, *args, **kwargs)\n\u001b[32m   1530\u001b[39m     auto_label = (bound.arguments.get(label_namer)\n\u001b[32m   1531\u001b[39m                   \u001b[38;5;129;01mor\u001b[39;00m bound.kwargs.get(label_namer))\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\axes\\_axes.py:3207\u001b[39m, in \u001b[36mAxes.stem\u001b[39m\u001b[34m(self, linefmt, markerfmt, basefmt, bottom, label, orientation, *args)\u001b[39m\n\u001b[32m   3205\u001b[39m     linestyle = mpl.rcParams[\u001b[33m'\u001b[39m\u001b[33mlines.linestyle\u001b[39m\u001b[33m'\u001b[39m]\n\u001b[32m   3206\u001b[39m xlines = \u001b[38;5;28mself\u001b[39m.vlines \u001b[38;5;28;01mif\u001b[39;00m orientation == \u001b[33m\"\u001b[39m\u001b[33mvertical\u001b[39m\u001b[33m\"\u001b[39m \u001b[38;5;28;01melse\u001b[39;00m \u001b[38;5;28mself\u001b[39m.hlines\n\u001b[32m-> \u001b[39m\u001b[32m3207\u001b[39m stemlines = \u001b[43mxlines\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   3208\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlocs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mbottom\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mheads\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   3209\u001b[39m \u001b[43m    \u001b[49m\u001b[43mcolors\u001b[49m\u001b[43m=\u001b[49m\u001b[43mlinecolor\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlinestyles\u001b[49m\u001b[43m=\u001b[49m\u001b[43mlinestyle\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m\"\u001b[39;49m\u001b[33;43m_nolegend_\u001b[39;49m\u001b[33;43m\"\u001b[39;49m\u001b[43m)\u001b[49m\n\u001b[32m   3211\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m orientation == \u001b[33m'\u001b[39m\u001b[33mhorizontal\u001b[39m\u001b[33m'\u001b[39m:\n\u001b[32m   3212\u001b[39m     marker_x = heads\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\_api\\deprecation.py:453\u001b[39m, in \u001b[36mmake_keyword_only.<locals>.wrapper\u001b[39m\u001b[34m(*args, **kwargs)\u001b[39m\n\u001b[32m    447\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mlen\u001b[39m(args) > name_idx:\n\u001b[32m    448\u001b[39m     warn_deprecated(\n\u001b[32m    449\u001b[39m         since, message=\u001b[33m\"\u001b[39m\u001b[33mPassing the \u001b[39m\u001b[38;5;132;01m%(name)s\u001b[39;00m\u001b[33m \u001b[39m\u001b[38;5;132;01m%(obj_type)s\u001b[39;00m\u001b[33m \u001b[39m\u001b[33m\"\u001b[39m\n\u001b[32m    450\u001b[39m         \u001b[33m\"\u001b[39m\u001b[33mpositionally is deprecated since Matplotlib \u001b[39m\u001b[38;5;132;01m%(since)s\u001b[39;00m\u001b[33m; the \u001b[39m\u001b[33m\"\u001b[39m\n\u001b[32m    451\u001b[39m         \u001b[33m\"\u001b[39m\u001b[33mparameter will become keyword-only in \u001b[39m\u001b[38;5;132;01m%(removal)s\u001b[39;00m\u001b[33m.\u001b[39m\u001b[33m\"\u001b[39m,\n\u001b[32m    452\u001b[39m         name=name, obj_type=\u001b[33mf\u001b[39m\u001b[33m\"\u001b[39m\u001b[33mparameter of \u001b[39m\u001b[38;5;132;01m{\u001b[39;00mfunc.\u001b[34m__name__\u001b[39m\u001b[38;5;132;01m}\u001b[39;00m\u001b[33m()\u001b[39m\u001b[33m\"\u001b[39m)\n\u001b[32m--> \u001b[39m\u001b[32m453\u001b[39m \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\u001b[43m*\u001b[49m\u001b[43margs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m)\u001b[49m\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\__init__.py:1524\u001b[39m, in \u001b[36m_preprocess_data.<locals>.inner\u001b[39m\u001b[34m(ax, data, *args, **kwargs)\u001b[39m\n\u001b[32m   1521\u001b[39m \u001b[38;5;129m@functools\u001b[39m.wraps(func)\n\u001b[32m   1522\u001b[39m \u001b[38;5;28;01mdef\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[34minner\u001b[39m(ax, *args, data=\u001b[38;5;28;01mNone\u001b[39;00m, **kwargs):\n\u001b[32m   1523\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m data \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[32m-> \u001b[39m\u001b[32m1524\u001b[39m         \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   1525\u001b[39m \u001b[43m            \u001b[49m\u001b[43max\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1526\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[38;5;28;43mmap\u001b[39;49m\u001b[43m(\u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43margs\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1527\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43m{\u001b[49m\u001b[43mk\u001b[49m\u001b[43m:\u001b[49m\u001b[43m \u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m(\u001b[49m\u001b[43mv\u001b[49m\u001b[43m)\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mfor\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mk\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mv\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;129;43;01min\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m.\u001b[49m\u001b[43mitems\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\u001b[43m}\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m   1529\u001b[39m     bound = new_sig.bind(ax, *args, **kwargs)\n\u001b[32m   1530\u001b[39m     auto_label = (bound.arguments.get(label_namer)\n\u001b[32m   1531\u001b[39m                   \u001b[38;5;129;01mor\u001b[39;00m bound.kwargs.get(label_namer))\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\axes\\_axes.py:1250\u001b[39m, in \u001b[36mAxes.vlines\u001b[39m\u001b[34m(self, x, ymin, ymax, colors, linestyles, label, **kwargs)\u001b[39m\n\u001b[32m   1248\u001b[39m masked_verts[:, \u001b[32m0\u001b[39m, \u001b[32m1\u001b[39m] = ymin\n\u001b[32m   1249\u001b[39m masked_verts[:, \u001b[32m1\u001b[39m, \u001b[32m0\u001b[39m] = x\n\u001b[32m-> \u001b[39m\u001b[32m1250\u001b[39m \u001b[43mmasked_verts\u001b[49m\u001b[43m[\u001b[49m\u001b[43m:\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[32;43m1\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[32;43m1\u001b[39;49m\u001b[43m]\u001b[49m = ymax\n\u001b[32m   1252\u001b[39m lines = mcoll.LineCollection(masked_verts, colors=colors,\n\u001b[32m   1253\u001b[39m                              linestyles=linestyles, label=label)\n\u001b[32m   1254\u001b[39m \u001b[38;5;28mself\u001b[39m.add_collection(lines, autolim=\u001b[38;5;28;01mFalse\u001b[39;00m)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\numpy\\_core\\_ufunc_config.py:511\u001b[39m, in \u001b[36merrstate.__call__.<locals>.inner\u001b[39m\u001b[34m(*args, **kwargs)\u001b[39m\n\u001b[32m    508\u001b[39m _token = _extobj_contextvar.set(extobj)\n\u001b[32m    509\u001b[39m \u001b[38;5;28;01mtry\u001b[39;00m:\n\u001b[32m    510\u001b[39m     \u001b[38;5;66;03m# Call the original, decorated, function:\u001b[39;00m\n\u001b[32m--> \u001b[39m\u001b[32m511\u001b[39m     \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\u001b[43m*\u001b[49m\u001b[43margs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m    512\u001b[39m \u001b[38;5;28;01mfinally\u001b[39;00m:\n\u001b[32m    513\u001b[39m     _extobj_contextvar.reset(_token)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\numpy\\ma\\core.py:3452\u001b[39m, in \u001b[36mMaskedArray.__setitem__\u001b[39m\u001b[34m(self, indx, value)\u001b[39m\n\u001b[32m   3449\u001b[39m     mval = \u001b[38;5;28mtuple\u001b[39m([\u001b[38;5;28;01mFalse\u001b[39;00m] * \u001b[38;5;28mlen\u001b[39m(_dtype.names))\n\u001b[32m   3450\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m _mask \u001b[38;5;129;01mis\u001b[39;00m nomask:\n\u001b[32m   3451\u001b[39m     \u001b[38;5;66;03m# Set the data, then the mask\u001b[39;00m\n\u001b[32m-> \u001b[39m\u001b[32m3452\u001b[39m     \u001b[43m_data\u001b[49m\u001b[43m[\u001b[49m\u001b[43mindx\u001b[49m\u001b[43m]\u001b[49m = dval\n\u001b[32m   3453\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m mval \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m nomask:\n\u001b[32m   3454\u001b[39m         _mask = \u001b[38;5;28mself\u001b[39m._mask = make_mask_none(\u001b[38;5;28mself\u001b[39m.shape, _dtype)\n",
+      "\u001b[31mValueError\u001b[39m: could not broadcast input array from shape (128,) into shape (32,)"
+     ]
+    }
+   ],
+   "source": [
+    "N = 32\n",
+    "m0 = 3\n",
+    "k_arr = np.arange(4*N)\n",
+    "\n",
+    "x_k = np.sin(2 * np.pi / N * m0 * k_arr) + np.sin(2 * np.pi / N * (m0 + 0.25) * k_arr)\n",
+    "\n",
+    "nu_dtft, X_dtft = plot_tools.compute_dtft_analysis(x_k, dtft_points=2048, plot_results=False)\n",
+    "\n",
+    "nu_dft = np.fft.fftshift(np.fft.fftfreq(N))\n",
+    "X_dft = np.fft.fftshift(np.fft.fft(x_k))\n",
+    "\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft)],\n",
+    "    x=[nu_dtft, nu_dft],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| (N={N})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='ДВПФ и ДПФ исходного сигнала',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")\n",
+    "\n",
+    "# Частоты синусоид: f1 = m0/N = 3/32 = 12/128; f2 = (m0+0.25)/N = 3.25/32 = 13/128.\n",
+    "# Чтобы частоты точно попадали на бины ДПФ, размер ДПФ M должен быть кратен 128.\n",
+    "M = 128\n",
+    "x_k_padded = np.pad(x_k, (0, M - N))\n",
+    "\n",
+    "# Вычисление ДПФ интерполированного сигнала\n",
+    "nu_dft_padded = np.fft.fftshift(np.fft.fftfreq(M))\n",
+    "X_dft_padded = np.fft.fftshift(np.fft.fft(x_k_padded))\n",
+    "\n",
+    "# Визуализация 2: Модули ДВПФ и интерполированного ДПФ на одном графике\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft_padded)],\n",
+    "    x=[nu_dtft, nu_dft_padded],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| нуль-дополненного (M={M})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='Интерполяция ДПФ добавлением нулевых отсчетов',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 106,
+   "id": "3dc0608b",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([-6.65177689e-01 +0.j        , -3.30676023e-01 +0.34822684j,\n",
+       "        3.02337001e-02 +0.02725132j, -2.77818499e-01 -0.34742498j,\n",
+       "       -6.66956756e-01 -0.054678j  , -3.90678881e-01 +0.34580351j,\n",
+       "        2.01310783e-02 +0.08246031j, -2.30841978e-01 -0.34332602j,\n",
+       "       -6.72457810e-01 -0.11078869j, -4.59752825e-01 +0.33993564j,\n",
+       "       -1.00375365e-03 +0.13986965j, -1.89011334e-01 -0.33555209j,\n",
+       "       -6.82207021e-01 -0.16993271j, -5.40757983e-01 +0.33006729j,\n",
+       "       -3.52266076e-02 +0.20123907j, -1.52097382e-01 -0.32333919j,\n",
+       "       -6.97210375e-01 -0.23409259j, -6.37990509e-01 +0.31518308j,\n",
+       "       -8.61908184e-02 +0.26885435j, -1.20472678e-01 -0.30535933j,\n",
+       "       -7.19204097e-01 -0.30596233j, -7.58108822e-01 +0.29355617j,\n",
+       "       -1.60101607e-01 +0.34595885j, -9.53916792e-02 -0.27936484j,\n",
+       "       -7.51161077e-01 -0.38952971j, -9.11928507e-01 +0.26224345j,\n",
+       "       -2.67652978e-01 +0.43756157j, -7.96342236e-02 -0.24146292j,\n",
+       "       -7.98357500e-01 -0.49122878j, -1.11817537e+00 +0.21602424j,\n",
+       "       -4.28211554e-01 +0.5521291j , -7.89899046e-02 -0.18452771j,\n",
+       "       -8.70825273e-01 -0.62250412j, -1.41220263e+00 +0.14495855j,\n",
+       "       -6.79840424e-01 +0.70561421j, -1.05991742e-01 -0.09431979j,\n",
+       "       -9.89789875e-01 -0.80641138j, -1.86943715e+00 +0.02796924j,\n",
+       "       -1.10727205e+00 +0.93283067j, -1.90833613e-01 +0.06165889j,\n",
+       "       -1.20828201e+00 -1.09848584j, -2.68384433e+00 -0.18773244j,\n",
+       "       -1.94058738e+00 +1.32895204j, -4.22107185e-01 +0.37528077j,\n",
+       "       -1.70276571e+00 -1.67880529j, -4.54892849e+00 -0.67820229j,\n",
+       "       -4.08342445e+00 +2.28952966j, -1.18546199e+00 +1.23712697j,\n",
+       "       -3.59934783e+00 -3.67898679j, -1.32465557e+01 -2.56882192j,\n",
+       "       -1.88670874e+01+10.50421636j, -9.15472629e+00+25.32889824j,\n",
+       "        1.00388437e+01+25.82889824j,  2.07563979e+01+11.07866411j,\n",
+       "        1.52958939e+01 -2.99437417j,  4.66467863e+00 -4.33047903j,\n",
+       "        1.96825817e+00 +1.58563473j,  5.89433735e+00 +3.02361115j,\n",
+       "        6.86533758e+00 -0.9441208j ,  3.06193764e+00 -2.50477646j,\n",
+       "        1.17729152e+00 +0.54930959j,  3.75751308e+00 +2.26140119j,\n",
+       "        5.44500283e+00 -0.25528329j,  3.05755111e+00 -2.16014472j,\n",
+       "        1.01352160e+00 +0.j        ,  3.05755111e+00 +2.16014472j,\n",
+       "        5.44500283e+00 +0.25528329j,  3.75751308e+00 -2.26140119j,\n",
+       "        1.17729152e+00 -0.54930959j,  3.06193764e+00 +2.50477646j,\n",
+       "        6.86533758e+00 +0.9441208j ,  5.89433735e+00 -3.02361115j,\n",
+       "        1.96825817e+00 -1.58563473j,  4.66467863e+00 +4.33047903j,\n",
+       "        1.52958939e+01 +2.99437417j,  2.07563979e+01-11.07866411j,\n",
+       "        1.00388437e+01-25.82889824j, -9.15472629e+00-25.32889824j,\n",
+       "       -1.88670874e+01-10.50421636j, -1.32465557e+01 +2.56882192j,\n",
+       "       -3.59934783e+00 +3.67898679j, -1.18546199e+00 -1.23712697j,\n",
+       "       -4.08342445e+00 -2.28952966j, -4.54892849e+00 +0.67820229j,\n",
+       "       -1.70276571e+00 +1.67880529j, -4.22107185e-01 -0.37528077j,\n",
+       "       -1.94058738e+00 -1.32895204j, -2.68384433e+00 +0.18773244j,\n",
+       "       -1.20828201e+00 +1.09848584j, -1.90833613e-01 -0.06165889j,\n",
+       "       -1.10727205e+00 -0.93283067j, -1.86943715e+00 -0.02796924j,\n",
+       "       -9.89789875e-01 +0.80641138j, -1.05991742e-01 +0.09431979j,\n",
+       "       -6.79840424e-01 -0.70561421j, -1.41220263e+00 -0.14495855j,\n",
+       "       -8.70825273e-01 +0.62250412j, -7.89899046e-02 +0.18452771j,\n",
+       "       -4.28211554e-01 -0.5521291j , -1.11817537e+00 -0.21602424j,\n",
+       "       -7.98357500e-01 +0.49122878j, -7.96342236e-02 +0.24146292j,\n",
+       "       -2.67652978e-01 -0.43756157j, -9.11928507e-01 -0.26224345j,\n",
+       "       -7.51161077e-01 +0.38952971j, -9.53916792e-02 +0.27936484j,\n",
+       "       -1.60101607e-01 -0.34595885j, -7.58108822e-01 -0.29355617j,\n",
+       "       -7.19204097e-01 +0.30596233j, -1.20472678e-01 +0.30535933j,\n",
+       "       -8.61908184e-02 -0.26885435j, -6.37990509e-01 -0.31518308j,\n",
+       "       -6.97210375e-01 +0.23409259j, -1.52097382e-01 +0.32333919j,\n",
+       "       -3.52266076e-02 -0.20123907j, -5.40757983e-01 -0.33006729j,\n",
+       "       -6.82207021e-01 +0.16993271j, -1.89011334e-01 +0.33555209j,\n",
+       "       -1.00375365e-03 -0.13986965j, -4.59752825e-01 -0.33993564j,\n",
+       "       -6.72457810e-01 +0.11078869j, -2.30841978e-01 +0.34332602j,\n",
+       "        2.01310783e-02 -0.08246031j, -3.90678881e-01 -0.34580351j,\n",
+       "       -6.66956756e-01 +0.054678j  , -2.77818499e-01 +0.34742498j,\n",
+       "        3.02337001e-02 -0.02725132j, -3.30676023e-01 -0.34822684j])"
+      ]
+     },
+     "execution_count": 106,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_dft_padded"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 107,
+   "id": "2b765636",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(128,)"
+      ]
+     },
+     "execution_count": 107,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_dft_padded.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 108,
+   "id": "51effbbd",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([-0.5      , -0.4921875, -0.484375 , -0.4765625, -0.46875  ,\n",
+       "       -0.4609375, -0.453125 , -0.4453125, -0.4375   , -0.4296875,\n",
+       "       -0.421875 , -0.4140625, -0.40625  , -0.3984375, -0.390625 ,\n",
+       "       -0.3828125, -0.375    , -0.3671875, -0.359375 , -0.3515625,\n",
+       "       -0.34375  , -0.3359375, -0.328125 , -0.3203125, -0.3125   ,\n",
+       "       -0.3046875, -0.296875 , -0.2890625, -0.28125  , -0.2734375,\n",
+       "       -0.265625 , -0.2578125, -0.25     , -0.2421875, -0.234375 ,\n",
+       "       -0.2265625, -0.21875  , -0.2109375, -0.203125 , -0.1953125,\n",
+       "       -0.1875   , -0.1796875, -0.171875 , -0.1640625, -0.15625  ,\n",
+       "       -0.1484375, -0.140625 , -0.1328125, -0.125    , -0.1171875,\n",
+       "       -0.109375 , -0.1015625, -0.09375  , -0.0859375, -0.078125 ,\n",
+       "       -0.0703125, -0.0625   , -0.0546875, -0.046875 , -0.0390625,\n",
+       "       -0.03125  , -0.0234375, -0.015625 , -0.0078125,  0.       ,\n",
+       "        0.0078125,  0.015625 ,  0.0234375,  0.03125  ,  0.0390625,\n",
+       "        0.046875 ,  0.0546875,  0.0625   ,  0.0703125,  0.078125 ,\n",
+       "        0.0859375,  0.09375  ,  0.1015625,  0.109375 ,  0.1171875,\n",
+       "        0.125    ,  0.1328125,  0.140625 ,  0.1484375,  0.15625  ,\n",
+       "        0.1640625,  0.171875 ,  0.1796875,  0.1875   ,  0.1953125,\n",
+       "        0.203125 ,  0.2109375,  0.21875  ,  0.2265625,  0.234375 ,\n",
+       "        0.2421875,  0.25     ,  0.2578125,  0.265625 ,  0.2734375,\n",
+       "        0.28125  ,  0.2890625,  0.296875 ,  0.3046875,  0.3125   ,\n",
+       "        0.3203125,  0.328125 ,  0.3359375,  0.34375  ,  0.3515625,\n",
+       "        0.359375 ,  0.3671875,  0.375    ,  0.3828125,  0.390625 ,\n",
+       "        0.3984375,  0.40625  ,  0.4140625,  0.421875 ,  0.4296875,\n",
+       "        0.4375   ,  0.4453125,  0.453125 ,  0.4609375,  0.46875  ,\n",
+       "        0.4765625,  0.484375 ,  0.4921875])"
+      ]
+     },
+     "execution_count": 108,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "nu_dft_padded"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 109,
+   "id": "c1fd5559",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(128,)"
+      ]
+     },
+     "execution_count": 109,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "nu_dft_padded.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 110,
+   "id": "9bdbaf11",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(2048,)"
+      ]
+     },
+     "execution_count": 110,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_dtft.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 111,
+   "id": "0e95436a",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(2048,)"
+      ]
+     },
+     "execution_count": 111,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "nu_dtft.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 112,
+   "id": "a338cfbf",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(128,)"
+      ]
+     },
+     "execution_count": 112,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_dft.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 113,
+   "id": "73d7512e",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(32,)"
+      ]
+     },
+     "execution_count": 113,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "nu_dft.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 114,
+   "id": "5f528c28",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "ValueError",
+     "evalue": "could not broadcast input array from shape (224,) into shape (128,)",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[31m---------------------------------------------------------------------------\u001b[39m",
+      "\u001b[31mValueError\u001b[39m                                Traceback (most recent call last)",
+      "\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[114]\u001b[39m\u001b[32m, line 32\u001b[39m\n\u001b[32m     29\u001b[39m X_dft_padded = np.fft.fftshift(np.fft.fft(x_k_padded))\n\u001b[32m     31\u001b[39m \u001b[38;5;66;03m# Визуализация 2: Модули ДВПФ и интерполированного ДПФ на одном графике\u001b[39;00m\n\u001b[32m---> \u001b[39m\u001b[32m32\u001b[39m \u001b[43mplot_tools\u001b[49m\u001b[43m.\u001b[49m\u001b[43mplot_signals\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m     33\u001b[39m \u001b[43m    \u001b[49m\u001b[43my\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[43mnp\u001b[49m\u001b[43m.\u001b[49m\u001b[43mabs\u001b[49m\u001b[43m(\u001b[49m\u001b[43mX_dtft\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mnp\u001b[49m\u001b[43m.\u001b[49m\u001b[43mabs\u001b[49m\u001b[43m(\u001b[49m\u001b[43mX_dft_padded\u001b[49m\u001b[43m)\u001b[49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     34\u001b[39m \u001b[43m    \u001b[49m\u001b[43mx\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[43mnu_dtft\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mnu_dft_padded\u001b[49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     35\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlabels\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mДВПФ |X(ν)|\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[33;43mf\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mДПФ |X[n]| нуль-дополненного (M=\u001b[39;49m\u001b[38;5;132;43;01m{\u001b[39;49;00m\u001b[43mM\u001b[49m\u001b[38;5;132;43;01m}\u001b[39;49;00m\u001b[33;43m)\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     36\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlinestyles\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43m-\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43m--\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     37\u001b[39m \u001b[43m    \u001b[49m\u001b[43mtitle\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mИнтерполяция ДПФ добавлением нулевых отсчетов\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\n\u001b[32m     38\u001b[39m \u001b[43m    \u001b[49m\u001b[43mxlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mНормированная частота ν\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\n\u001b[32m     39\u001b[39m \u001b[43m    \u001b[49m\u001b[43mas_stem\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[38;5;28;43;01mFalse\u001b[39;49;00m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mTrue\u001b[39;49;00m\u001b[43m]\u001b[49m\n\u001b[32m     40\u001b[39m \u001b[43m)\u001b[49m\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mD:\\git\\MIPT\\tools\\plot_tools.py:133\u001b[39m, in \u001b[36mplot_signals\u001b[39m\u001b[34m(y, x, figsize, errors, labels, colors, linestyles, title, xlabel, ylabel, as_stem, show_err)\u001b[39m\n\u001b[32m    131\u001b[39m \u001b[38;5;66;03m# Priority 2: Discrete stem plotting\u001b[39;00m\n\u001b[32m    132\u001b[39m \u001b[38;5;28;01melif\u001b[39;00m current_as_stem:\n\u001b[32m--> \u001b[39m\u001b[32m133\u001b[39m     markerline, stemlines, baseline = \u001b[43max\u001b[49m\u001b[43m.\u001b[49m\u001b[43mstem\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m    134\u001b[39m \u001b[43m        \u001b[49m\u001b[43mcurr_x\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mcurr_y\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlinefmt\u001b[49m\u001b[43m=\u001b[49m\u001b[43mcolor\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mbasefmt\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m\"\u001b[39;49m\u001b[33;43m \u001b[39;49m\u001b[33;43m\"\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[43mfinal_labels\u001b[49m\u001b[43m[\u001b[49m\u001b[43mi\u001b[49m\u001b[43m]\u001b[49m\n\u001b[32m    135\u001b[39m \u001b[43m    \u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m    136\u001b[39m     plt.setp(markerline, marker=\u001b[33m\"\u001b[39m\u001b[33mo\u001b[39m\u001b[33m\"\u001b[39m, markersize=\u001b[32m4\u001b[39m, color=color)\n\u001b[32m    137\u001b[39m     plt.setp(stemlines, linewidth=\u001b[32m1.2\u001b[39m, color=color, linestyle=l_style)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\__init__.py:1524\u001b[39m, in \u001b[36m_preprocess_data.<locals>.inner\u001b[39m\u001b[34m(ax, data, *args, **kwargs)\u001b[39m\n\u001b[32m   1521\u001b[39m \u001b[38;5;129m@functools\u001b[39m.wraps(func)\n\u001b[32m   1522\u001b[39m \u001b[38;5;28;01mdef\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[34minner\u001b[39m(ax, *args, data=\u001b[38;5;28;01mNone\u001b[39;00m, **kwargs):\n\u001b[32m   1523\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m data \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[32m-> \u001b[39m\u001b[32m1524\u001b[39m         \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   1525\u001b[39m \u001b[43m            \u001b[49m\u001b[43max\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1526\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[38;5;28;43mmap\u001b[39;49m\u001b[43m(\u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43margs\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1527\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43m{\u001b[49m\u001b[43mk\u001b[49m\u001b[43m:\u001b[49m\u001b[43m \u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m(\u001b[49m\u001b[43mv\u001b[49m\u001b[43m)\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mfor\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mk\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mv\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;129;43;01min\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m.\u001b[49m\u001b[43mitems\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\u001b[43m}\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m   1529\u001b[39m     bound = new_sig.bind(ax, *args, **kwargs)\n\u001b[32m   1530\u001b[39m     auto_label = (bound.arguments.get(label_namer)\n\u001b[32m   1531\u001b[39m                   \u001b[38;5;129;01mor\u001b[39;00m bound.kwargs.get(label_namer))\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\axes\\_axes.py:3207\u001b[39m, in \u001b[36mAxes.stem\u001b[39m\u001b[34m(self, linefmt, markerfmt, basefmt, bottom, label, orientation, *args)\u001b[39m\n\u001b[32m   3205\u001b[39m     linestyle = mpl.rcParams[\u001b[33m'\u001b[39m\u001b[33mlines.linestyle\u001b[39m\u001b[33m'\u001b[39m]\n\u001b[32m   3206\u001b[39m xlines = \u001b[38;5;28mself\u001b[39m.vlines \u001b[38;5;28;01mif\u001b[39;00m orientation == \u001b[33m\"\u001b[39m\u001b[33mvertical\u001b[39m\u001b[33m\"\u001b[39m \u001b[38;5;28;01melse\u001b[39;00m \u001b[38;5;28mself\u001b[39m.hlines\n\u001b[32m-> \u001b[39m\u001b[32m3207\u001b[39m stemlines = \u001b[43mxlines\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   3208\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlocs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mbottom\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mheads\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   3209\u001b[39m \u001b[43m    \u001b[49m\u001b[43mcolors\u001b[49m\u001b[43m=\u001b[49m\u001b[43mlinecolor\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlinestyles\u001b[49m\u001b[43m=\u001b[49m\u001b[43mlinestyle\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m\"\u001b[39;49m\u001b[33;43m_nolegend_\u001b[39;49m\u001b[33;43m\"\u001b[39;49m\u001b[43m)\u001b[49m\n\u001b[32m   3211\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m orientation == \u001b[33m'\u001b[39m\u001b[33mhorizontal\u001b[39m\u001b[33m'\u001b[39m:\n\u001b[32m   3212\u001b[39m     marker_x = heads\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\_api\\deprecation.py:453\u001b[39m, in \u001b[36mmake_keyword_only.<locals>.wrapper\u001b[39m\u001b[34m(*args, **kwargs)\u001b[39m\n\u001b[32m    447\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mlen\u001b[39m(args) > name_idx:\n\u001b[32m    448\u001b[39m     warn_deprecated(\n\u001b[32m    449\u001b[39m         since, message=\u001b[33m\"\u001b[39m\u001b[33mPassing the \u001b[39m\u001b[38;5;132;01m%(name)s\u001b[39;00m\u001b[33m \u001b[39m\u001b[38;5;132;01m%(obj_type)s\u001b[39;00m\u001b[33m \u001b[39m\u001b[33m\"\u001b[39m\n\u001b[32m    450\u001b[39m         \u001b[33m\"\u001b[39m\u001b[33mpositionally is deprecated since Matplotlib \u001b[39m\u001b[38;5;132;01m%(since)s\u001b[39;00m\u001b[33m; the \u001b[39m\u001b[33m\"\u001b[39m\n\u001b[32m    451\u001b[39m         \u001b[33m\"\u001b[39m\u001b[33mparameter will become keyword-only in \u001b[39m\u001b[38;5;132;01m%(removal)s\u001b[39;00m\u001b[33m.\u001b[39m\u001b[33m\"\u001b[39m,\n\u001b[32m    452\u001b[39m         name=name, obj_type=\u001b[33mf\u001b[39m\u001b[33m\"\u001b[39m\u001b[33mparameter of \u001b[39m\u001b[38;5;132;01m{\u001b[39;00mfunc.\u001b[34m__name__\u001b[39m\u001b[38;5;132;01m}\u001b[39;00m\u001b[33m()\u001b[39m\u001b[33m\"\u001b[39m)\n\u001b[32m--> \u001b[39m\u001b[32m453\u001b[39m \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\u001b[43m*\u001b[49m\u001b[43margs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m)\u001b[49m\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\__init__.py:1524\u001b[39m, in \u001b[36m_preprocess_data.<locals>.inner\u001b[39m\u001b[34m(ax, data, *args, **kwargs)\u001b[39m\n\u001b[32m   1521\u001b[39m \u001b[38;5;129m@functools\u001b[39m.wraps(func)\n\u001b[32m   1522\u001b[39m \u001b[38;5;28;01mdef\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[34minner\u001b[39m(ax, *args, data=\u001b[38;5;28;01mNone\u001b[39;00m, **kwargs):\n\u001b[32m   1523\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m data \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[32m-> \u001b[39m\u001b[32m1524\u001b[39m         \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   1525\u001b[39m \u001b[43m            \u001b[49m\u001b[43max\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1526\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[38;5;28;43mmap\u001b[39;49m\u001b[43m(\u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43margs\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1527\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43m{\u001b[49m\u001b[43mk\u001b[49m\u001b[43m:\u001b[49m\u001b[43m \u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m(\u001b[49m\u001b[43mv\u001b[49m\u001b[43m)\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mfor\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mk\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mv\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;129;43;01min\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m.\u001b[49m\u001b[43mitems\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\u001b[43m}\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m   1529\u001b[39m     bound = new_sig.bind(ax, *args, **kwargs)\n\u001b[32m   1530\u001b[39m     auto_label = (bound.arguments.get(label_namer)\n\u001b[32m   1531\u001b[39m                   \u001b[38;5;129;01mor\u001b[39;00m bound.kwargs.get(label_namer))\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\axes\\_axes.py:1250\u001b[39m, in \u001b[36mAxes.vlines\u001b[39m\u001b[34m(self, x, ymin, ymax, colors, linestyles, label, **kwargs)\u001b[39m\n\u001b[32m   1248\u001b[39m masked_verts[:, \u001b[32m0\u001b[39m, \u001b[32m1\u001b[39m] = ymin\n\u001b[32m   1249\u001b[39m masked_verts[:, \u001b[32m1\u001b[39m, \u001b[32m0\u001b[39m] = x\n\u001b[32m-> \u001b[39m\u001b[32m1250\u001b[39m \u001b[43mmasked_verts\u001b[49m\u001b[43m[\u001b[49m\u001b[43m:\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[32;43m1\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[32;43m1\u001b[39;49m\u001b[43m]\u001b[49m = ymax\n\u001b[32m   1252\u001b[39m lines = mcoll.LineCollection(masked_verts, colors=colors,\n\u001b[32m   1253\u001b[39m                              linestyles=linestyles, label=label)\n\u001b[32m   1254\u001b[39m \u001b[38;5;28mself\u001b[39m.add_collection(lines, autolim=\u001b[38;5;28;01mFalse\u001b[39;00m)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\numpy\\_core\\_ufunc_config.py:511\u001b[39m, in \u001b[36merrstate.__call__.<locals>.inner\u001b[39m\u001b[34m(*args, **kwargs)\u001b[39m\n\u001b[32m    508\u001b[39m _token = _extobj_contextvar.set(extobj)\n\u001b[32m    509\u001b[39m \u001b[38;5;28;01mtry\u001b[39;00m:\n\u001b[32m    510\u001b[39m     \u001b[38;5;66;03m# Call the original, decorated, function:\u001b[39;00m\n\u001b[32m--> \u001b[39m\u001b[32m511\u001b[39m     \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\u001b[43m*\u001b[49m\u001b[43margs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m    512\u001b[39m \u001b[38;5;28;01mfinally\u001b[39;00m:\n\u001b[32m    513\u001b[39m     _extobj_contextvar.reset(_token)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\numpy\\ma\\core.py:3452\u001b[39m, in \u001b[36mMaskedArray.__setitem__\u001b[39m\u001b[34m(self, indx, value)\u001b[39m\n\u001b[32m   3449\u001b[39m     mval = \u001b[38;5;28mtuple\u001b[39m([\u001b[38;5;28;01mFalse\u001b[39;00m] * \u001b[38;5;28mlen\u001b[39m(_dtype.names))\n\u001b[32m   3450\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m _mask \u001b[38;5;129;01mis\u001b[39;00m nomask:\n\u001b[32m   3451\u001b[39m     \u001b[38;5;66;03m# Set the data, then the mask\u001b[39;00m\n\u001b[32m-> \u001b[39m\u001b[32m3452\u001b[39m     \u001b[43m_data\u001b[49m\u001b[43m[\u001b[49m\u001b[43mindx\u001b[49m\u001b[43m]\u001b[49m = dval\n\u001b[32m   3453\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m mval \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m nomask:\n\u001b[32m   3454\u001b[39m         _mask = \u001b[38;5;28mself\u001b[39m._mask = make_mask_none(\u001b[38;5;28mself\u001b[39m.shape, _dtype)\n",
+      "\u001b[31mValueError\u001b[39m: could not broadcast input array from shape (224,) into shape (128,)"
+     ]
+    }
+   ],
+   "source": [
+    "N = 32\n",
+    "m0 = 3\n",
+    "k_arr = np.arange(4*N)\n",
+    "\n",
+    "x_k = np.sin(2 * np.pi / N * m0 * k_arr) + np.sin(2 * np.pi / N * (m0 + 0.25) * k_arr)\n",
+    "\n",
+    "nu_dtft, X_dtft = plot_tools.compute_dtft_analysis(x_k, dtft_points=2048, plot_results=False)\n",
+    "\n",
+    "nu_dft = np.fft.fftshift(np.fft.fftfreq(N*4))\n",
+    "X_dft = np.fft.fftshift(np.fft.fft(x_k))\n",
+    "\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft)],\n",
+    "    x=[nu_dtft, nu_dft],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| (N={N})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='ДВПФ и ДПФ исходного сигнала',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")\n",
+    "\n",
+    "# Частоты синусоид: f1 = m0/N = 3/32 = 12/128; f2 = (m0+0.25)/N = 3.25/32 = 13/128.\n",
+    "# Чтобы частоты точно попадали на бины ДПФ, размер ДПФ M должен быть кратен 128.\n",
+    "M = 128\n",
+    "x_k_padded = np.pad(x_k, (0, M - N))\n",
+    "\n",
+    "# Вычисление ДПФ интерполированного сигнала\n",
+    "nu_dft_padded = np.fft.fftshift(np.fft.fftfreq(M))\n",
+    "X_dft_padded = np.fft.fftshift(np.fft.fft(x_k_padded))\n",
+    "\n",
+    "# Визуализация 2: Модули ДВПФ и интерполированного ДПФ на одном графике\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft_padded)],\n",
+    "    x=[nu_dtft, nu_dft_padded],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| нуль-дополненного (M={M})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='Интерполяция ДПФ добавлением нулевых отсчетов',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 115,
+   "id": "86641084",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "ValueError",
+     "evalue": "could not broadcast input array from shape (1056,) into shape (128,)",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[31m---------------------------------------------------------------------------\u001b[39m",
+      "\u001b[31mValueError\u001b[39m                                Traceback (most recent call last)",
+      "\u001b[36mCell\u001b[39m\u001b[36m \u001b[39m\u001b[32mIn[115]\u001b[39m\u001b[32m, line 33\u001b[39m\n\u001b[32m     30\u001b[39m X_dft_padded = np.fft.fftshift(np.fft.fft(x_k_padded))\n\u001b[32m     32\u001b[39m \u001b[38;5;66;03m# Визуализация 2: Модули ДВПФ и интерполированного ДПФ на одном графике\u001b[39;00m\n\u001b[32m---> \u001b[39m\u001b[32m33\u001b[39m \u001b[43mplot_tools\u001b[49m\u001b[43m.\u001b[49m\u001b[43mplot_signals\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m     34\u001b[39m \u001b[43m    \u001b[49m\u001b[43my\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[43mnp\u001b[49m\u001b[43m.\u001b[49m\u001b[43mabs\u001b[49m\u001b[43m(\u001b[49m\u001b[43mX_dtft\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mnp\u001b[49m\u001b[43m.\u001b[49m\u001b[43mabs\u001b[49m\u001b[43m(\u001b[49m\u001b[43mX_dft_padded\u001b[49m\u001b[43m)\u001b[49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     35\u001b[39m \u001b[43m    \u001b[49m\u001b[43mx\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[43mnu_dtft\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mnu_dft_padded\u001b[49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     36\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlabels\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mДВПФ |X(ν)|\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[33;43mf\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mДПФ |X[n]| нуль-дополненного (M=\u001b[39;49m\u001b[38;5;132;43;01m{\u001b[39;49;00m\u001b[43mM\u001b[49m\u001b[38;5;132;43;01m}\u001b[39;49;00m\u001b[33;43m)\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     37\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlinestyles\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43m-\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43m--\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m]\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m     38\u001b[39m \u001b[43m    \u001b[49m\u001b[43mtitle\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mИнтерполяция ДПФ добавлением нулевых отсчетов\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\n\u001b[32m     39\u001b[39m \u001b[43m    \u001b[49m\u001b[43mxlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m'\u001b[39;49m\u001b[33;43mНормированная частота ν\u001b[39;49m\u001b[33;43m'\u001b[39;49m\u001b[43m,\u001b[49m\n\u001b[32m     40\u001b[39m \u001b[43m    \u001b[49m\u001b[43mas_stem\u001b[49m\u001b[43m=\u001b[49m\u001b[43m[\u001b[49m\u001b[38;5;28;43;01mFalse\u001b[39;49;00m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mTrue\u001b[39;49;00m\u001b[43m]\u001b[49m\n\u001b[32m     41\u001b[39m \u001b[43m)\u001b[49m\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mD:\\git\\MIPT\\tools\\plot_tools.py:133\u001b[39m, in \u001b[36mplot_signals\u001b[39m\u001b[34m(y, x, figsize, errors, labels, colors, linestyles, title, xlabel, ylabel, as_stem, show_err)\u001b[39m\n\u001b[32m    131\u001b[39m \u001b[38;5;66;03m# Priority 2: Discrete stem plotting\u001b[39;00m\n\u001b[32m    132\u001b[39m \u001b[38;5;28;01melif\u001b[39;00m current_as_stem:\n\u001b[32m--> \u001b[39m\u001b[32m133\u001b[39m     markerline, stemlines, baseline = \u001b[43max\u001b[49m\u001b[43m.\u001b[49m\u001b[43mstem\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m    134\u001b[39m \u001b[43m        \u001b[49m\u001b[43mcurr_x\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mcurr_y\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlinefmt\u001b[49m\u001b[43m=\u001b[49m\u001b[43mcolor\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mbasefmt\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m\"\u001b[39;49m\u001b[33;43m \u001b[39;49m\u001b[33;43m\"\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[43mfinal_labels\u001b[49m\u001b[43m[\u001b[49m\u001b[43mi\u001b[49m\u001b[43m]\u001b[49m\n\u001b[32m    135\u001b[39m \u001b[43m    \u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m    136\u001b[39m     plt.setp(markerline, marker=\u001b[33m\"\u001b[39m\u001b[33mo\u001b[39m\u001b[33m\"\u001b[39m, markersize=\u001b[32m4\u001b[39m, color=color)\n\u001b[32m    137\u001b[39m     plt.setp(stemlines, linewidth=\u001b[32m1.2\u001b[39m, color=color, linestyle=l_style)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\__init__.py:1524\u001b[39m, in \u001b[36m_preprocess_data.<locals>.inner\u001b[39m\u001b[34m(ax, data, *args, **kwargs)\u001b[39m\n\u001b[32m   1521\u001b[39m \u001b[38;5;129m@functools\u001b[39m.wraps(func)\n\u001b[32m   1522\u001b[39m \u001b[38;5;28;01mdef\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[34minner\u001b[39m(ax, *args, data=\u001b[38;5;28;01mNone\u001b[39;00m, **kwargs):\n\u001b[32m   1523\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m data \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[32m-> \u001b[39m\u001b[32m1524\u001b[39m         \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   1525\u001b[39m \u001b[43m            \u001b[49m\u001b[43max\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1526\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[38;5;28;43mmap\u001b[39;49m\u001b[43m(\u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43margs\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1527\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43m{\u001b[49m\u001b[43mk\u001b[49m\u001b[43m:\u001b[49m\u001b[43m \u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m(\u001b[49m\u001b[43mv\u001b[49m\u001b[43m)\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mfor\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mk\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mv\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;129;43;01min\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m.\u001b[49m\u001b[43mitems\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\u001b[43m}\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m   1529\u001b[39m     bound = new_sig.bind(ax, *args, **kwargs)\n\u001b[32m   1530\u001b[39m     auto_label = (bound.arguments.get(label_namer)\n\u001b[32m   1531\u001b[39m                   \u001b[38;5;129;01mor\u001b[39;00m bound.kwargs.get(label_namer))\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\axes\\_axes.py:3207\u001b[39m, in \u001b[36mAxes.stem\u001b[39m\u001b[34m(self, linefmt, markerfmt, basefmt, bottom, label, orientation, *args)\u001b[39m\n\u001b[32m   3205\u001b[39m     linestyle = mpl.rcParams[\u001b[33m'\u001b[39m\u001b[33mlines.linestyle\u001b[39m\u001b[33m'\u001b[39m]\n\u001b[32m   3206\u001b[39m xlines = \u001b[38;5;28mself\u001b[39m.vlines \u001b[38;5;28;01mif\u001b[39;00m orientation == \u001b[33m\"\u001b[39m\u001b[33mvertical\u001b[39m\u001b[33m\"\u001b[39m \u001b[38;5;28;01melse\u001b[39;00m \u001b[38;5;28mself\u001b[39m.hlines\n\u001b[32m-> \u001b[39m\u001b[32m3207\u001b[39m stemlines = \u001b[43mxlines\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   3208\u001b[39m \u001b[43m    \u001b[49m\u001b[43mlocs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mbottom\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mheads\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   3209\u001b[39m \u001b[43m    \u001b[49m\u001b[43mcolors\u001b[49m\u001b[43m=\u001b[49m\u001b[43mlinecolor\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlinestyles\u001b[49m\u001b[43m=\u001b[49m\u001b[43mlinestyle\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mlabel\u001b[49m\u001b[43m=\u001b[49m\u001b[33;43m\"\u001b[39;49m\u001b[33;43m_nolegend_\u001b[39;49m\u001b[33;43m\"\u001b[39;49m\u001b[43m)\u001b[49m\n\u001b[32m   3211\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m orientation == \u001b[33m'\u001b[39m\u001b[33mhorizontal\u001b[39m\u001b[33m'\u001b[39m:\n\u001b[32m   3212\u001b[39m     marker_x = heads\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\_api\\deprecation.py:453\u001b[39m, in \u001b[36mmake_keyword_only.<locals>.wrapper\u001b[39m\u001b[34m(*args, **kwargs)\u001b[39m\n\u001b[32m    447\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mlen\u001b[39m(args) > name_idx:\n\u001b[32m    448\u001b[39m     warn_deprecated(\n\u001b[32m    449\u001b[39m         since, message=\u001b[33m\"\u001b[39m\u001b[33mPassing the \u001b[39m\u001b[38;5;132;01m%(name)s\u001b[39;00m\u001b[33m \u001b[39m\u001b[38;5;132;01m%(obj_type)s\u001b[39;00m\u001b[33m \u001b[39m\u001b[33m\"\u001b[39m\n\u001b[32m    450\u001b[39m         \u001b[33m\"\u001b[39m\u001b[33mpositionally is deprecated since Matplotlib \u001b[39m\u001b[38;5;132;01m%(since)s\u001b[39;00m\u001b[33m; the \u001b[39m\u001b[33m\"\u001b[39m\n\u001b[32m    451\u001b[39m         \u001b[33m\"\u001b[39m\u001b[33mparameter will become keyword-only in \u001b[39m\u001b[38;5;132;01m%(removal)s\u001b[39;00m\u001b[33m.\u001b[39m\u001b[33m\"\u001b[39m,\n\u001b[32m    452\u001b[39m         name=name, obj_type=\u001b[33mf\u001b[39m\u001b[33m\"\u001b[39m\u001b[33mparameter of \u001b[39m\u001b[38;5;132;01m{\u001b[39;00mfunc.\u001b[34m__name__\u001b[39m\u001b[38;5;132;01m}\u001b[39;00m\u001b[33m()\u001b[39m\u001b[33m\"\u001b[39m)\n\u001b[32m--> \u001b[39m\u001b[32m453\u001b[39m \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\u001b[43m*\u001b[49m\u001b[43margs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m)\u001b[49m\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\__init__.py:1524\u001b[39m, in \u001b[36m_preprocess_data.<locals>.inner\u001b[39m\u001b[34m(ax, data, *args, **kwargs)\u001b[39m\n\u001b[32m   1521\u001b[39m \u001b[38;5;129m@functools\u001b[39m.wraps(func)\n\u001b[32m   1522\u001b[39m \u001b[38;5;28;01mdef\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[34minner\u001b[39m(ax, *args, data=\u001b[38;5;28;01mNone\u001b[39;00m, **kwargs):\n\u001b[32m   1523\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m data \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[32m-> \u001b[39m\u001b[32m1524\u001b[39m         \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\n\u001b[32m   1525\u001b[39m \u001b[43m            \u001b[49m\u001b[43max\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1526\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[38;5;28;43mmap\u001b[39;49m\u001b[43m(\u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43margs\u001b[49m\u001b[43m)\u001b[49m\u001b[43m,\u001b[49m\n\u001b[32m   1527\u001b[39m \u001b[43m            \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43m{\u001b[49m\u001b[43mk\u001b[49m\u001b[43m:\u001b[49m\u001b[43m \u001b[49m\u001b[43mcbook\u001b[49m\u001b[43m.\u001b[49m\u001b[43msanitize_sequence\u001b[49m\u001b[43m(\u001b[49m\u001b[43mv\u001b[49m\u001b[43m)\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43;01mfor\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mk\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43mv\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;129;43;01min\u001b[39;49;00m\u001b[43m \u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m.\u001b[49m\u001b[43mitems\u001b[49m\u001b[43m(\u001b[49m\u001b[43m)\u001b[49m\u001b[43m}\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m   1529\u001b[39m     bound = new_sig.bind(ax, *args, **kwargs)\n\u001b[32m   1530\u001b[39m     auto_label = (bound.arguments.get(label_namer)\n\u001b[32m   1531\u001b[39m                   \u001b[38;5;129;01mor\u001b[39;00m bound.kwargs.get(label_namer))\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\matplotlib\\axes\\_axes.py:1250\u001b[39m, in \u001b[36mAxes.vlines\u001b[39m\u001b[34m(self, x, ymin, ymax, colors, linestyles, label, **kwargs)\u001b[39m\n\u001b[32m   1248\u001b[39m masked_verts[:, \u001b[32m0\u001b[39m, \u001b[32m1\u001b[39m] = ymin\n\u001b[32m   1249\u001b[39m masked_verts[:, \u001b[32m1\u001b[39m, \u001b[32m0\u001b[39m] = x\n\u001b[32m-> \u001b[39m\u001b[32m1250\u001b[39m \u001b[43mmasked_verts\u001b[49m\u001b[43m[\u001b[49m\u001b[43m:\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[32;43m1\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[32;43m1\u001b[39;49m\u001b[43m]\u001b[49m = ymax\n\u001b[32m   1252\u001b[39m lines = mcoll.LineCollection(masked_verts, colors=colors,\n\u001b[32m   1253\u001b[39m                              linestyles=linestyles, label=label)\n\u001b[32m   1254\u001b[39m \u001b[38;5;28mself\u001b[39m.add_collection(lines, autolim=\u001b[38;5;28;01mFalse\u001b[39;00m)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\numpy\\_core\\_ufunc_config.py:511\u001b[39m, in \u001b[36merrstate.__call__.<locals>.inner\u001b[39m\u001b[34m(*args, **kwargs)\u001b[39m\n\u001b[32m    508\u001b[39m _token = _extobj_contextvar.set(extobj)\n\u001b[32m    509\u001b[39m \u001b[38;5;28;01mtry\u001b[39;00m:\n\u001b[32m    510\u001b[39m     \u001b[38;5;66;03m# Call the original, decorated, function:\u001b[39;00m\n\u001b[32m--> \u001b[39m\u001b[32m511\u001b[39m     \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mfunc\u001b[49m\u001b[43m(\u001b[49m\u001b[43m*\u001b[49m\u001b[43margs\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43m*\u001b[49m\u001b[43m*\u001b[49m\u001b[43mkwargs\u001b[49m\u001b[43m)\u001b[49m\n\u001b[32m    512\u001b[39m \u001b[38;5;28;01mfinally\u001b[39;00m:\n\u001b[32m    513\u001b[39m     _extobj_contextvar.reset(_token)\n",
+      "\u001b[36mFile \u001b[39m\u001b[32mc:\\Users\\Skifv\\miniconda3\\Lib\\site-packages\\numpy\\ma\\core.py:3452\u001b[39m, in \u001b[36mMaskedArray.__setitem__\u001b[39m\u001b[34m(self, indx, value)\u001b[39m\n\u001b[32m   3449\u001b[39m     mval = \u001b[38;5;28mtuple\u001b[39m([\u001b[38;5;28;01mFalse\u001b[39;00m] * \u001b[38;5;28mlen\u001b[39m(_dtype.names))\n\u001b[32m   3450\u001b[39m \u001b[38;5;28;01mif\u001b[39;00m _mask \u001b[38;5;129;01mis\u001b[39;00m nomask:\n\u001b[32m   3451\u001b[39m     \u001b[38;5;66;03m# Set the data, then the mask\u001b[39;00m\n\u001b[32m-> \u001b[39m\u001b[32m3452\u001b[39m     \u001b[43m_data\u001b[49m\u001b[43m[\u001b[49m\u001b[43mindx\u001b[49m\u001b[43m]\u001b[49m = dval\n\u001b[32m   3453\u001b[39m     \u001b[38;5;28;01mif\u001b[39;00m mval \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;129;01mnot\u001b[39;00m nomask:\n\u001b[32m   3454\u001b[39m         _mask = \u001b[38;5;28mself\u001b[39m._mask = make_mask_none(\u001b[38;5;28mself\u001b[39m.shape, _dtype)\n",
+      "\u001b[31mValueError\u001b[39m: could not broadcast input array from shape (1056,) into shape (128,)"
+     ]
+    }
+   ],
+   "source": [
+    "N = 32\n",
+    "s=30\n",
+    "m0 = 3\n",
+    "k_arr = np.arange(s*N)\n",
+    "\n",
+    "x_k = np.sin(2 * np.pi / N * m0 * k_arr) + np.sin(2 * np.pi / N * (m0 + 0.25) * k_arr)\n",
+    "\n",
+    "nu_dtft, X_dtft = plot_tools.compute_dtft_analysis(x_k, dtft_points=2048, plot_results=False)\n",
+    "\n",
+    "nu_dft = np.fft.fftshift(np.fft.fftfreq(N*s))\n",
+    "X_dft = np.fft.fftshift(np.fft.fft(x_k))\n",
+    "\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft)],\n",
+    "    x=[nu_dtft, nu_dft],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| (N={N})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='ДВПФ и ДПФ исходного сигнала',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")\n",
+    "\n",
+    "# Частоты синусоид: f1 = m0/N = 3/32 = 12/128; f2 = (m0+0.25)/N = 3.25/32 = 13/128.\n",
+    "# Чтобы частоты точно попадали на бины ДПФ, размер ДПФ M должен быть кратен 128.\n",
+    "M = 128\n",
+    "x_k_padded = np.pad(x_k, (0, M - N))\n",
+    "\n",
+    "# Вычисление ДПФ интерполированного сигнала\n",
+    "nu_dft_padded = np.fft.fftshift(np.fft.fftfreq(M))\n",
+    "X_dft_padded = np.fft.fftshift(np.fft.fft(x_k_padded))\n",
+    "\n",
+    "# Визуализация 2: Модули ДВПФ и интерполированного ДПФ на одном графике\n",
+    "plot_tools.plot_signals(\n",
+    "    y=[np.abs(X_dtft), np.abs(X_dft_padded)],\n",
+    "    x=[nu_dtft, nu_dft_padded],\n",
+    "    labels=['ДВПФ |X(ν)|', f'ДПФ |X[n]| нуль-дополненного (M={M})'],\n",
+    "    linestyles=['-', '--'],\n",
+    "    title='Интерполяция ДПФ добавлением нулевых отсчетов',\n",
+    "    xlabel='Нормированная частота ν',\n",
+    "    as_stem=[False, True]\n",
+    ")"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.13.9"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

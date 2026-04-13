@@ -1,0 +1,39 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=latex 2025.7.24)  3 APR 2026 01:24
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**D:/git/MIPT/6_sem/probability/lectures/lectures/Многомерное_ура
+внение_теплопроводности.tex
+
+(d:/git/MIPT/6_sem/probability/lectures/lectures/Многомерное_ура�
+�нение_теплопроводности.tex
+LaTeX2e <2025-06-01> patch level 1
+L3 programming layer <2025-07-19>
+
+! LaTeX Error: \usepackage before \documentclass.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.2 \usepackage[T2A]{
+                     fontenc}
+? 
+! Emergency stop.
+ ...                                              
+                                                  
+l.2 \usepackage[T2A]{
+                     fontenc}
+\usepackage may only appear in the document preamble, i.e.,
+between \documentclass and \begin{document}.
+
+ 
+Here is how much of TeX's memory you used:
+ 17 strings out of 467817
+ 944 string characters out of 5436457
+ 427005 words of memory out of 5000000
+ 28740 multiletter control sequences out of 15000+600000
+ 626825 words of font info for 40 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 12i,0n,13p,228b,14s stack positions out of 10000i,1000n,20000p,200000b,200000s
+No pages of output.

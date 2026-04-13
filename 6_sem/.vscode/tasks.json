@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build and Run",
+            "type": "shell",
+            // Используем полный путь к твоему g++, чтобы точно сработало
+            "command": "C:\\msys64\\mingw64\\bin\\g++.exe -Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wcast-align -Wconversion -Wsign-conversion -Wnull-dereference -g3 -O0 \"${file}\" -o \"${fileDirname}\\build\\Debug\\outDebug.exe\" && \"${fileDirname}\\build\\Debug\\outDebug.exe\"",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": false,           // Скрывает команду запуска
+                "reveal": "always",      // Показывает результат
+                "focus": true,           // Фокус на терминал
+                "panel": "shared",       // Одно окно
+                "showReuseMessage": false, // Убирает "Press any key to close"
+                "clear": true            // Очищает терминал перед запуском
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Очищенный вывод: Сборка и запуск текущего файла"
+        }
+    ]
+}

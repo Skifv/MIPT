@@ -1,0 +1,10 @@
+\babel@toc {russian}{}\relax 
+\contentsline {section}{\numberline {1}1. Постановка задачи Коши для волнового уравнения}{1}{}%
+\contentsline {section}{\numberline {2}2. Общие аналитические формулы}{1}{}%
+\contentsline {section}{\numberline {3}3. ПРИЁМ 1: Разбивка на сумму задач}{1}{}%
+\contentsline {section}{\numberline {4}4. ПРИЁМ 2: Отщепление гармонического множителя}{2}{}%
+\contentsline {section}{\numberline {5}5. ПРИЁМ 3: Использование собственных функций оператора $\Delta $}{2}{}%
+\contentsline {section}{\numberline {6}6. ПРИЁМ 4: Полиномиальные и гармонические данные}{2}{}%
+\contentsline {section}{\numberline {7}7. ПРИЁМ 5: Сведение к одной переменной (Плоские волны)}{3}{}%
+\contentsline {section}{\numberline {8}8. ПРИЁМ 6: Сферическая симметрия ($n=3$)}{3}{}%
+\contentsline {section}{\numberline {A}Приложение: Доказательства математических приёмов}{4}{}%
