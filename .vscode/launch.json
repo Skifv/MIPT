@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "d:/git/MIPT/Informatics_4/1_seminar",
-      "program": "d:/git/MIPT/Informatics_4/1_seminar/build/Debug/outDebug",
+      "cwd": "d:/git/MIPT/6_sem/parprog/lab2",
+      "program": "d:/git/MIPT/6_sem/parprog/lab2/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

@@ -1,0 +1,951 @@
+\section{Стек-алгоритмы}
+
+Рассмотрим синхронную систему множественного доступа. Время дискретно и разбито на слоты равной длительности. В конце каждого слота станции получают безошибочную тернарную обратную связь (возможны три исхода: \textit{пусто}, \textit{успех}, \textit{коллизия}). 
+
+\begin{definition}{Стек-алгоритм (алгоритм расщепления дерева)}
+    Пусть в некотором слоте произошла коллизия. Станции, участвующие в ней, образуют корневую вершину дерева коллизий. Цель алгоритма — обойти это дерево и успешно передать все вступившие в коллизию пакеты. Время, затраченное на обход дерева, назовем интервалом разрешения коллизии (англ.: Collision Resolution Interval, CRI).
+    
+    Каждая станция поддерживает внутренний счетчик задержки $r$. Работа алгоритма подчиняется следующим правилам:
+    \begin{enumerate}
+        \item \textbf{Блокировка.} Станции, сгенерировавшие пакеты после начала CRI, устанавливают $r = \infty$ и переходят в режим ожидания. Они получат право на передачу только после полного завершения текущего CRI.
+        \item \textbf{Передача.} В текущем слоте передают пакет только те станции, у которых $r = 0$. Станции с $r > 0$ ожидают.
+        \item \textbf{Обновление счетчиков.} По итогам слота станции пересчитывают значения $r$ на основе сигнала обратной связи:
+        \begin{itemize}
+            \item \textit{Коллизия:} Каждая станция с $r=0$ равновероятно (с $p=1/2$) выбирает новое значение $r \in \{0, 1\}$. Ожидающие станции с $r > 0$ увеличивают счетчик: $r \to r + 1$.
+            \item \textit{Успех или Пусто:} Все станции уменьшают счетчики: $r \to r - 1$.
+        \end{itemize}
+        \item \textbf{Завершение.} CRI заканчивается, когда система обходит все ветви текущего дерева. После этого заблокированные новые станции сбрасывают $r \to 0$ и начинают новый цикл передач.
+    \end{enumerate}
+\end{definition}
+
+\begin{note}[1]
+    Возникает вопрос: почему при наличии обратной связи алгоритм не строит прямое расписание передач для устройств? Это невозможно, так как тернарная обратная связь анонимна. Система узнает лишь сам факт конфликта, но не располагает информацией о точном количестве активных станций и их идентификаторах.
+\end{note}
+
+\begin{note}[2]
+    В классической математической модели предполагается, что станция непрерывно слушает канал с момента запуска системы ($t=0$), независимо от наличия пакетов для передачи. Следовательно, к моменту генерации заявки она обладает полной предысторией эфира. Для отслеживания границ CRI каждая станция локально поддерживает глобальный счетчик открытых ветвей дерева коллизий. 
+    
+    Так, при первой коллизии (в корне дерева) счетчик устанавливается равным двум. Каждая последующая коллизия расщепляет одну ветвь на две, увеличивая счетчик на единицу. Успешная передача или пустой слот закрывают одну ветвь, уменьшая счетчик на единицу. Как только глобальный счетчик достигает нуля, CRI завершается.
+\end{note}
+
+\begin{note}[3]
+    Если в сети появляется абсолютно новая (только что включенная) станция, она сталкивается с проблемой рассинхронизации. Без предыстории она не знает текущего значения счетчика ветвей и в рамках данной модели не способна определить границу CRI по одной лишь анонимной обратной связи. На практике в протоколах множественного доступа этот недостаток можно устранить следующим образом. Головной узел сети должен централизованно отслеживать ход разрешения конфликтов и транслировать в нисходящий канал служебный маркер. Он открыто может сообщать станциям факт завершения CRI, позволяя новым участникам мгновенно синхронизироваться.
+\end{note}
+
+\begin{note}[4]
+    Название «стек-алгоритм» обусловлено тем, что переменная $r$ выполняет роль указателя вершины стека. Станции с $r=0$ находятся на вершине и имеют право доступа к каналу. При коллизии инкремент $r \to r+1$ эквивалентен операции проталкивания в стек (push), а при пустом слоте или успехе декремент $r \to r-1$ соответствует выталкиванию из стека (pop).
+\end{note}
+
+\begin{example}{Работа алгоритма}
+    Пусть передачу начинают станции $\{1, 2, 3, 4\}$. Построим дерево коллизий, отображающее динамику счетчиков $r$.
+    
+    \begin{center}
+    \begin{tikzpicture}[
+        >=Stealth, thick,
+        level distance=1.5cm,
+        sibling distance=3.5cm,
+        node/.style={rectangle, draw, minimum width=1.2cm, minimum height=0.6cm, font=\small},
+        empty/.style={rectangle, draw, dashed, minimum width=1.2cm, minimum height=0.6cm, font=\small, text=gray}
+    ]
+        % Узлы дерева
+        \node[node] (root) at (0,0) {1, 2, 3, 4};
+        \node[node] (l1) at (-2.5,-1.5) {1, 2, 4};
+        \node[node] (r1) at (2.5,-1.5) {3};
+        
+        \node[empty] (l2) at (-4,-3) {$\emptyset$};
+        \node[node, draw=Red3, very thick] (r2) at (-1,-3) {1, 2, 4};
+        
+        \node[node] (l3) at (-2.5,-4.5) {1};
+        \node[node] (r3) at (0.5,-4.5) {2, 4};
+        
+        \node[node] (l4) at (-1,-6) {2};
+        \node[node] (r4) at (2,-6) {4};
+
+        % Ребра
+        \draw[->] (root) -- (l1) node[midway, above left, font=\scriptsize] {$r=0$};
+        \draw[->] (root) -- (r1) node[midway, above right, font=\scriptsize] {$r=1$};
+        
+        \draw[->] (l1) -- (l2);
+        \draw[->] (l1) -- (r2);
+        
+        \draw[->] (r2) -- (l3);
+        \draw[->] (r2) -- (r3);
+        
+        \draw[->] (r3) -- (l4);
+        \draw[->] (r3) -- (r4);
+        
+        % Временные метки
+        \node[left=1.5cm, font=\small, DeepSkyBlue4] at (root) {Слот 1};
+        \node[left=1.5cm, font=\small, DeepSkyBlue4] at (l1) {Слот 2};
+        \node[left=1.5cm, font=\small, DeepSkyBlue4] at (l2) {Слот 3};
+        \node[right=1cm, font=\small, Red3] at (r2) {Слот 4 (коллизия)};
+        \node[left=1cm, font=\small, DeepSkyBlue4] at (l3) {Слот 5};
+        \node[right=1.2cm, font=\small, DeepSkyBlue4] at (r3) {Слот 6};
+        \node[left=1cm, font=\small, DeepSkyBlue4] at (l4) {Слот 7};
+        \node[right=1.2cm, font=\small, DeepSkyBlue4] at (r4) {Слот 8};
+        \node[right=1cm, font=\small, DeepSkyBlue4] at (r1) {Слот 9};
+    \end{tikzpicture}
+    \end{center}
+    
+    В слоте 1 возникает коллизия. Станции $\{1, 2, 4\}$ выбирают $r=0$, а станция $\{3\}$ выбирает $r=1$ (переход в правое поддерево). В слоте 2 станции $\{1, 2, 4\}$ снова сталкиваются, и в результате жеребьевки все они синхронно выбирают $r=1$. 
+    
+    Следовательно, в слоте 3 станций с $r=0$ нет, канал пуст. По правилам алгоритма пустой слот вызывает декремент: все станции $\{1, 2, 4\}$ сбрасывают счетчик до $r=0$. Значит, в слоте 4 они вновь выходят в эфир, образуя детерминированную повторную коллизию.
+\end{example}
+
+Выявленная избыточность (пустой слот влечет за собой неизбежную коллизию) позволяет модифицировать алгоритм. Пусть за слотом с коллизией следует пустой слот. Это гарантирует, что все участники предыдущей коллизии перешли в правую ветвь ($r=1$) и в следующем слоте неминуемо столкнутся вновь. В этом случае алгоритм принудительно эмулирует коллизию: станции с $r=0$ немедленно осуществляют жеребьевку, а станции с $r>0$ увеличивают счетчики без фактической потери таймслота на заведомо конфликтную передачу. Сравним временные диаграммы работы базового и оптимизированного алгоритмов для рассмотренного примера.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, thick]
+    % Базовый алгоритм
+    \draw[->] (0,0) -- (10.5,0) node[right, font=\small] {$t$};
+    \foreach \x in {1,...,10} {
+        \draw (\x, 0.1) -- (\x, -0.1) node[below, font=\scriptsize] {\x};
+    }
+    
+    \node[left, font=\small, DeepSkyBlue4] at (0, 0.5) {Базовый алгоритм:};
+    
+    \node[draw, align=center, font=\scriptsize, inner sep=2pt, anchor=south] at (1, 0.15) {1\\2\\3\\4};
+    \node[draw, align=center, font=\scriptsize, inner sep=2pt, anchor=south] at (2, 0.15) {1\\2\\4};
+    \node[font=\small, anchor=south] at (3, 0.15) {$\emptyset$};
+    \node[draw, align=center, font=\scriptsize, inner sep=2pt, draw=Red3, anchor=south] at (4, 0.15) {1\\2\\4};
+    \node[draw, align=center, font=\scriptsize, inner sep=2pt, anchor=south] at (5, 0.15) {1};
+    \node[draw, align=center, font=\scriptsize, inner sep=2pt, anchor=south] at (6, 0.15) {2\\4};
+    \node[draw, align=center, font=\scriptsize, inner sep=2pt, anchor=south] at (7, 0.15) {2};
+    \node[draw, align=center, font=\scriptsize, inner sep=2pt, anchor=south] at (8, 0.15) {4};
+    \node[draw, align=center, font=\scriptsize, inner sep=2pt, anchor=south] at (9, 0.15) {3};
+
+    % Оптимизированный алгоритм
+    \begin{scope}[yshift=-2.5cm]
+        \draw[->] (0,0) -- (10.5,0) node[right, font=\small] {$t$};
+        \foreach \x in {1,...,10} {
+            \draw (\x, 0.1) -- (\x, -0.1) node[below, font=\scriptsize] {\x};
+        }
+        
+        \node[left, font=\small, SpringGreen4] at (0, 0.5) {С оптимизацией:};
+        
+        \node[draw, align=center, font=\scriptsize, inner sep=2pt, anchor=south] at (1, 0.15) {1\\2\\3\\4};
+        \node[draw, align=center, font=\scriptsize, inner sep=2pt, anchor=south] at (2, 0.15) {1\\2\\4};
+        \node[font=\small, anchor=south] at (3, 0.15) {$\emptyset$};
+        
+        % Сдвиг блоков после оптимизации
+        \node[draw, align=center, font=\scriptsize, inner sep=2pt, fill=SpringGreen4!20, anchor=south] at (4, 0.15) {1};
+        \node[draw, align=center, font=\scriptsize, inner sep=2pt, fill=SpringGreen4!20, anchor=south] at (5, 0.15) {2\\4};
+        \node[draw, align=center, font=\scriptsize, inner sep=2pt, fill=SpringGreen4!20, anchor=south] at (6, 0.15) {2};
+        \node[draw, align=center, font=\scriptsize, inner sep=2pt, fill=SpringGreen4!20, anchor=south] at (7, 0.15) {4};
+        \node[draw, align=center, font=\scriptsize, inner sep=2pt, fill=SpringGreen4!20, anchor=south] at (8, 0.15) {3};
+    \end{scope}
+    
+    % Пунктирные линии сдвига
+    \draw[->, dashed, gray] (5, 0.1) -- (4, -2.1);
+    \draw[->, dashed, gray] (6, 0.1) -- (5, -2.1);
+    \draw[->, dashed, gray] (7, 0.1) -- (6, -2.1);
+    \draw[->, dashed, gray] (8, 0.1) -- (7, -2.1);
+    \draw[->, dashed, gray] (9, 0.1) -- (8, -2.1);
+\end{tikzpicture}
+\end{center}
+
+Стек-алгоритмы обеспечивают разрешение конфликтов за конечное время, однако их применение на практике ограничено жестким требованием к наличию канала безошибочной обратной связи.
+
+\begin{note}
+    В 1981 году Б.С. Цыбаков и В.А. Михайлов показали, что пропускная способность класса систем синхронного случайного множественного доступа (бесконечное число станций, пуассоновский поток заявок, тернарная обратная связь без прослушивания несущей) строго ограничена сверху значением $0{,}587$. Позднее эта верхняя граница неоднократно уточнялась в сторону уменьшения (вплоть до $0{,}568$). При этом лучшие из известных конструктивных алгоритмов расщепления (например, оптимальный алгоритм Галагера — Цыбакова — Михайлова) достигают пропускной способности лишь около $0{,}488$.
+\end{note}
+
+\section{Протоколы с прослушиванием несущей (CSMA)}
+
+В базовых протоколах случайного доступа (ALOHA, стек-алгоритмы) длительность коллизии или пустого слота равна времени передачи пакета $T$. Для повышения пропускной способности необходимо сократить это время. С этой целью станции предварительно слушают канал. Этот механизм называют множественным доступом с прослушиванием несущей (англ.: Carrier Sense Multiple Access, CSMA).
+
+Пусть $l$ — максимальное расстояние между узлами сети, а $c \approx 3 \cdot 10^8$ м/с — скорость распространения электромагнитного сигнала. Тогда время распространения сигнала между наиболее удаленными станциями составляет $\tau = l/c$. Для типичной локальной сети протяженностью $l = 100$ м задержка распространения равна $\tau \approx 0.33$ мкс. Время передачи пакета $T$ составляет десятки или сотни микросекунд. Следовательно, выполняется строгое неравенство $\tau \ll T$. Отсюда получаем, что длительность пустых слотов можно существенно сократить, выбрав ее сопоставимой с $\tau$.
+
+\begin{note}
+    В протоколах семейства CSMA ось времени разбивается на слоты длины $a$. Величина $a$ ограничена снизу задержкой распространения сигнала.
+    
+    Пусть станция 1 начинает передачу в момент $t_0$. Тогда фронт сигнала достигает наиболее удаленной станции 2 в момент $t_0 + \tau$. Если станция 2 заканчивает прослушивание канала в момент $t_0 + \tau - \varepsilon$ (где $\varepsilon > 0, \varepsilon \ll \tau$), она фиксирует свободную среду и начинает собственную передачу. В результате возникает коллизия. Значит, для надежного обнаружения занятости канала слот должен длиться не менее $2 \tau$. 
+    
+    На практике также учитывают задержку переключения состояний приемопередатчика $t_{\text{hw}} \approx 2$ мкс и время оценки состояния канала $t_{\text{sense}} \approx 4$ мкс. Заметим, что эти аппаратные величины превышают $2 \tau$ на порядок.
+\end{note}
+
+Согласно требованию рассматриваемого протокола, две станции могут вступить в коллизию тогда и только тогда, когда они начнут передачу в течение одного слота. Отсюда получаем ограничение на длительность слота $a$:
+\[
+    a > 2\tau + t_{\text{hw}} + t_{\text{sense}}.
+\]
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=1.5, font=\small]
+    % Задаем параметры для геометрии
+    \def\tzero{0.5}      % t0
+    \def\tauval{3.0}     % тау (горизонтальное расстояние)
+    \def\eps{1.0}        % эпсилон
+    \def\yOne{1.0}       % Y-координата Станции 1
+    \def\yTwo{0}         % Y-координата Станции 2
+    
+    % Вычисляемые точки времени
+    \pgfmathsetmacro{\tArrival}{\tzero + \tauval}         
+    \pgfmathsetmacro{\tStartTwo}{\tArrival - \eps}        
+    \pgfmathsetmacro{\tDetect}{\tStartTwo + \tauval}      
+
+    % Оси времени
+    \draw[->, thick] (0, \yOne) -- (7.5, \yOne) node[right] {$t$};
+    \draw[->, thick] (0, \yTwo) -- (7.5, \yTwo) node[right] {$t$};
+
+    \node[left, fill=Snow2] at (-0.2, \yOne) {Станция 1};
+    \node[left, fill=Snow2] at (-0.2, \yTwo) {Станция 2};
+
+    % Пакет Станции 1 (длительность больше тау: 3.8 > 3.0)
+    \draw[thick, fill=DeepSkyBlue4!20] (\tzero, \yOne) rectangle (\tzero+3.5, \yOne+0.35) node[midway] {Пакет 1};
+    
+    % Метка t0
+    \draw[dashed, gray] (\tzero, \yOne) -- (\tzero, -0.6);
+    \node[below, fill=Snow2, inner sep=1.5pt] at (\tzero, -0.6) {$t_0$};
+
+    % Пакет Станции 2
+    \draw[thick, fill=Red3!20] (\tStartTwo, \yTwo) rectangle (\tStartTwo+3.5, \yTwo-0.35) node[midway] {Пакет 2};
+
+    % Распространение сигналов (Лучи)
+    \draw[->, thick, DeepSkyBlue4] (\tzero, \yOne) -- (\tArrival, \yTwo); 
+    \draw[->, thick, Red3] (\tStartTwo, \yTwo) -- (\tDetect, \yOne); 
+
+    % --- ВЕРТИКАЛЬНЫЕ ЛИНИИ И МЕТКИ СТАНЦИИ 2 ---
+    
+    % Линия и метка "Начало передачи"
+    \draw[dashed, gray] (\tStartTwo, \yTwo-0.35) -- (\tStartTwo, -0.6);
+    \node[below left, align=right, fill=Snow2, inner sep=1pt] at (\tStartTwo, -0.6) {
+        $t_0 + \tau - \varepsilon$\\
+        {\color{gray}\scriptsize (начало передачи)}
+    };
+
+    % Линия и метка "Приход сигнала"
+    \draw[dashed, gray] (\tArrival, \yTwo-0.35) -- (\tArrival, -0.6);
+    \node[below right, align=left, fill=Snow2, inner sep=1pt] at (\tArrival, -0.6) {
+        $t_0 + \tau$\\
+        {\color{gray}\scriptsize (приход сигнала)}
+    };
+    
+    % Дополнительная вертикальная линия tau на оси 1
+    \draw[dashed, gray] (\tArrival, \yOne) -- (\tArrival, \yOne+0.35);
+
+    % --- ОБНАРУЖЕНИЕ КОЛЛИЗИИ ---
+    
+    % % Зона коллизии на оси 1
+    % \draw[ultra thick, Red3] (\tDetect, \yOne) -- (7.5, \yOne);
+    % \node[Red3, above right, fill=Snow2, inner sep=1pt] at (\tDetect+0.1, \yOne+0.05) {Обнаружение коллизии};
+
+    % Метка времени обнаружения
+    \draw[dashed, gray] (\tDetect, \yOne) -- (\tDetect, \yOne+0.8);
+    \node[above left, fill=Snow2, inner sep=3.0pt] at (\tDetect-0.05, \yOne+0.01) {$t_0 + 2\tau - \varepsilon$};
+
+    % --- РАЗМЕРНАЯ ЛИНИЯ ---
+    \draw[<->, thick] (\tzero, \yOne+0.9) -- (\tDetect, \yOne+0.9) node[midway, fill=Snow2, inner sep=2pt] {Уязвимый интервал $\approx 2\tau$};
+    \draw[dashed, gray] (\tzero, \yOne+0.35) -- (\tzero, \yOne+1.1);
+    \draw[dashed, gray] (\tDetect, \yOne+0.8) -- (\tDetect, \yOne+1.1);
+    
+\end{tikzpicture}
+\end{center}
+
+\begin{definition}{Математическая модель системы CSMA}
+    Для аналитического исследования протоколов семейства CSMA вводятся следующие предположения:
+    \begin{itemize}
+        \item \textbf{Бесконечное число станций.} В сети находится бесконечное количество терминалов ($n \to \infty$), генерирующих суммарный пуассоновский поток новых заявок с интенсивностью $\lambda_0$. Каждый терминал отправляет пакеты редко и имеет в буфере не более одной заявки.
+        \item \textbf{Случайная задержка.} При возникновении коллизии станции узнают об этом по отсутствию подтверждения (англ.: acknowledgement, ACK). Мгновенная повторная передача привела бы к новой коллизии, поэтому станции откладывают попытку на случайное время $X$ (например, экспоненциально с некоторым средним $\overline{X}$).
+        \item \textbf{Параметры времени.} Длина пакета строго фиксирована и равна $T$. Среднее время задержки перед повторной передачей $\overline{X}$ многократно превышает длину пакета ($\overline{X} \gg T$), а длина слота мала ($a \ll T$).
+        \item \textbf{Суммарный поток.} Трафик в канале состоит из новых и повторно передаваемых пакетов. В силу условия $\overline{X} \gg T$ и того, что повторные передачи откладываются на экспоненциальное время, суммарный поток попыток передачи можно считать пуассоновским процессом с интенсивностью $\lambda \ge \lambda_0$.
+    \end{itemize}
+\end{definition}
+
+Отличие между конкретными методами CSMA заключается в алгоритме действий станции после прослушивания канала.
+
+\begin{definition}{Ненастойчивый CSMA (Non-persistent CSMA)}
+    Алгоритм минимизирует наложение пакетов за счет безусловного отказа от передачи при занятом канале:
+    \begin{enumerate}
+        \item Перед передачей станция слушает канал.
+        \item Если канал свободен, станция передает пакет.
+        \item Если канал занят, станция откладывает передачу на случайное время (эмулирует коллизию), после чего переходит к шагу 1.
+        \item Если передача завершается коллизией (отсутствует подтверждение), станция откладывает повторную передачу на случайное время и возвращается к шагу 1.
+    \end{enumerate}
+
+    \begin{center}
+    \begin{tikzpicture}[>=Stealth, font=\small,
+        base/.style={rectangle, draw=DeepSkyBlue4, thick, rounded corners, fill=Snow2, minimum height=0.8cm, minimum width=2.5cm, align=center},
+        dec/.style={diamond, draw=DeepSkyBlue4, thick, aspect=2.5, inner sep=1pt, align=center, fill=Snow2},
+        tx/.style={rectangle, draw=SpringGreen4, thick, rounded corners, fill=Snow2, minimum height=0.8cm, minimum width=2.5cm, align=center},
+        del/.style={rectangle, draw=Red3, thick, rounded corners, fill=Snow2, minimum height=0.8cm, minimum width=2.5cm, align=center},
+        arr/.style={->, thick, black}
+    ]
+        \node[base] (start) at (0,0) {Слушать канал};
+        \node[dec] (idle) at (0,-2) {Канал\\свободен?};
+        \node[tx] (trans) at (0,-4.5) {Передать\\пакет};
+        \node[dec] (coll) at (0,-7) {Коллизия?};
+        \node[tx] (succ) at (0,-9.5) {Успешная\\передача};
+        \node[del] (delay) at (4,-4.5) {Случайная\\задержка};
+
+        \draw[arr] (start) -- (idle);
+        \draw[arr] (idle.south) -- node[right] {Да} (trans.north);
+        \draw[arr] (trans.south) -- (coll.north);
+        \draw[arr] (coll.south) -- node[right] {Нет} (succ.north);
+        
+        \draw[arr] (idle.east) -- node[above] {Нет} (4,-2) -- (delay.north);
+        \draw[arr] (coll.east) -- node[above] {Да} (4,-7) -- (delay.south);
+        
+        \draw[arr] (delay.east) -- (6,-4.5) |- (0,1.5) -- (start.north);
+    \end{tikzpicture}
+    \end{center}
+\end{definition}
+
+\begin{definition}{1-настойчивый CSMA (1-persistent CSMA)}
+    Алгоритм минимизирует время простоя канала, обеспечивая немедленную передачу после его освобождения:
+    \begin{enumerate}
+        \item Перед передачей станция слушает канал.
+        \item Если канал свободен, станция передает пакет с вероятностью $1$.
+        \item Если канал занят, станция непрерывно слушает его до момента освобождения, после чего немедленно передает пакет.
+        \item Если передача завершается коллизией, станция откладывает повторную передачу на случайное время и возвращается к шагу 1.
+    \end{enumerate}
+
+    \begin{center}
+    \begin{tikzpicture}[>=Stealth, font=\small,
+        base/.style={rectangle, draw=DeepSkyBlue4, thick, rounded corners, fill=Snow2, minimum height=0.8cm, minimum width=2.5cm, align=center},
+        dec/.style={diamond, draw=DeepSkyBlue4, thick, aspect=2.5, inner sep=1pt, align=center, fill=Snow2},
+        tx/.style={rectangle, draw=SpringGreen4, thick, rounded corners, fill=Snow2, minimum height=0.8cm, minimum width=2.5cm, align=center},
+        del/.style={rectangle, draw=Red3, thick, rounded corners, fill=Snow2, minimum height=0.8cm, minimum width=2.5cm, align=center},
+        arr/.style={->, thick, black}
+    ]
+        \node[base] (start) at (0,0) {Слушать канал};
+        \node[dec] (idle) at (0,-2) {Канал\\свободен?};
+        \node[tx] (trans) at (0,-4.5) {Передать\\пакет};
+        \node[dec] (coll) at (0,-7) {Коллизия?};
+        \node[tx] (succ) at (0,-9.5) {Успешная\\передача};
+        \node[del] (delay) at (4,-7) {Случайная\\задержка};
+
+        \draw[arr] (start) -- (idle);
+        \draw[arr] (idle.south) -- node[right] {Да} (trans.north);
+        \draw[arr] (trans.south) -- (coll.north);
+        \draw[arr] (coll.south) -- node[right] {Нет} (succ.north);
+        \draw[arr] (coll.east) -- node[above] {Да} (delay.west);
+        
+        % Увеличен отступ до -4 для исключения пересечения текста со стрелкой
+        \draw[arr] (idle.west) -- node[above] {Нет} (-4,-2) |- (start.west);
+        \draw[arr] (delay.east) -- (6,-7) |- (0,1.5) -- (start.north);
+    \end{tikzpicture}
+    \end{center}
+\end{definition}
+
+\begin{definition}{$p$-настойчивый CSMA ($p$-persistent CSMA)}
+    Алгоритм снижает вероятность коллизии, возникающей в 1-настойчивом CSMA, когда несколько станций одновременно ждут освобождения канала:
+    \begin{enumerate}
+        \item Перед передачей станция слушает канал.
+        \item Если канал свободен, станция передает пакет с вероятностью $p$, а с вероятностью $1 - p$ откладывает передачу на один слот $a$.
+        \item Если в следующем слоте канал остается свободным, процесс вероятностного выбора повторяется (возврат к шагу 2).
+        \item Если в следующем слоте канал оказался занятым (то есть другая станция начала передачу в предыдущем слоте), станция откладывает передачу на случайное время (эмулирует коллизию) и возвращается к шагу 1.
+        \item Если канал исходно занят, станция ждет его освобождения, после чего переходит к шагу 2.
+        \item Если отправленный пакет испытывает коллизию в процессе передачи, станция откладывает повторную передачу на случайное время и возвращается к шагу 1.
+    \end{enumerate}
+
+    \begin{center}
+    \begin{tikzpicture}[>=Stealth, font=\small,
+        base/.style={rectangle, draw=DeepSkyBlue4, thick, rounded corners, fill=Snow2, minimum height=0.8cm, minimum width=2.5cm, align=center},
+        dec/.style={diamond, draw=DeepSkyBlue4, thick, aspect=2.5, inner sep=1pt, align=center, fill=Snow2},
+        tx/.style={rectangle, draw=SpringGreen4, thick, rounded corners, fill=Snow2, minimum height=0.8cm, minimum width=2.5cm, align=center},
+        del/.style={rectangle, draw=Red3, thick, rounded corners, fill=Snow2, minimum height=0.8cm, minimum width=2.5cm, align=center},
+        arr/.style={->, thick, black}
+    ]
+        \node[base] (start) at (0,0) {Слушать канал};
+        \node[dec] (idle1) at (0,-2) {Канал\\свободен?};
+        \node[dec] (prob) at (0,-4.5) {Передача?};
+        \node[tx] (trans) at (-3.5,-4.5) {Передать\\пакет};
+        \node[base] (wait) at (3.5,-4.5) {Ждать $1$ слот};
+        \node[dec] (idle2) at (3.5,-7.5) {Канал\\свободен?};
+        \node[dec] (coll) at (-3.5,-7.5) {Коллизия?};
+        \node[tx] (succ) at (-3.5,-10.5) {Успешная\\передача};
+        \node[del] (delay) at (0,-10.5) {Случайная\\задержка};
+
+        \draw[arr] (start) -- (idle1);
+        % Увеличен отступ до -4 для исключения пересечения
+        \draw[arr] (idle1.west) -- node[above] {Нет} (-4,-2) |- (start.west);
+        \draw[arr] (idle1.south) -- node[right] {Да} (prob.north);
+        
+        \draw[arr] (prob.west) -- node[above] {$p$} (trans.east);
+        \draw[arr] (prob.east) -- node[above] {$1-p$} (wait.west);
+        
+        \draw[arr] (wait.south) -- (idle2.north);
+        \draw[arr] (idle2.west) -- node[above] {Да} (0,-7.5) -- (prob.south);
+        \draw[arr] (idle2.south) -- node[right] {Нет} (3.5,-10.5) -- (delay.east);
+        
+        \draw[arr] (trans.south) -- (coll.north);
+        \draw[arr] (coll.south) -- node[right] {Нет} (succ.north);
+        \draw[arr] (coll.east) -- node[above] {Да} (-1.5,-7.5) |- (delay.west);
+        
+        \draw[arr] (delay.south) -- (0,-12) -| (6,-12) |- (0,1.5) -- (start.north);
+    \end{tikzpicture}
+    \end{center}
+\end{definition}
+
+\begin{note}
+    Во всех рассмотренных протоколах действует общее правило обработки реальных коллизий: если передача завершилась неудачно (произошло наложение сигналов), станция обязана выждать случайное время перед новой попыткой доступа к среде.
+\end{note}
+
+\subsection{Ненастойчивый протокол CSMA (Non-persistent CSMA)}
+
+Эволюция системы представляет собой чередование периодов занятости (англ.: busy period, $B$) и периодов простоя (англ.: idle period, $I$). Пара смежных интервалов образует цикл. Внутри периода $B$ между двумя последовательными передачами всегда присутствует минимум один свободный слот длины $a$. В самом деле, для инициации новой передачи терминал обязан зафиксировать свободное состояние среды.
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=1.2, font=\small]
+    % Ось времени
+    \draw[->, thick] (-1.5,0) -- (12.5,0) node[right] {$t$};
+
+    % Левое троеточие (предыстория системы)
+    \node at (-1.0, 0.4) {$\dots$};
+
+    % Левые два слота a (до момента начала отсчета t=0)
+    \foreach \x in {-0.4, -0.2} {
+        \draw[thick] (\x,0) -- (\x,0.3);
+    }
+    % Выровненные стрелочки для левых слотов
+    \foreach \x in {-0.3, -0.1} {
+        \draw[<-] (\x,0.3) -- (\x,1.2) node[above] {$a$};
+    }
+
+    % Вертикальная линия старта (t=0)
+    \draw[thick] (0,-0.2) -- (0,1.8);
+
+    % Блок 1 (Успех)
+    \draw[thick, fill=SpringGreen4!10] (0,0) rectangle (1.4,0.8) node[midway] {Успех};
+    \draw[thick, pattern=north east lines, pattern color=DeepSkyBlue4] (1.4,0) rectangle (1.6,0.8);
+    \draw[<-] (1.5,0.8) -- (1.5,1.2) node[above] {$a$};
+    % Обозначение T для Блока 1
+    \draw[<->] (0,-0.12) -- (1.4,-0.12) node[midway, below, font=\scriptsize] {$T$};
+    
+    % Блок 2 (Коллизия)
+    \draw[thick, fill=Red3!10] (1.6,0) rectangle (3.0,0.8) node[midway] {Коллизия};
+    \draw[thick, pattern=north east lines, pattern color=DeepSkyBlue4] (3.0,0) rectangle (3.2,0.8);
+    \draw[<-] (3.1,0.8) -- (3.1,1.2) node[above] {$a$};
+    % Обозначение T для Блока 2
+    \draw[<->] (1.6,-0.12) -- (3.0,-0.12) node[midway, below, font=\scriptsize] {$T$};
+
+    % Блок 3 (Успех)
+    \draw[thick, fill=SpringGreen4!10] (3.2,0) rectangle (4.6,0.8) node[midway] {Успех};
+    \draw[thick, pattern=north east lines, pattern color=DeepSkyBlue4] (4.6,0) rectangle (4.8,0.8);
+    \draw[<-] (4.7,0.8) -- (4.7,1.2) node[above] {$a$};
+    % Обозначение T для Блока 3
+    \draw[<->] (3.2,-0.12) -- (4.6,-0.12) node[midway, below, font=\scriptsize] {$T$};
+    
+    % Слоты простоя (I)
+    \foreach \x in {4.8, 5.0, 5.2, 5.4, 5.6} {
+        \draw[thick] (\x,0) -- (\x,0.3);
+    }
+    % Стрелочки для слотов простоя (единая высота выравнивания)
+    \foreach \x in {4.9, 5.1, 5.3, 5.5} {
+        \draw[<-] (\x,0.3) -- (\x,1.2) node[above] {$a$};
+    }
+    
+    % Троеточие в середине (переход к следующему циклу)
+    \node at (6.2, 0.4) {$\dots$};
+
+    % Второй период B
+    \draw[thick, fill=SpringGreen4!10] (6.8,0) rectangle (8.2,0.8) node[midway] {Успех};
+    \draw[thick, pattern=north east lines, pattern color=DeepSkyBlue4] (8.2,0) rectangle (8.4,0.8);
+    \draw[<-] (8.3,0.8) -- (8.3,1.2) node[above] {$a$};
+    % Обозначение T для Блока 4
+    \draw[<->] (6.8,-0.12) -- (8.2,-0.12) node[midway, below, font=\scriptsize] {$T$};
+    
+    \draw[thick, fill=SpringGreen4!10] (8.4,0) rectangle (9.8,0.8) node[midway] {Успех};
+    \draw[thick, pattern=north east lines, pattern color=DeepSkyBlue4] (9.8,0) rectangle (10.0,0.8);
+    \draw[<-] (9.9,0.8) -- (9.9,1.2) node[above] {$a$};
+    % Обозначение T для Блока 5
+    \draw[<->] (8.4,-0.12) -- (9.8,-0.12) node[midway, below, font=\scriptsize] {$T$};
+    
+    % Правые слоты простоя
+    \foreach \x in {10.0, 10.2, 10.4, 10.6} {
+        \draw[thick] (\x,0) -- (\x,0.3);
+    }
+    
+    % Правое троеточие
+    \node at (11.4, 0.4) {$\dots$};
+    
+    % Подписи B и I снизу
+    \draw[decorate, decoration={brace, amplitude=6pt, mirror}, thick] (0, -0.45) -- (4.8, -0.45) node[midway, below=8pt] {$B$};
+    \draw[decorate, decoration={brace, amplitude=6pt, mirror}, thick] (4.8, -0.45) -- (6.8, -0.45) node[midway, below=8pt] {$I$};
+    \draw[decorate, decoration={brace, amplitude=6pt, mirror}, thick] (6.8, -0.45) -- (10.0, -0.45) node[midway, below=8pt] {$B$};
+\end{tikzpicture}
+\end{center}
+
+\begin{statement}[Пропускная способность ненастойчивого CSMA]
+    Для сети, использующей протокол ненастойчивого CSMA, зависимость нормированной пропускной способности $S$ от абсолютной интенсивности предложенной нагрузки $\lambda$ имеет вид:
+    $$ S = \frac{\lambda a T e^{-\lambda a}}{a + T(1 - e^{-\lambda a})}, $$
+    где $T$ — время передачи пакета, $a$ — длительность слота прослушивания.
+\end{statement}
+\begin{sproof}
+    Пропускная способность равна отношению среднего времени успешной передачи к средней длине цикла:
+    $$ S = \frac{\E[U]}{\E[B] + \E[I]}, $$
+    где $\E[B]$ и $\E[I]$ — математические ожидания длительностей периодов занятости и простоя соответственно, а $\E[U]$ — среднее суммарное время успешных передач за один цикл.
+
+    Вычислим математическое ожидание периода простоя $\E[I]$. Период простоя состоит из дискретного числа слотов длины $a$. Он включает ровно $k$ слотов, если в течение первых $k-1$ слотов заявки не поступали, а в $k$-м слоте появилась хотя бы одна заявка. Так как входящий поток пуассоновский с интенсивностью $\lambda$, вероятность отсутствия заявок на интервале $a$ равна $e^{-\lambda a}$. Следовательно, число слотов подчиняется геометрическому распределению:
+    $$ \P(I = ka) = \left(e^{-\lambda a}\right)^{k-1} (1 - e^{-\lambda a}), \quad k \ge 1. $$
+    Отсюда математическое ожидание длины периода простоя составляет:
+    $$ \E[I] = \frac{a}{1 - e^{-\lambda a}}. $$
+
+    Рассмотрим период занятости $B$. Он представляет собой последовательность тактов передачи (англ.: transmission period, $TP$). Каждый такт включает непосредственную передачу пакета (длительность $T$) и обязательный слот прослушивания (длительность $a$), откуда полная длина такта равна $T+a$. Новый такт инициируется, если в течение слота $a$ в систему поступает пакет. В противном случае начинается период простоя $I$. Вероятность того, что период занятости состоит из $k$ тактов, равна:
+    $$ \P(B = k(T + a)) = \left(1 - e^{-\lambda a}\right)^{k-1} e^{-\lambda a}, \quad k \ge 1. $$
+    Значит, математическое ожидание периода занятости равно:
+    $$ \E[B] = \frac{T+a}{e^{-\lambda a}}. $$
+
+    Вычислим $\E[U]$. Среднее число тактов передачи в одном периоде $B$ составляет $\E[B] / (T+a) = 1/e^{-\lambda a}$. Передача завершается успехом тогда и только тогда, когда в предшествующем слоте $a$ поступила ровно одна заявка. Поскольку такт передачи уже состоялся, достоверно известно, что число заявок не равно нулю. Следовательно, вероятность успеха $P_{suc}$ вычисляется как условная вероятность:
+    $$ P_{suc} = \P(\text{поступила 1 заявка} \mid \text{поступило } \ge 1 \text{ заявок}) = \frac{\lambda a e^{-\lambda a}}{1 - e^{-\lambda a}}. $$
+    Умножая среднее число тактов на вероятность успеха и длительность полезной передачи $T$, получаем:
+    $$ \E[U] = \frac{1}{e^{-\lambda a}} \cdot \frac{\lambda a e^{-\lambda a}}{1 - e^{-\lambda a}} \cdot T = \frac{\lambda a T}{1 - e^{-\lambda a}}. $$
+
+    Подставим найденные величины $\E[I]$, $\E[B]$ и $\E[U]$ в исходную формулу для пропускной способности:
+    $$ S = \frac{\frac{\lambda a T}{1 - e^{-\lambda a}}}{\frac{T+a}{e^{-\lambda a}} + \frac{a}{1 - e^{-\lambda a}}}. $$
+    Домножим числитель и знаменатель дроби на величину $e^{-\lambda a} (1 - e^{-\lambda a})$. Тогда числитель преобразуется к виду $\lambda a T e^{-\lambda a}$, а знаменатель принимает вид:
+    $$ (T+a)(1 - e^{-\lambda a}) + a e^{-\lambda a} = T + a - T e^{-\lambda a} - a e^{-\lambda a} + a e^{-\lambda a} = T + a - T e^{-\lambda a}. $$
+    Окончательно получаем требуемое соотношение для $S$.
+\end{sproof}
+
+\begin{conseq}
+    Перейдем к пределу при устремлении длины слота прослушивания к нулю ($a \to 0$). Разделим числитель и знаменатель полученной дроби на $a$:
+    $$ S = \frac{\lambda T e^{-\lambda a}}{\frac{T}{a}(1 - e^{-\lambda a}) + 1}. $$
+    Используя первый замечательный предел для экспоненты $\lim\limits_{a \to 0} \frac{1 - e^{-\lambda a}}{a} = \lambda$, находим асимптотическую пропускную способность идеализированной системы:
+    $$ \lim_{a \to 0} S = \frac{\lambda T}{\lambda T + 1} = \frac{G}{G + 1}, $$
+    где $G = \lambda T$ — среднее число заявок, генерируемых за время передачи одного пакета. При неограниченном росте предложенной нагрузки ($G \to \infty$) предел функции равен $1$. Это показывает, что теоретически ненастойчивый CSMA способен обеспечить абсолютную утилизацию канала без потерь на коллизии.
+\end{conseq}
+
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth, height=8cm,
+            xlabel={Предложенная нагрузка $G = \lambda T$}, 
+            ylabel={Пропускная способность $S$},
+            xmin=0, xmax=10, ymin=0, ymax=1.1,
+            grid=major,
+            samples=150,
+            domain=0.01:10,
+            legend pos=south east,
+            legend style={font=\small},
+            thick,
+            title={Зависимость пропускной способности от нагрузки (при $T=1$)}
+        ]
+            % a = 0
+            \addplot[black, dashed] {x/(1+x)}; 
+            \addlegendentry{$a=0$}
+            
+            % a = 0.1T
+            \addplot[Red3] {x*0.1*exp(-x*0.1)/(1 - exp(-x*0.1) + 0.1)}; 
+            \addlegendentry{$a=0.1T$}
+            
+            % a = 0.2T
+            \addplot[Tan1] {x*0.2*exp(-x*0.2)/(1 - exp(-x*0.2) + 0.2)}; 
+            \addlegendentry{$a=0.2T$}
+
+            % a = 0.5T
+            \addplot[DeepSkyBlue4] {x*0.5*exp(-x*0.5)/(1 - exp(-x*0.5) + 0.5)}; 
+            \addlegendentry{$a=0.5T$}
+            
+            % a = 1.0T
+            \addplot[SpringGreen4] {x*1.0*exp(-x*1.0)/(1 - exp(-x*1.0) + 1.0)}; 
+            \addlegendentry{$a=T$}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsection{1-настойчивый протокол CSMA (1-persistent CSMA)}
+
+Временная диаграмма процесса идентична случаю ненастойчивого CSMA: эволюция системы представляет собой чередование периодов занятости $B$ и периодов простоя $I$. 
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=1.2, font=\small]
+    % Ось времени
+    \draw[->, thick] (-1.5,0) -- (12.5,0) node[right] {$t$};
+
+    % Левое троеточие (предыстория системы)
+    \node at (-1.0, 0.4) {$\dots$};
+
+    % Левые два слота a (до момента начала отсчета t=0)
+    \foreach \x in {-0.4, -0.2} {
+        \draw[thick] (\x,0) -- (\x,0.3);
+    }
+    % Выровненные стрелочки для левых слотов
+    \foreach \x in {-0.3, -0.1} {
+        \draw[<-] (\x,0.3) -- (\x,1.2) node[above] {$a$};
+    }
+
+    % Вертикальная линия старта (t=0)
+    \draw[thick] (0,-0.2) -- (0,1.8);
+
+    % Блок 1 (Успех)
+    \draw[thick, fill=SpringGreen4!10] (0,0) rectangle (1.4,0.8) node[midway] {Успех};
+    \draw[thick, pattern=north east lines, pattern color=DeepSkyBlue4] (1.4,0) rectangle (1.6,0.8);
+    \draw[<-] (1.5,0.8) -- (1.5,1.2) node[above] {$a$};
+    % Обозначение T для Блока 1
+    \draw[<->] (0,-0.12) -- (1.4,-0.12) node[midway, below, font=\scriptsize] {$T$};
+    
+    % Блок 2 (Коллизия)
+    \draw[thick, fill=Red3!10] (1.6,0) rectangle (3.0,0.8) node[midway] {Коллизия};
+    \draw[thick, pattern=north east lines, pattern color=DeepSkyBlue4] (3.0,0) rectangle (3.2,0.8);
+    \draw[<-] (3.1,0.8) -- (3.1,1.2) node[above] {$a$};
+    % Обозначение T для Блока 2
+    \draw[<->] (1.6,-0.12) -- (3.0,-0.12) node[midway, below, font=\scriptsize] {$T$};
+
+    % Блок 3 (Успех)
+    \draw[thick, fill=SpringGreen4!10] (3.2,0) rectangle (4.6,0.8) node[midway] {Успех};
+    \draw[thick, pattern=north east lines, pattern color=DeepSkyBlue4] (4.6,0) rectangle (4.8,0.8);
+    \draw[<-] (4.7,0.8) -- (4.7,1.2) node[above] {$a$};
+    % Обозначение T для Блока 3
+    \draw[<->] (3.2,-0.12) -- (4.6,-0.12) node[midway, below, font=\scriptsize] {$T$};
+    
+    % Слоты простоя (I)
+    \foreach \x in {4.8, 5.0, 5.2, 5.4, 5.6} {
+        \draw[thick] (\x,0) -- (\x,0.3);
+    }
+    % Стрелочки для слотов простоя (единая высота выравнивания)
+    \foreach \x in {4.9, 5.1, 5.3, 5.5} {
+        \draw[<-] (\x,0.3) -- (\x,1.2) node[above] {$a$};
+    }
+    
+    % Троеточие в середине (переход к следующему циклу)
+    \node at (6.2, 0.4) {$\dots$};
+
+    % Второй период B
+    \draw[thick, fill=SpringGreen4!10] (6.8,0) rectangle (8.2,0.8) node[midway] {Успех};
+    \draw[thick, pattern=north east lines, pattern color=DeepSkyBlue4] (8.2,0) rectangle (8.4,0.8);
+    \draw[<-] (8.3,0.8) -- (8.3,1.2) node[above] {$a$};
+    % Обозначение T для Блока 4
+    \draw[<->] (6.8,-0.12) -- (8.2,-0.12) node[midway, below, font=\scriptsize] {$T$};
+    
+    \draw[thick, fill=SpringGreen4!10] (8.4,0) rectangle (9.8,0.8) node[midway] {Успех};
+    \draw[thick, pattern=north east lines, pattern color=DeepSkyBlue4] (9.8,0) rectangle (10.0,0.8);
+    \draw[<-] (9.9,0.8) -- (9.9,1.2) node[above] {$a$};
+    % Обозначение T для Блока 5
+    \draw[<->] (8.4,-0.12) -- (9.8,-0.12) node[midway, below, font=\scriptsize] {$T$};
+    
+    % Правые слоты простоя
+    \foreach \x in {10.0, 10.2, 10.4, 10.6} {
+        \draw[thick] (\x,0) -- (\x,0.3);
+    }
+    
+    % Правое троеточие
+    \node at (11.4, 0.4) {$\dots$};
+    
+    % Подписи B и I снизу
+    \draw[decorate, decoration={brace, amplitude=6pt, mirror}, thick] (0, -0.45) -- (4.8, -0.45) node[midway, below=8pt] {$B$};
+    \draw[decorate, decoration={brace, amplitude=6pt, mirror}, thick] (4.8, -0.45) -- (6.8, -0.45) node[midway, below=8pt] {$I$};
+    \draw[decorate, decoration={brace, amplitude=6pt, mirror}, thick] (6.8, -0.45) -- (10.0, -0.45) node[midway, below=8pt] {$B$};
+\end{tikzpicture}
+\end{center}
+
+\begin{statement}[Пропускная способность 1-настойчивого CSMA]
+    Для сети, использующей 1-настойчивый протокол CSMA, зависимость нормированной пропускной способности $S$ от абсолютной интенсивности предложенной нагрузки $\lambda$ имеет вид:
+    $$ S = \frac{\lambda T e^{-\lambda(T+a)} [T + a - T e^{-\lambda a}]}{(T+a)(1 - e^{-\lambda a}) + a e^{-\lambda(T+a)}}, $$
+    где $T$ — время передачи пакета, $a$ — длительность слота прослушивания.
+\end{statement}
+\begin{sproof}
+    Аналогично доказательству для ненастойчивого CSMA, пропускная способность вычисляется как отношение среднего времени успешной передачи к средней длине цикла:
+    $$ S = \frac{\E[U]}{\E[B] + \E[I]}. $$
+    
+    Распределение длины периода простоя $I$ совпадает со случаем ненастойчивого CSMA. Математическое ожидание равно:
+    $$ \E[I] = \frac{a}{1 - e^{-\lambda a}}. $$
+
+    Рассмотрим период занятости $B$. В 1-настойчивом CSMA заявки, поступившие во время текущей передачи, не откладываются, а ожидают освобождения канала. Следовательно, интервал накопления заявок для инициации следующего такта передачи составляет $T+a$. Вероятность того, что период занятости состоит из $k$ тактов, равна:
+    $$ \P(B = k(T + a)) = \left(1 - e^{-\lambda(T+a)}\right)^{k-1} e^{-\lambda(T+a)}, \quad k \ge 1. $$
+    Отсюда математическое ожидание периода занятости составляет:
+    $$ \E[B] = \frac{T+a}{e^{-\lambda(T+a)}}. $$
+
+    Вычисление математического ожидания времени успешной передачи $\E[U]$ требует разделения первого и последующих тактов внутри периода $B$. Среднее число тактов равно $N = \E[B]/(T+a) = e^{\lambda(T+a)}$. 
+    
+    Первый такт следует за периодом простоя. Он завершается успехом, если в последнем слоте $a$ поступила ровно одна заявка при условии, что поступила хотя бы одна:
+    $$ P_1 = \frac{\lambda a e^{-\lambda a}}{1 - e^{-\lambda a}}. $$
+    
+    Последующие такты успешны, если на предшествующем интервале $T+a$ (включающем саму передачу и слот прослушивания) поступила ровно одна заявка при условии, что поступила хотя бы одна:
+    $$ P_{\ge 2} = \frac{\lambda(T+a) e^{-\lambda(T+a)}}{1 - e^{-\lambda(T+a)}}. $$
+    
+    Суммируя вероятности по всем тактам и умножая на длительность полезной передачи $T$, получаем:
+    $$ \E[U] = T \left[ P_1 + (N - 1) P_{\ge 2} \right] = T \left[ \frac{\lambda a e^{-\lambda a}}{1 - e^{-\lambda a}} + \left(e^{\lambda(T+a)} - 1\right) \frac{\lambda(T+a) e^{-\lambda(T+a)}}{1 - e^{-\lambda(T+a)}} \right]. $$
+    Так как $\left(e^{\lambda(T+a)} - 1\right) e^{-\lambda(T+a)} = 1 - e^{-\lambda(T+a)}$, второе слагаемое в скобках упрощается до $\lambda(T+a)$. Приводя выражение к общему знаменателю, находим:
+    $$ \E[U] = \frac{T \lambda \left[ a e^{-\lambda a} + (T+a)(1 - e^{-\lambda a}) \right]}{1 - e^{-\lambda a}} = \frac{\lambda T \left[ T + a - T e^{-\lambda a} \right]}{1 - e^{-\lambda a}}. $$
+
+    Подставим найденные величины $\E[I]$, $\E[B]$ и $\E[U]$ в исходную формулу для $S$:
+    $$ S = \frac{\frac{\lambda T \left[ T + a - T e^{-\lambda a} \right]}{1 - e^{-\lambda a}}}{\frac{T+a}{e^{-\lambda(T+a)}} + \frac{a}{1 - e^{-\lambda a}}}. $$
+    Домножим числитель и знаменатель дроби на произведение $e^{-\lambda(T+a)} (1 - e^{-\lambda a})$. Тогда числитель принимает вид $\lambda T e^{-\lambda(T+a)} [T + a - T e^{-\lambda a}]$, а знаменатель преобразуется к виду:
+    $$ (T+a)(1 - e^{-\lambda a}) + a e^{-\lambda(T+a)}. $$
+    Окончательно получаем требуемое соотношение для пропускной способности.
+\end{sproof}
+
+\begin{conseq}
+    Перейдем к пределу при устремлении длины слота прослушивания к нулю ($a \to 0$). Разделим числитель и знаменатель дроби на $a$:
+    $$ S = \frac{\lambda T e^{-\lambda(T+a)} \left[ \frac{T}{a}(1 - e^{-\lambda a}) + 1 \right]}{\frac{T+a}{a}(1 - e^{-\lambda a}) + e^{-\lambda(T+a)}}. $$
+    Воспользуемся первым замечательным пределом $\lim\limits_{a \to 0} \frac{1 - e^{-\lambda a}}{a} = \lambda$. Подставляя этот предел, находим асимптотическую пропускную способность:
+    $$ \lim_{a \to 0} S = \frac{\lambda T e^{-\lambda T} (\lambda T + 1)}{T \lambda + e^{-\lambda T}}. $$
+    В терминах безразмерной предложенной нагрузки $G = \lambda T$ предельная формула принимает классический вид:
+    $$ \lim_{a \to 0} S = \frac{G e^{-G} (1 + G)}{G + e^{-G}}. $$
+    
+    Для нахождения теоретического максимума продифференцируем полученную функцию по $G$ и приравняем производную к нулю. Это приводит к трансцендентному уравнению:
+    $$ G^3 e^G - 2G - 1 = 0. $$
+    Численное решение данного уравнения дает точку экстремума $G \approx 1.019$. Подстановка этого значения показывает, что абсолютный теоретический максимум пропускной способности 1-настойчивого CSMA составляет $S_{\max} \approx 0.538$. В отличие от ненастойчивого протокола, система не способна достичь полной утилизации канала из-за неизбежных коллизий: если во время текущей передачи заявки генерируют сразу несколько станций, по ее окончании они гарантированно выйдут в эфир одновременно.
+\end{conseq}
+
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.8\textwidth, height=8cm,
+            xlabel={Предложенная нагрузка $G = \lambda T$}, 
+            ylabel={Пропускная способность $S$},
+            xmin=0, xmax=10, ymin=0, ymax=0.6,
+            grid=major,
+            samples=150,
+            domain=0.01:10,
+            legend pos=north east,
+            legend style={font=\small},
+            thick,
+            title={Зависимость пропускной способности от нагрузки (при $T=1$)}
+        ]
+            % a = 0
+            \addplot[black, dashed] {x * exp(-x) * (1 + x) / (x + exp(-x))}; 
+            \addlegendentry{$a=0$}
+            
+            % a = 0.1T
+            \addplot[Red3] {x * exp(-x*1.1) * (1.1 - exp(-x*0.1)) / (1.1*(1 - exp(-x*0.1)) + 0.1*exp(-x*1.1))}; 
+            \addlegendentry{$a=0.1T$}
+            
+            % a = 0.2T
+            \addplot[Tan1] {x * exp(-x*1.2) * (1.2 - exp(-x*0.2)) / (1.2*(1 - exp(-x*0.2)) + 0.2*exp(-x*1.2))}; 
+            \addlegendentry{$a=0.2T$}
+
+            % a = 0.5T
+            \addplot[DeepSkyBlue4] {x * exp(-x*1.5) * (1.5 - exp(-x*0.5)) / (1.5*(1 - exp(-x*0.5)) + 0.5*exp(-x*1.5))}; 
+            \addlegendentry{$a=0.5T$}
+            
+            % a = 1.0T
+            \addplot[SpringGreen4] {x * exp(-x*2.0) * (2.0 - exp(-x*1.0)) / (2.0*(1 - exp(-x*1.0)) + 1.0*exp(-x*2.0))}; 
+            \addlegendentry{$a=T$}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\section{Анализ протоколов CSMA при разной топологии сети}
+
+Рассмотрим несколько сценариев множественного доступа с различными топологическими особенностями сети. Пусть система состоит из четырех узлов, где узлы 2 и 3 выступают активными передатчиками, а узлы 1 и 4 — получателями. Передача данных осуществляется строго по направлениям $2 \to 1$ и $3 \to 4$. 
+
+Узлы 1 и 4 находятся на краях сети: узел 1 слышит только узел 2, узел 4 слышит только узел 3. Взаимодействие центральных узлов 2 и 3 порождает два класса топологий:
+\begin{itemize}
+    \item \textbf{Симметричная топология:} Узлы 2 и 3 находятся в зоне радиовидимости друг друга.
+    \item \textbf{Асимметричная топология:} Узел 2 слышит передачу узла 3, однако узел 3 не слышит передачу узла 2.
+\end{itemize}
+
+Успешный прием пакета данных (длительности $T$) требует отправки кадра подтверждения (англ.: acknowledgement, ACK) длительности $T_{ack}$. Время распространения сигнала мало и включено в длительность базового слота прослушивания $a$. Длительность кадра подтверждения будем считать кратной длительности слота: $T_{ack} = k \cdot a$. 
+
+\begin{example}{Анализ протоколов CSMA при различных топологиях сети}
+В зависимости от применяемого алгоритма доступа и топологии выделяют шесть базовых конфигураций:
+
+\begin{enumerate}
+    \item Ненастойчивый CSMA, асимметричный случай.
+    \item Ненастойчивый CSMA, симметричный случай.
+    \item 1-настойчивый CSMA, асимметричный случай.
+    \item 1-настойчивый CSMA, симметричный случай.
+    \item $p$-настойчивый CSMA, асимметричный случай.
+    \item $p$-настойчивый CSMA, симметричный случай.
+\end{enumerate}
+
+\begin{center}
+\begin{tikzpicture}[
+    scale=0.9,
+    node distance=2.5cm,
+    terminal/.style={circle, draw, thick, fill=BG, minimum size=7mm},
+    >=Stealth
+]
+
+% ================= СИММЕТРИЧНЫЙ СЛУЧАЙ (Сверху) =================
+\begin{scope}[yshift=0cm]
+    \node[font=\bfseries] at (3, 3.5) {Симметричный случай};
+    
+    % Координаты
+    \coordinate (n1) at (0,0);
+    \coordinate (n2) at (2,0);
+    \coordinate (n3) at (4,0);
+    \coordinate (n4) at (6,0);
+
+    % Зоны видимости 
+    \draw[DeepSkyBlue4, dashed, thick, fill=DeepSkyBlue4, fill opacity=0.07] (n1) circle (2.4);
+    \draw[Red3, dashed, thick, fill=Red3, fill opacity=0.07] (n2) circle (2.4);
+    \draw[SpringGreen4, dashed, thick, fill=SpringGreen4, fill opacity=0.07] (n3) circle (2.4);
+    \draw[Tan1, dashed, thick, fill=Tan1, fill opacity=0.07] (n4) circle (2.4);
+
+    % Узлы
+    \node[terminal] at (n1) {1};
+    \node[terminal] at (n2) {2};
+    \node[terminal] at (n3) {3};
+    \node[terminal] at (n4) {4};
+
+    % Передача данных
+    \draw[->, ultra thick] (2, 0.4) to[bend right=25] node[midway, above=1pt] {?} (0, 0.4);
+    \draw[->, ultra thick] (4, 0.4) to[bend left=25] node[midway, above=1pt] {?} (6, 0.4);
+\end{scope}
+
+% ================= АСИММЕТРИЧНЫЙ СЛУЧАЙ (Снизу) =================
+% Смещаем вниз на 8 единиц
+\begin{scope}[yshift=-8cm]
+    \node[font=\bfseries] at (3.5, 4.2) {Асимметричный случай};
+    
+    % Координаты
+    \coordinate (m1) at (0,0);
+    \coordinate (m2) at (2,0);
+    \coordinate (m3) at (5,0);
+    \coordinate (m4) at (7,0);
+
+    % Зоны видимости
+    % Узел 1: видит соседа 2
+    \draw[DeepSkyBlue4, dashed, thick, fill=DeepSkyBlue4, fill opacity=0.07] (m1) circle (2.4);
+    % Узел 2: видит 1, но не достает до 3
+    \draw[Red3, dashed, thick, fill=Red3, fill opacity=0.07] (m2) circle (2.5);
+    % Узел 3: большой радиус, уверенно накрывает 2 и 4
+    \draw[SpringGreen4, dashed, thick, fill=SpringGreen4, fill opacity=0.07] (m3) circle (3.8);
+    % Узел 4: видит 3
+    \draw[Tan1, dashed, thick, fill=Tan1, fill opacity=0.07] (m4) circle (2.4);
+
+    % Узлы
+    \node[terminal] at (m1) {1};
+    \node[terminal] at (m2) {2};
+    \node[terminal] at (m3) {3};
+    \node[terminal] at (m4) {4};
+
+    % Передача данных
+    \draw[->, ultra thick] (2, 0.4) to[bend right=25] node[midway, above=1pt] {?} (0, 0.4);
+    \draw[->, ultra thick] (5, 0.4) to[bend left=25] node[midway, above=1pt] {?} (7, 0.4);
+\end{scope}
+
+\end{tikzpicture}
+\end{center}
+
+Проанализируем детально \textbf{Случай 5} ($p$-настойчивый CSMA, асимметричный случай) с учетом передачи кадров ACK. Требуется определить пропускные способности $S_{2 \to 1}$ и $S_{3 \to 4}$, а также условия возникновения коллизий.
+\end{example}
+
+\begin{eproof}
+    Проведем последовательный анализ каждой конфигурации. 
+
+    \begin{enumerate}
+        \item \textbf{Случай 1:} Ненастойчивый CSMA, асимметричный случай.
+        
+        [Оставлено для заполнения].
+
+        \item \textbf{Случай 2:} Ненастойчивый CSMA, симметричный случай.
+        
+        [Оставлено для заполнения].
+
+        \item \textbf{Случай 3:} 1-настойчивый CSMA, асимметричный случай.
+        
+        [Оставлено для заполнения].
+
+        \item \textbf{Случай 4:} 1-настойчивый CSMA, симметричный случай.[Оставлено для заполнения].
+
+        \item \textbf{Случай 5:} $p$-настойчивый CSMA, асимметричный случай.
+
+        Рассмотрим узел 3. Он не слышит передачи узла 2. Следовательно, состояние канала для него полностью определяется собственными передачами и сигналами от узла 4. Передачи узла 2 не создают интерференции на узле 4. Значит, передача $3 \to 4$ протекает в условиях отсутствия конкуренции. Узел 3 функционирует как единственная станция в системе с $p$-настойчивым CSMA. Отсюда получаем, что пропускная способность канала $3 \to 4$ достигает теоретического максимума при высокой нагрузке и $p = 1$: $S_{3 \to 4} \to 1$.
+        
+        Рассмотрим передачу $2 \to 1$. Узел 2 слышит передачу узла 3. Согласно алгоритму CSMA, если узел 3 передает пакет, узел 2 фиксирует занятость несущей и переходит в режим ожидания. Как только узел 3 завершает передачу данных, наступает интервал $a$. После этого узел 4 начинает передачу ACK. Поскольку узел 2 не слышит узел 4, эфир для узла 2 становится свободным ровно в момент окончания данных от узла 3. 
+        
+        Момент завершения ожидания слота для узла 2 определяется моментом завершения передачи узла 3 (с точностью до аппаратной погрешности $\varepsilon \ll a$). Узел 2 с вероятностью $p$ начинает передачу пакета данных в освободившийся канал.
+        
+        Проанализируем условия успешной доставки пакета $2 \to 1$. Пакет данных от узла 2 доходит до узла 1 без искажений. Далее узел 1 формирует кадр ACK. Коллизия возникает исключительно на приемной стороне узла 2, если в момент приема кадра ACK от узла 1 узел 3 возобновляет передачу собственных данных.
+        
+        \begin{center}
+\begin{tikzpicture}[>=Stealth, scale=0.85, font=\small]
+
+    % 1. ЛИНИИ СИНХРОНИЗАЦИИ (рисуем первыми, чтобы они были ПОД пакетами)
+    \draw[dashed, gray] (5, 3.5) -- (5, -1);
+    \draw[dashed, gray] (8, 3.5) -- (8, -1);
+    \draw[dashed, gray] (9.2, 3.5) -- (9.2, -1);
+    \draw[dashed, gray] (10.7, 3.5) -- (10.7, -1); 
+
+    % --- Ось узла 3 ---
+    \draw[->, thick] (0, 3) -- (13.5, 3) node[right] {$t$ (Узел 3)};
+    \node[left, font=\bfseries] at (-0.5, 3) {Узел 3 $\to$ 4};
+
+    % Передача данных узлом 3
+    \draw[fill=SpringGreen4!30, thick] (1, 2.7) rectangle (5, 3.3);
+    \node at (3, 3) {Данные 3 ($T$)};
+
+    % ACK от 4 
+    \draw[fill=Tan1!30, thick] (5.2, 2.7) rectangle (6.7, 3.3);
+    \node at (5.95, 3) {\scriptsize ACK 4};
+
+    % Следующая передача данных узлом 3
+    \draw[fill=SpringGreen4!30, thick] (8, 2.7) rectangle (12, 3.3);
+    \node at (10, 3) {Данные 3 ($T$)};
+
+
+    % --- Ось узла 2 ---
+    \draw[->, thick] (0, 0) -- (13.5, 0) node[right] {$t$ (Узел 2)};
+    \node[left, font=\bfseries] at (-0.5, 0) {Узел 2 $\to$ 1};
+
+    % Задержка CSMA
+    \draw[<->, dashed, thick] (1, -0.8) -- (5, -0.8) node[midway, below, fill=BG] {CSMA: Ожидание (канал занят 3 узлом)};
+
+    % Передача данных узлом 2 
+    \draw[fill=Red3!30, thick] (5, -0.3) rectangle (9, 0.3);
+    \node at (7, 0) {Данные 2 ($T$)};
+
+    % ACK от 1 
+    \draw[fill=DeepSkyBlue4!30, thick] (9.2, -0.3) rectangle (10.7, 0.3);
+    \node at (9.95, 0) {\scriptsize ACK 1};
+
+
+    % --- Коллизия ---
+    % Центрируем элементы коллизии относительно нового размера ACK 1 (центр на 9.95)
+    \draw[decorate, decoration={zigzag, segment length=4pt, amplitude=2pt}, red, thick] (9.2, 1.5) -- (10.7, 1.5);
+    \draw[<->, red, thick] (9.95, 0.4) -- (9.95, 2.6);
+    
+    \node[red, align=center, fill=BG, inner sep=2pt] at (9.95, 1.5) {\textbf{Коллизия ACK 1}\\\textbf{и Данных 3 на узле 2}};
+
+\end{tikzpicture}
+\end{center}
+        
+        Пусть $t_0$ — момент завершения передачи данных узлом 3. Узел 2 начинает передачу в момент $t_0 + j \cdot a$, где $j \ge 0$ — число слотов отсрочки. Передача данных узла 2 завершается в момент $t_0 + j \cdot a + T$. Ожидаемый кадр ACK от узла 1 занимает интервал $[t_0 + j \cdot a + T + a, \ t_0 + j \cdot a + T + a + T_{ack}]$.
+        
+        Узел 3 освобождает канал и готов к новой передаче в момент $t_0 + a + T_{ack}$. Так как $T \gg T_{ack}$, узел 3 завершает обработку цикла значительно раньше, чем узел 2 закончит передачу. Следовательно, при высокой интенсивности $\lambda_3$ узел 3 начнет новую передачу на интервале, перекрывающемся с ожиданием кадра ACK узлом 2. Для успешной передачи $2 \to 1$ необходимо, чтобы узел 3 сохранял молчание на интервале длиной $T$ плюс время на получение ACK. Вероятность такого события стремится к нулю при $\lambda_3 \to \infty$. Значит, $S_{2 \to 1} \to 0$. Это классическая проблема скрытой станции (англ.: hidden terminal problem).
+
+        Рассмотрим специфический случай удачной синхронизации. Допустим, узлы 2 и 3 начинают передачу одновременно в одном слоте. Поскольку длины пакетов равны ($T$), передачи завершаются синхронно. Спустя интервал $a$ узлы 1 и 4 одновременно отправляют кадры ACK. В этот момент узлы 2 и 3 переходят в режим приема. Так как узел 2 слышит узлы 1 и 3 (узел 3 молчит), а узел 3 слышит узлы 2 и 4 (узел 2 молчит), взаимная интерференция отсутствует. Оба кадра ACK успешно достигают адресатов. Таким образом, полная деградация пропускной способности зависимого канала наступает только при рассинхронизации стартов передач.
+
+        \item \textbf{Случай 6:} $p$-настойчивый CSMA, симметричный случай.
+        
+        [Оставлено для заполнения].
+    \end{enumerate}
+\end{eproof}
+
+\section{Анализ средней задержки передачи}
+
+Для оценки производительности протоколов множественного доступа, помимо пропускной способности, критически важной характеристикой является средняя задержка передачи $D$ — интервал времени от момента генерации пакета терминалом до его успешной доставки адресату.
+
+Для построения аналитической модели введем следующие предположения. Успешный прием пакета сопровождается отправкой подтверждения (англ.: acknowledgement, ACK). Время обработки данных на приемной и передающей сторонах пренебрежимо мало. При отсутствии подтверждения (вследствие коллизии) терминал планирует повторную передачу через случайное время $X$. В соответствии с ранее принятым допущением о том, что суммарный трафик первичных и повторных пакетов образует пуассоновский поток, вероятность успеха любой попытки передачи одинакова и равна:
+\[
+    P_{suc} = \frac{S}{G},
+\]
+где $S$ — пропускная способность, $G$ — предложенная нагрузка.
+
+\begin{statement}[Средняя задержка в системах ALOHA]
+    В сетях, использующих протоколы семейства ALOHA без предварительного прослушивания несущей, среднее время доставки пакета вычисляется по формуле:
+    \[
+        D = \left( \frac{G}{S} - 1 \right) R + T + \tau,
+    \]
+    где $R = T + 2\tau + T_{ack} + \E[X]$ — среднее время, затрачиваемое на одну неудачную попытку передачи, $T$ — длительность передачи пакета, $T_{ack}$ — длительность передачи подтверждения, $\tau$ — максимальное время распространения сигнала в среде.
+\end{statement}
+\begin{sproof}
+    Вероятность того, что пакет будет успешно доставлен ровно с $k$-й попытки, подчиняется геометрическому распределению:
+    \[
+        \P(k) = (1 - P_{suc})^{k-1} P_{suc}.
+    \]
+    Математическое ожидание общего числа попыток передачи для одного пакета составляет:
+    \[
+        \E[K] = \sum_{k=1}^{\infty} k (1 - P_{suc})^{k-1} P_{suc} = \frac{1}{P_{suc}} = \frac{G}{S}.
+    \]
+    Значит, среднее число неудачных попыток (коллизий), предшествующих успешной передаче, равно $\frac{G}{S} - 1$.
+    
+    Каждая неудачная попытка занимает интервал времени $R$, который складывается из следующих компонент:
+    \begin{itemize}
+        \item $T$ — время непосредственной передачи пакета в канал;
+        \item $\tau$ — задержка распространения сигнала от источника до приемника;
+        \item $T_{ack}$ — время передачи служебного пакета подтверждения;
+        \item $\tau$ — задержка распространения подтверждения обратно к источнику.
+    \end{itemize}
+    Следовательно, таймер ожидания передачи подтверждения установлен на величину $T + 2\tau + T_{ack}$. Если по истечении этого времени источник не получает подтверждение, он фиксирует факт коллизии и ожидает в среднем время $\E[X]$ до инициации следующей попытки. Отсюда полная длительность цикла неудачной передачи равна $R = T + 2\tau + T_{ack} + \E[X]$.
+
+    Для последней (успешной) попытки пакет считается доставленным в момент завершения его полного приема адресатом, то есть через время $T + \tau$ после начала передачи. Суммируя временные затраты на все неудачные и одну успешную попытки, получаем итоговое выражение для $D$.
+\end{sproof}
+
+\begin{note}
+    В протоколах с прослушиванием несущей (CSMA) приведенный расчет задержки требует существенной модификации. Поскольку терминалы не осуществляют передачу немедленно, а предварительно анализируют состояние среды, к интервалу $R$ добавляется время вынужденного ожидания освобождения канала. Структура этого ожидания нетривиальна и жестко детерминирована конкретной дисциплиной доступа (например, ненастойчивый или $p$-настойчивый алгоритмы), а также текущей загрузкой сети.
+\end{note}

@@ -87,6 +87,72 @@ def solve_triangular(A, b, type=None):
         return x
 
 
+def solve_tridiagonal(A, b):
+    """
+    Solves the linear system A @ X = B where A is a tridiagonal matrix using the Thomas algorithm.
+
+    Parameters
+    ----------
+    - A : (M, M) ndarray
+        Tridiagonal coefficient matrix.
+    - b : (M,) or (M, K) array_like
+        Vector or matrix of right-hand sides.
+
+    Returns
+    -------
+    - x : (M,) or (M, K) ndarray
+        Solution of the system. Shape matches b.
+    """
+    A = np.asarray(A, dtype=np.float64)
+    b = np.asarray(b, dtype=np.float64)
+    
+    is_vector = b.ndim == 1
+    if is_vector:
+        b = b.reshape(-1, 1)
+        
+    n = A.shape[0]
+    if A.shape[1] != n or b.shape[0] != n:
+        raise ValueError("Incompatible dimensions.")
+
+    a = np.zeros(n)
+    c = np.zeros(n)
+    d = np.zeros(n)
+    
+    # Extract diagonals
+    d[0] = A[0, 0]
+    c[0] = A[0, 1]
+    for i in range(1, n-1):
+        a[i] = A[i, i-1]
+        d[i] = A[i, i]
+        c[i] = A[i, i+1]
+    a[-1] = A[-1, -2]
+    d[-1] = A[-1, -1]
+    
+    c_prime = np.zeros(n)
+    d_prime = np.zeros((n, b.shape[1]))
+    
+    # Forward sweep
+    c_prime[0] = c[0] / d[0]
+    d_prime[0] = b[0] / d[0]
+    
+    for i in range(1, n):
+        denominator = d[i] - a[i] * c_prime[i-1]
+        if i < n - 1:
+            c_prime[i] = c[i] / denominator
+        d_prime[i] = (b[i] - a[i] * d_prime[i-1]) / denominator
+        
+    # Back substitution
+    x = np.zeros_like(b)
+    x[-1] = d_prime[-1]
+    for i in range(n - 2, -1, -1):
+        x[i] = d_prime[i] - c_prime[i] * x[i+1]
+        
+    if is_vector:
+        return x.ravel()
+    return x
+
+
+
 def solve_gauss(A, b, pivoting='full'):
     """
     Solves the linear system A @ x = b using Gaussian elimination with pivoting.

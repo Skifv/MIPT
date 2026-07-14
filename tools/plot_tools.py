@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import List, Union, Optional, Tuple, Iterable
+import scipy.signal as sg
 
 
 def plot_signals(
@@ -28,7 +29,16 @@ def plot_signals(
     show_err: bool = False,
     legend_pos: Union[str, Tuple[float, float]] = "best",
     ncol: int = 1,
+    alpha: Optional[Union[float, List[float]]] = None,
+    markers: Optional[Union[str, List[str]]] = None,
+    markersize: float = 6.0,
+    markevery: Optional[int] = None,
+    cmap: Optional[str] = None,
     save_name: Optional[str] = None,
+    use_subplots: bool = False,
+    subplots_cols: int = 1,
+    to_db: Optional[Tuple[bool, bool]] = None,
+    db_relative: bool = False,
 ) -> None:
     """
     Visualizes one or multiple 1D signals. Supports continuous plots,
@@ -43,7 +53,7 @@ def plot_signals(
     - figsize : Tuple[float, float], optional
         Figure size in inches (width, height). Defaults to (10, 6).
     - errors : Tuple or List[Tuple], optional
-        Errors for X and Y axes. Format: (xerr, yerr).
+        Errors for X and Y axes. Format: (yerr, xerr).
         xerr/yerr can be arrays of the same length as y, or scalars.
     - labels : str or List[str], optional
         Labels for the legend. If a string is passed for multiple signals,
@@ -71,8 +81,23 @@ def plot_signals(
         Legend position. String (e.g., 'upper right') or relative coordinate tuple.
     - ncol : int, optional
         Number of columns in the legend.
+    - alpha : float or List[float], optional
+        Transparency of the lines/markers.
+    - markers : str or List[str], optional
+        Marker styles (e.g., 'o', 'x', '').
+    - cmap : str, optional
+        Colormap name to generate colors if `colors` is not provided.
     - save_name : str, optional
         File path to save the generated plot.
+    - use_subplots : bool, optional
+        Flag to draw each signal on an individual subplot. Defaults to False.
+    - subplots_cols : int, optional
+        Number of columns for the subplots grid if use_subplots is True. Defaults to 1.
+    - to_db : Tuple[bool, bool], optional
+        Tuple (db_x, db_y). If True, applies 20*log10() transformation to the respective axis data.
+    - db_relative : bool, optional
+        If True and a Y-axis is chosen as dB, the transformation is done relative to the maximum 
+        value of that signal (20*log10(y / max(y))). The X-axis remains absolute. Defaults to False.
 
     Returns
     -------
@@ -84,10 +109,10 @@ def plot_signals(
     • *Algorithm workflow*
     1. Normalize input arrays and parameters into unified lists to handle single vs multiple signals.
     2. Prepare visual styles (colors, line types) dynamically based on the signal count.
-    3. Render plot elements iteratively (priority: Errorbar -> Stem -> Standard Line).
-    4. Apply axis formatting, grids, scales, and layout limits.
+    3. Initialize single axis or grid of subplots if requested. Calculate dB transformations.
+    4. Render plot elements iteratively (priority: Errorbar -> Stem -> Standard Line).
+    5. Apply axis formatting, grids, scales, and layout limits per individual axis.
     """
-    plt.close()  # Ensure cleanup of previous figures in interactive environments
 
     # --- Step 1: Input Data Normalization ---
     # Convert y to a list of arrays for unified processing
@@ -111,7 +136,9 @@ def plot_signals(
     # --- Step 2: Visual Style Preparation ---
     # Obtain current color palette if colors are not explicitly defined
     if colors is None:
-        if num_signals <= 10:
+        if cmap is not None:
+            style_colors = plt.get_cmap(cmap)(np.linspace(0.1, 0.9, num_signals))
+        elif num_signals <= 10:
             # Standard property cycle
             style_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
         elif num_signals <= 20:
@@ -141,8 +168,24 @@ def plot_signals(
     else:
         stem_flags = list(as_stem)
 
+    if alpha is None:
+        style_alphas = [1.0] * num_signals
+    else:
+        style_alphas = [alpha] if isinstance(alpha, (float, int)) else list(alpha)
+
+    style_markers = (
+        [""] if markers is None else ([markers] if isinstance(markers, str) else list(markers))
+    )
+
     # --- Step 3: Canvas Initialization and Rendering ---
-    fig, ax = plt.subplots(figsize=figsize)
+    if use_subplots:
+        cols = min(num_signals, subplots_cols) if num_signals > 0 else subplots_cols
+        rows = int(np.ceil(num_signals / cols)) if cols > 0 else 1
+        fig, axes_raw = plt.subplots(rows, cols, figsize=figsize, squeeze=False)
+        axes = axes_raw.flatten()
+    else:
+        fig, ax = plt.subplots(figsize=figsize)
+        axes = [ax] * num_signals
 
     for i in range(num_signals):
         # Select current signal parameters with cyclical modulo fallback
@@ -153,13 +196,36 @@ def plot_signals(
         color = style_colors[i % len(style_colors)]
         l_style = style_lines[i % len(style_lines)]
         current_as_stem = stem_flags[i % len(stem_flags)]
+        current_alpha = style_alphas[i % len(style_alphas)]
+        current_marker = style_markers[i % len(style_markers)]
+        
+        current_ax = axes[i] if use_subplots else axes[0]
+
+        # Convert to float array to prevent issues in calculations (like np.log10)
+        curr_x_plot = np.array(curr_x, dtype=float)
+        curr_y_plot = np.array(curr_y, dtype=float)
+
+        # Apply dB transformation
+        if to_db is not None:
+            db_x, db_y = to_db
+            epsilon = 1e-12
+            if db_x:
+                curr_x_plot = 20 * np.log10(np.abs(curr_x_plot) + epsilon)
+            if db_y:
+                if db_relative:
+                    max_y = np.max(np.abs(curr_y_plot))
+                    if max_y == 0:
+                        max_y = 1.0
+                    curr_y_plot = 20 * np.log10((np.abs(curr_y_plot) / max_y) + epsilon)
+                else:
+                    curr_y_plot = 20 * np.log10(np.abs(curr_y_plot) + epsilon)
 
         # --- Step 3a: Plotting Logic ---
         # Priority: Errorbar -> Stem -> Standard Line Plot
         if show_err and (curr_err_x is not None or curr_err_y is not None):
-            ax.errorbar(
-                curr_x,
-                curr_y,
+            current_ax.errorbar(
+                curr_x_plot,
+                curr_y_plot,
                 xerr=curr_err_x,
                 yerr=curr_err_y,
                 label=final_labels[i],
@@ -169,71 +235,380 @@ def plot_signals(
                 capsize=3,
                 capthick=1.2,
                 elinewidth=1.0,
-                alpha=0.9,
+                alpha=current_alpha,
             )
         elif current_as_stem:
-            markerline, stemlines, baseline = ax.stem(
-                curr_x, curr_y, linefmt=color, basefmt=" ", label=final_labels[i]
+            markerline, stemlines, baseline = current_ax.stem(
+                curr_x_plot, curr_y_plot, linefmt=color, basefmt=" ", label=final_labels[i]
             )
-            plt.setp(markerline, marker="o", markersize=4, color=color)
-            plt.setp(stemlines, linewidth=1.2, color=color, linestyle=l_style)
+            plt.setp(markerline, marker=current_marker if current_marker else "o", markersize=4, color=color, alpha=current_alpha)
+            plt.setp(stemlines, linewidth=1.2, color=color, linestyle=l_style, alpha=current_alpha)
         else:
-            ax.plot(
-                curr_x,
-                curr_y,
+            plot_kwargs = dict(
                 label=final_labels[i],
                 lw=1.8,
                 color=color,
                 linestyle=l_style,
+                alpha=current_alpha,
+                marker=current_marker,
+                markersize=markersize,
             )
+            if markevery is not None:
+                plot_kwargs['markevery'] = markevery
+            current_ax.plot(curr_x_plot, curr_y_plot, **plot_kwargs)
 
     # --- Step 4: Final Formatting and Plot Limits ---
-    # Apply logarithmic scales if specified
-    if log_scale:
-        log_x, log_y = log_scale
-        if log_x:
-            ax.set_xscale("log")
-        if log_y:
-            ax.set_yscale("log")
-
-    if limits:
-        x_lim, y_lim = limits
-        if x_lim is not None:
-            ax.set_xlim(x_lim)
-        if y_lim is not None:
-            ax.set_ylim(y_lim)
-
-    if title:
-        ax.set_title(title, fontsize=12)
-
-    ax.set_xlabel(xlabel if xlabel else ("Samples (n)" if x is None else ""))
-    if ylabel:
-        ax.set_ylabel(ylabel)
-
-    # Configure grid: major lines solid gray, minor lines dotted
-    ax.grid(True, which="major", color="gray", linestyle="-", alpha=0.4)
-    ax.grid(True, which="minor", color="gray", linestyle=":", alpha=0.2)
-    ax.minorticks_on()
-
-    # Handle legend positioning dynamically
-    if isinstance(legend_pos, tuple):
-        ax.legend(
-            loc="upper left",
-            bbox_to_anchor=legend_pos,
-            ncol=ncol,
-            frameon=True,
-            shadow=True,
-            fontsize=9,
-        )
+    if use_subplots:
+        # Hide unused subplots if grid is larger than signals
+        for i in range(num_signals, len(axes)):
+            axes[i].set_visible(False)
+        active_axes = axes[:num_signals]
     else:
-        ax.legend(loc=legend_pos, ncol=ncol, frameon=True, shadow=True, fontsize=10)
+        active_axes = [axes[0]]
+
+    for current_ax in active_axes:
+        # Apply logarithmic scales if specified
+        if log_scale:
+            log_x, log_y = log_scale
+            if log_x:
+                current_ax.set_xscale("log")
+            if log_y:
+                current_ax.set_yscale("log")
+
+        if limits:
+            x_lim, y_lim = limits
+            if x_lim is not None:
+                current_ax.set_xlim(x_lim)
+            if y_lim is not None:
+                current_ax.set_ylim(y_lim)
+
+        current_ax.set_xlabel(xlabel if xlabel else ("Samples (n)" if x is None else ""))
+        if ylabel:
+            current_ax.set_ylabel(ylabel)
+
+        # Configure grid: major lines solid gray, minor lines dotted
+        current_ax.grid(True, which="major", color="gray", linestyle="-", alpha=0.4)
+        current_ax.grid(True, which="minor", color="gray", linestyle=":", alpha=0.2)
+        current_ax.minorticks_on()
+
+        # Specific legend positioning per subplot
+        if use_subplots:
+            if isinstance(legend_pos, tuple):
+                current_ax.legend(
+                    loc="upper left",
+                    bbox_to_anchor=legend_pos,
+                    ncol=ncol,
+                    frameon=True,
+                    shadow=True,
+                    fontsize=9,
+                )
+            else:
+                current_ax.legend(loc=legend_pos, ncol=ncol, frameon=True, shadow=True, fontsize=10)
+
+    # Global Formatting (Titles and Legends)
+    if not use_subplots:
+        single_ax = active_axes[0]
+        if title:
+            single_ax.set_title(title, fontsize=12)
+
+        if isinstance(legend_pos, tuple):
+            single_ax.legend(
+                loc="upper left",
+                bbox_to_anchor=legend_pos,
+                ncol=ncol,
+                frameon=True,
+                shadow=True,
+                fontsize=9,
+            )
+        else:
+            # Default to moving legend outside if it has many items
+            if len(final_labels) > 10 and legend_pos == 'best':
+                 single_ax.legend(loc="upper left", bbox_to_anchor=(1.05, 1), ncol=ncol, frameon=True, shadow=True, fontsize=9)
+            else:
+                 single_ax.legend(loc=legend_pos, ncol=ncol, frameon=True, shadow=True, fontsize=10)
+    else:
+        if title:
+            fig.suptitle(title, fontsize=14)
+        # Prettify layout to prevent subplots overlapping
+        fig.tight_layout()
 
     # Use bbox_inches='tight' to ensure external legends are not cut off during save
     if save_name:
         plt.savefig(save_name, bbox_inches="tight")
+    
 
-    plt.show()
+def plot_stft(
+    f: np.ndarray,
+    t_vecs: Union[np.ndarray, Iterable[np.ndarray]],
+    spectrums: Union[np.ndarray, Iterable[np.ndarray]],
+    Fs: float,
+    nperseg: int,
+    noverlap: int,
+    *,
+    nfft: Optional[int] = None,
+    labels: Optional[Union[str, List[str]]] = None,
+    limits: Optional[
+        Tuple[Optional[Tuple[float, float]], Optional[Tuple[float, float]]]
+    ] = None,
+    use_log_scale: bool = False,
+    cmap: str = 'viridis',
+    figsize: Optional[Tuple[float, float]] = None,
+) -> None:
+    """
+    Visualizes the Short-Time Fourier Transform (STFT) spectrums sequentially.
 
+    Parameters
+    ----------
+    - f : (N_fft,) ndarray
+        Array of sample frequencies.
+    - t_vecs : (N_frames,) ndarray or Iterable[(N_frames,) ndarray]
+        Array of segment times. Can be a single array or list of arrays (if signals vary in length).
+    - spectrums : (N_fft, N_frames) ndarray or Iterable[(N_fft, N_frames) ndarray]
+        Complex STFT outputs to be visualized.
+    - Fs : float
+        Sampling frequency of the time series.
+    - nperseg : int
+        Length of each segment.
+    - noverlap : int
+        Number of points to overlap between segments.
+    - nfft : int, optional
+        Length of the FFT used. If None, nperseg was used.
+    - labels : str or List[str], optional
+        Signal labels for the titles.
+    - limits : Tuple[Optional[Tuple[float, float]], Optional[Tuple[float, float]]], optional
+        Axes limits formatted as ((time_min, time_max), (freq_min, freq_max)).
+    - use_log_scale : bool, optional
+        Flag to convert magnitude to decibel scale (dB).
+    - cmap : str, optional
+        Colormap for the spectrograms.
+    - figsize : Tuple[float, float], optional
+        Figure dimensions. Defaults to (16.0, 6.0).
+
+    Returns
+    -------
+    - None : None
+        Generates and displays figures sequentially using plt.show().
+
+    Notes
+    -----
+    • *Algorithm workflow*
+    1. Normalize inputs to iterable structures.
+    2. Iterate through each provided STFT spectrum.
+    3. Calculate absolute magnitude (and apply 20*log10 if use_log_scale is True).
+    4. Handle the 1-frame edge case via pcolormesh flat shading bounds, or 
+       render standard pcolormesh for >1 frames.
+    5. Apply formatting, limits, colorbar, and render via plt.show() immediately.
+    """
+    # --- Step 1: Input Data Normalization ---
+    if isinstance(spectrums, np.ndarray) and spectrums.ndim == 2:
+        work_spectrums = [spectrums]
+    else:
+        work_spectrums = list(spectrums)
+
+    if isinstance(t_vecs, np.ndarray) and t_vecs.ndim == 1:
+        work_t = [t_vecs] * len(work_spectrums)
+    else:
+        work_t = list(t_vecs)
+
+    num_signals = len(work_spectrums)
+    
+    final_labels = (
+        ([labels] if isinstance(labels, str) else list(labels))
+        if labels
+        else [f"Signal {i+1}" for i in range(num_signals)]
+    )
+
+    if figsize is None:
+        figsize = (16.0, 6.0)
+
+    actual_nfft = nfft if nfft is not None else nperseg
+
+    # --- Step 2: Visualization Loop ---
+    for i in range(num_signals):
+        plt.figure(figsize=figsize)
+        
+        spec = work_spectrums[i]
+        t_curr = work_t[i]
+        lbl = final_labels[i % len(final_labels)]
+
+        # --- Step 2a: Magnitude Calculation ---
+        amplitude = np.abs(spec)
+        
+        if use_log_scale:
+            display_data = 20 * np.log10(amplitude + 1e-12)
+            cbar_label = 'Amplitude (dB)'
+            title_str = f"STFT Magnitude (dB) - {lbl}"
+        else:
+            display_data = amplitude
+            cbar_label = 'Amplitude'
+            title_str = f"STFT Magnitude - {lbl}"
+
+        # --- Step 2b: Spectrogram Rendering ---
+        # 1-frame edge case
+        if len(t_curr) == 1:
+            dt = 1 / Fs
+            df = Fs / actual_nfft
+            
+            R = nperseg - noverlap
+            t_half_width = (R * dt) / 2
+            
+            t_edges = np.array([t_curr[0] - t_half_width, t_curr[0] + t_half_width])
+            f_edges = np.append(f - df/2, f[-1] + df/2)
+            
+            plt.pcolormesh(t_edges, f_edges, display_data, shading='flat', cmap=cmap)
+            
+        # Standard case
+        else:   
+            plt.pcolormesh(t_curr, f, display_data, shading='nearest', cmap=cmap)
+            
+        # --- Step 2c: Formatting and Limits ---
+        plt.xlabel("Time, s")
+        plt.ylabel("Frequency, Hz")
+        plt.title(title_str)
+        plt.colorbar(label=cbar_label)
+        plt.rc("font", size=15)
+
+        if limits:
+            t_lim, f_lim = limits
+            if t_lim is not None:
+                plt.xlim(t_lim)
+            if f_lim is not None:
+                plt.ylim(f_lim)
+            else:
+                plt.ylim((-Fs / 2, Fs / 2)) # Default Nyquist
+        else:
+            plt.ylim((-Fs / 2, Fs / 2))     # Default Nyquist
+
+        plt.tight_layout()
+        plt.show()  # Display each plot iteratively
+        
+        
+def compute_stft(
+    signals: Union[np.ndarray, Iterable[np.ndarray]],
+    Fs: float,
+    nperseg: int,
+    noverlap: int,
+    *,
+    nfft: Optional[int] = None,
+    window: str = 'boxcar',
+    plot_results: bool = False,
+    labels: Optional[Union[str, List[str]]] = None,
+    limits: Optional[
+        Tuple[Optional[Tuple[float, float]], Optional[Tuple[float, float]]]
+    ] = None,
+    use_log_scale: bool = False,
+    cmap: str = 'viridis',
+    figsize: Optional[Tuple[float, float]] = None,
+) -> Tuple[np.ndarray, Union[np.ndarray, List[np.ndarray]], Union[np.ndarray, List[np.ndarray]]]:
+    """
+    Computes the Short-Time Fourier Transform (STFT) for one or multiple signals 
+    and optionally triggers their visual representation.
+
+    Parameters
+    ----------
+    - signals : (N,) ndarray or Iterable[(N,) ndarray]
+        Input time-domain signals.
+    - Fs : float
+        Sampling frequency.
+    - nperseg : int
+        Length of each segment (window).
+    - noverlap : int
+        Number of points to overlap between segments.
+    - nfft : int, optional
+        Length of the FFT used. If None, defaults to nperseg.
+    - window : str, optional
+        Desired window to use (e.g., 'boxcar', 'hann', 'hamming'). Defaults to 'boxcar'.
+    - plot_results : bool, optional
+        If True, invokes `plot_stft` automatically. Defaults to False.
+    - labels : str or List[str], optional
+        Signal labels passed to the visualizer.
+    - limits : Tuple[Optional[Tuple[float, float]], Optional[Tuple[float, float]]], optional
+        Axes limits passed to the visualizer formatted as ((time_lim), (freq_lim)).
+    - use_log_scale : bool, optional
+        Passed to the visualizer. Converts amplitude to dB.
+    - cmap : str, optional
+        Passed to the visualizer. Sets the colormap.
+    - figsize : Tuple[float, float], optional
+        Passed to the visualizer. Configures figure size.
+
+    Returns
+    -------
+    - f : (N_fft,) ndarray
+        Frequency array (centered around zero).
+    - t : (N_frames,) ndarray or List[(N_frames,) ndarray]
+        Time array(s). Returns a single array for a single signal, else a list.
+    - spectrums : (N_fft, N_frames) ndarray or List[(N_fft, N_frames) ndarray]
+        Calculated complex STFT spectrums (centered around zero frequency). 
+
+    Notes
+    -----
+    • *Algorithm workflow*
+    1. Normalize input signals into a unified list structure.
+    2. Iteratively compute STFT via scipy.signal.stft.
+    3. Apply internal amplitude scaling corrections.
+    4. Execute fftshift to center 0 Hz frequency.
+    5. Optionally route parameters to `plot_stft`.
+    """
+    # --- Step 1: Input Data Normalization ---
+    if isinstance(signals, np.ndarray) and signals.ndim == 1:
+        work_signals = [signals]
+        is_single_input = True
+    else:
+        work_signals = [np.atleast_1d(s) for s in signals]
+        is_single_input = False
+
+    spectrums = []
+    t_vecs = []
+    f_vec = None
+
+    # --- Step 2: STFT Computation Loop ---
+    for sig in work_signals:
+        f, t, spec = sg.stft(
+            sig, 
+            fs=Fs, 
+            window=window, 
+            nperseg=nperseg, 
+            noverlap=noverlap, 
+            nfft=nfft, 
+            return_onesided=False, 
+            boundary=None, 
+            padded=False
+        )
+        
+        # Internal sci-py magnitude normalization logic
+        spec *= spec.shape[1] / nperseg
+        
+        # Zero-frequency shift
+        f = np.fft.fftshift(f)
+        spec = np.fft.fftshift(spec, axes=0)
+        
+        f_vec = f  # Frequency grid is same across all signals
+        t_vecs.append(t)
+        spectrums.append(spec)
+
+    # --- Step 3: Optional Visualization ---
+    if plot_results:
+        plot_stft(
+            f=f_vec,
+            t_vecs=t_vecs,
+            spectrums=spectrums,
+            Fs=Fs,
+            nperseg=nperseg,
+            noverlap=noverlap,
+            nfft=nfft,
+            labels=labels,
+            limits=limits,
+            use_log_scale=use_log_scale,
+            cmap=cmap,
+            figsize=figsize
+        )
+
+    # --- Step 4: Return Formatting ---
+    if is_single_input:
+        return f_vec, t_vecs[0], spectrums[0]
+    else:
+        return f_vec, t_vecs, spectrums
+    
 
 def plot_dtft_analysis(
     nu_vec: np.ndarray,
@@ -247,9 +622,11 @@ def plot_dtft_analysis(
     ] = None,
     title: Optional[str] = None,
     plot_phase: bool = False,
-    separate_axes: bool = False,
+    use_subplots: bool = False,
+    subplots_cols: int = 1,
     as_stem: Union[bool, List[bool]] = False,
     use_db: bool = False,
+    db_relative: bool = False,
     legend_pos: Union[str, Tuple[float, float]] = "best",
     ncol: int = 1,
     figsize: Optional[Tuple[float, float]] = None,
@@ -276,12 +653,17 @@ def plot_dtft_analysis(
         Overall title for the figure.
     - plot_phase : bool, optional
         If True, creates an additional subplot/axis for the unwrapped phase spectrum.
-    - separate_axes : bool, optional
-        If True, renders each signal in its own distinct row of subplots.
+    - use_subplots : bool, optional
+        If True, renders each signal in its own distinct subplot cell (or row group).
+    - subplots_cols : int, optional
+        Number of columns for the subplots grid if use_subplots is True. Defaults to 1.
     - as_stem : bool or List[bool], optional
         If True, visualizes the spectrum as discrete samples using a stem plot.
     - use_db : bool, optional
         Converts the magnitude to decibels using 20 * log10(|X|).
+    - db_relative : bool, optional
+        If True and use_db is True, the magnitude calculation is done relative to the
+        maximum value of that spectrum (20 * log10(|X| / max(|X|))). Defaults to False.
     - legend_pos : str or Tuple[float, float], optional
         Position of the legend, either as a location string or a coordinate tuple.
     - ncol : int, optional
@@ -298,17 +680,16 @@ def plot_dtft_analysis(
     -----
     • *Mathematical foundation*
     - Magnitude: |X(ν)|
-    - Magnitude in dB: 20 * log10(|X(ν)|)
+    - Magnitude in dB: 20 * log10(|X(ν)|) or 20 * log10(|X(ν)| / max(|X(ν)|))
     - Phase: arg(X(ν)) (unwrapped to avoid 2π discontinuities)
 
     • *Algorithm workflow*
     1. Normalize complex spectrums into a unified list structure.
     2. Initialize visual parameters (colors, styles, labels).
     3. Calculate geometric layout for subplots depending on phase and separation flags.
-    4. Compute magnitudes (linear or dB) and phase arrays.
+    4. Compute magnitudes (linear, dB or relative dB) and phase arrays.
     5. Render characteristics iteratively and apply axis limit configurations.
     """
-    plt.close()
 
     # --- Step 1: Spectrums Normalization ---
     if isinstance(spectrums, np.ndarray):
@@ -324,13 +705,10 @@ def plot_dtft_analysis(
     # --- Step 2: Style Initialization ---
     if colors is None:
         if num_signals <= 10:
-            # Standard property cycle
             style_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
         elif num_signals <= 20:
-            # Extended qualitative palette
             style_colors = plt.get_cmap("tab20")(np.linspace(0, 1, num_signals))
         else:
-            # Universal palette for a large number of distinct lines
             style_colors = plt.get_cmap("turbo")(np.linspace(0, 1, num_signals))
     else:
         style_colors = [colors] if isinstance(colors, str) else list(colors)
@@ -347,15 +725,21 @@ def plot_dtft_analysis(
     )
 
     # --- Step 3: Layout Geometry Calculation ---
-    # Require 2 rows per signal/group if phase plot is requested
     row_multiplier = 2 if plot_phase else 1
-    nrows = num_signals * row_multiplier if separate_axes else row_multiplier
+
+    if use_subplots:
+        cols = min(num_signals, subplots_cols) if num_signals > 0 else subplots_cols
+        rows = int(np.ceil(num_signals / cols)) if cols > 0 else 1
+        nrows = rows * row_multiplier
+    else:
+        cols = 1
+        nrows = row_multiplier
 
     if figsize is None:
-        figsize = (10, 3.5 * nrows)
+        fig_width = 10 if cols == 1 else max(10, 6 * cols)
+        figsize = (fig_width, 3.5 * nrows)
 
-    fig, axes = plt.subplots(nrows, 1, figsize=figsize, sharex=True, squeeze=False)
-    axes_f = axes.flatten()
+    fig, axes = plt.subplots(nrows, cols, figsize=figsize, sharex=True, squeeze=False)
 
     # --- Step 4: Characteristics Calculation and Rendering ---
     for i in range(num_signals):
@@ -366,12 +750,25 @@ def plot_dtft_analysis(
         is_stem_mode = stem_flags[i % len(stem_flags)]
 
         # Determine target axes for the current signal
-        ax_mag = axes_f[i * row_multiplier] if separate_axes else axes_f[0]
+        if use_subplots:
+            c = i % cols
+            r_base = (i // cols) * row_multiplier
+            ax_mag = axes[r_base, c]
+            ax_phase = axes[r_base + 1, c] if plot_phase else None
+        else:
+            ax_mag = axes[0, 0]
+            ax_phase = axes[1, 0] if plot_phase else None
 
         # --- Step 4a: Magnitude Calculation ---
         magnitude = np.abs(spec_val)  # shape: (N,)
         if use_db:
-            magnitude = 20 * np.log10(magnitude + 1e-12)  # shape: (N,)
+            if db_relative:
+                max_mag = np.max(magnitude)
+                if max_mag == 0:
+                    max_mag = 1.0
+                magnitude = 20 * np.log10((magnitude / max_mag) + 1e-12)
+            else:
+                magnitude = 20 * np.log10(magnitude + 1e-12)
 
         if is_stem_mode:
             markerline, stemlines, _ = ax_mag.stem(
@@ -385,8 +782,7 @@ def plot_dtft_analysis(
             )
 
         # --- Step 4b: Phase Calculation and Rendering ---
-        if plot_phase:
-            ax_phase = axes_f[i * row_multiplier + 1] if separate_axes else axes_f[1]
+        if plot_phase and ax_phase is not None:
             # Use unwrap to eliminate 2*pi phase jumps
             phase_vals = np.unwrap(np.angle(spec_val))  # shape: (N,)
             ax_phase.plot(
@@ -394,8 +790,18 @@ def plot_dtft_analysis(
             )
 
     # --- Step 5: Final Formatting and Limits Application ---
-    for j, ax in enumerate(axes_f):
-        if not ax.get_lines() and not ax.collections:
+    # Hide unused axes if the grid is larger than necessary
+    if use_subplots:
+        for i in range(num_signals, rows * cols):
+            c = i % cols
+            r_base = (i // cols) * row_multiplier
+            axes[r_base, c].set_visible(False)
+            if plot_phase:
+                axes[r_base + 1, c].set_visible(False)
+
+    # Set formatting per individual axis
+    for j, ax in enumerate(axes.flatten()):
+        if not ax.get_visible() or (not ax.get_lines() and not ax.collections):
             continue
 
         ax.grid(True, which="both", linestyle="--", alpha=0.3)
@@ -414,9 +820,8 @@ def plot_dtft_analysis(
             ax.legend(loc=legend_pos, ncol=ncol, frameon=True, shadow=True, fontsize=9)
 
         # Determine if the current axis represents phase
-        is_phase_ax = plot_phase and (
-            j % row_multiplier != 0 if separate_axes else j % 2 != 0
-        )
+        r = j // cols
+        is_phase_ax = plot_phase and (r % row_multiplier != 0)
 
         if limits:
             x_lim, y_lim = limits
@@ -426,17 +831,27 @@ def plot_dtft_analysis(
             if y_lim is not None and not is_phase_ax:
                 ax.set_ylim(y_lim)
 
-        ax.set_ylabel(
-            r"$\arg(X)$ [рад]"
-            if is_phase_ax
-            else (r"$|X|_{dB}$" if use_db else r"$|X|$")
-        )
+        if is_phase_ax:
+            ylabel_str = r"$\arg(X)$ [рад]"
+        else:
+            if use_db:
+                ylabel_str = r"$|X|_{dB, rel}$" if db_relative else r"$|X|_{dB}$"
+            else:
+                ylabel_str = r"$|X|$"
+        ax.set_ylabel(ylabel_str)
+
+    # Ensure appropriate x-labels for lowest visible axes in each column (handling sharex=True)
+    for c in range(cols):
+        for r in range(nrows - 1, -1, -1):
+            if axes[r, c].get_visible():
+                axes[r, c].set_xlabel(r"Нормированная частота $\nu$")
+                axes[r, c].tick_params(labelbottom=True)
+                break
 
     if title:
         fig.suptitle(title, y=1.01)
-    axes_f[-1].set_xlabel(r"Нормированная частота $\nu$")
+    
     plt.tight_layout()
-    plt.show()
 
 
 def compute_dtft_analysis(
@@ -452,9 +867,11 @@ def compute_dtft_analysis(
     dtft_points: int = 2048,
     plot_results: bool = False,
     plot_phase: bool = False,
-    separate_axes: bool = False,
+    use_subplots: bool = False,
+    subplots_cols: int = 1,
     should_shift: bool = True,
     use_db: bool = False,
+    db_relative: bool = False,
     as_stem: Union[bool, List[bool]] = False,
     legend_pos: Union[str, Tuple[float, float]] = "best",
     ncol: int = 1,
@@ -484,12 +901,17 @@ def compute_dtft_analysis(
         Flag to automatically trigger the `plot_dtft_analysis` function. Defaults to False.
     - plot_phase : bool, optional
         If True, creates an additional subplot for the unwrapped phase spectrum (if plotted).
-    - separate_axes : bool, optional
-        If True, renders each signal in its own distinct row of subplots (if plotted).
+    - use_subplots : bool, optional
+        If True, renders each signal in its own distinct subplot cell (if plotted).
+    - subplots_cols : int, optional
+        Number of columns for the subplots grid if use_subplots is True (if plotted). Defaults to 1.
     - should_shift : bool, optional
         If True, applies fftshift to center the zero frequency in the array/plot. Defaults to True.
     - use_db : bool, optional
         Converts the magnitude to decibels using 20 * log10(|X|) (if plotted).
+    - db_relative : bool, optional
+        If True and use_db is True, the magnitude calculation is done relative to the
+        maximum value of that spectrum (if plotted). Defaults to False.
     - as_stem : bool or List[bool], optional
         If True, visualizes the spectrum as discrete samples using a stem plot.
     - legend_pos : str or Tuple[float, float], optional
@@ -547,7 +969,6 @@ def compute_dtft_analysis(
     # --- Step 4: Optional Visualization ---
     # Delegate rendering to the plotting function if the flag is active
     if plot_results:
-        # Ensure plot_dtft_analysis is defined and imported in the scope
         plot_dtft_analysis(
             nu_vec=nu_vec,
             spectrums=spectrums,
@@ -557,9 +978,11 @@ def compute_dtft_analysis(
             limits=limits,
             title=title,
             plot_phase=plot_phase,
-            separate_axes=separate_axes,
-            use_db=use_db,
+            use_subplots=use_subplots,
+            subplots_cols=subplots_cols,
             as_stem=as_stem,
+            use_db=use_db,
+            db_relative=db_relative,
             legend_pos=legend_pos,
             ncol=ncol,
             figsize=figsize,
@@ -939,3 +1362,164 @@ def plot_convergence(
         plt.savefig(save_name, bbox_inches="tight")
 
     plt.show()
+
+
+def plot_polar_heatmap(
+    theta: np.ndarray,
+    r: np.ndarray,
+    values: np.ndarray,
+    *,
+    figsize: Tuple[float, float] = (8, 8),
+    cmap: str = "inferno",
+    title: Optional[str] = None,
+    save_name: Optional[str] = None,
+) -> None:
+    """
+    Plots a heatmap in polar coordinates mapped to a Cartesian square,
+    ensuring 0 is in the center of the square (Wikipedia style).
+    """
+    plt.close()
+    fig, ax = plt.subplots(figsize=figsize)
+    
+    # Convert polar to cartesian
+    X = r * np.cos(theta)
+    Y = r * np.sin(theta)
+    
+    mesh = ax.pcolormesh(X, Y, values, cmap=cmap, shading='auto')
+    
+    ax.set_aspect('equal', 'box') # square box
+    ax.set_axis_off() # remove axes
+    
+    if title:
+        ax.set_title(title, pad=20)
+        
+    fig.colorbar(mesh, ax=ax, fraction=0.046, pad=0.04)
+    
+    if save_name:
+        plt.savefig(save_name, bbox_inches="tight")
+        
+    plt.show()
+
+
+def plot_parametric_surface_3d(
+    X: np.ndarray,
+    Y: np.ndarray,
+    Z: np.ndarray,
+    *,
+    color_values: Optional[np.ndarray] = None,
+    figsize: Tuple[float, float] = (8, 8),
+    cmap: str = "viridis",
+    title: Optional[str] = None,
+    save_name: Optional[str] = None,
+) -> None:
+    """
+    Plots a 3D parametric surface as a wireframe/mesh.
+    """
+    plt.close()
+    fig = plt.figure(figsize=figsize)
+    ax = fig.add_subplot(111, projection='3d')
+    
+    if color_values is None:
+        ax.plot_wireframe(X, Y, Z, color='C0', linewidth=0.5, alpha=0.8)
+    else:
+        v_min, v_max = color_values.min(), color_values.max()
+        if v_max == v_min:
+            # Avoid division by zero in normalization for constant values
+            norm = plt.Normalize(vmin=v_min - 0.5, vmax=v_max + 0.5)
+        else:
+            norm = plt.Normalize(vmin=v_min, vmax=v_max)
+        colors = plt.get_cmap(cmap)(norm(color_values))
+        ax.plot_surface(X, Y, Z, facecolors=colors, shade=False, linewidth=0, alpha=0.9)
+        
+    max_range = np.array([X.max()-X.min(), Y.max()-Y.min(), Z.max()-Z.min()]).max() / 2.0
+    mid_x = (X.max()+X.min()) * 0.5
+    mid_y = (Y.max()+Y.min()) * 0.5
+    mid_z = (Z.max()+Z.min()) * 0.5
+    ax.set_xlim(mid_x - max_range, mid_x + max_range)
+    ax.set_ylim(mid_y - max_range, mid_y + max_range)
+    ax.set_zlim(mid_z - max_range, mid_z + max_range)
+    ax.set_box_aspect((1, 1, 1))
+    
+    if not getattr(plt, '_keep_3d_axes', False):
+        ax.set_axis_off()
+    else:
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+    
+    if title:
+        ax.set_title(title, pad=20)
+        
+    if save_name:
+        plt.savefig(save_name, bbox_inches="tight")
+        
+    plt.show()
+
+def plot_polar_curve(
+    theta: np.ndarray,
+    r: np.ndarray,
+    *,
+    color: str = 'purple',
+    fill: bool = True,
+    alpha: float = 0.3,
+    title: Optional[str] = None,
+    save_name: Optional[str] = None,
+) -> None:
+    plt.close()
+    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(6, 6))
+    ax.plot(theta, r, color=color, linewidth=2)
+    if fill:
+        ax.fill(theta, r, color=color, alpha=alpha)
+    
+    # Hide radial labels as they can be messy in 2D plots
+    ax.set_yticklabels([])
+    
+    if title:
+        ax.set_title(title, pad=20)
+    if save_name:
+        plt.savefig(save_name, bbox_inches="tight")
+    plt.show()
+
+def plot_radial_heatmap_2d(
+    r_arr: np.ndarray,
+    val_arr: np.ndarray,
+    *,
+    cmap: str = 'viridis',
+    title: Optional[str] = None,
+    save_name: Optional[str] = None,
+) -> None:
+    plt.close()
+    fig, ax = plt.subplots(figsize=(8, 8))
+    
+    # Create 2D grid covering the maximum radius
+    R_max = r_arr[-1]
+    grid_pts = 500
+    x = np.linspace(-R_max, R_max, grid_pts)
+    y = np.linspace(-R_max, R_max, grid_pts)
+    X, Y = np.meshgrid(x, y)
+    R_grid = np.sqrt(X**2 + Y**2)
+    
+    # Interpolate values based on radius
+    Z = np.interp(R_grid, r_arr, val_arr, right=0.0)
+    
+    # Mask values outside max radius
+    Z = np.ma.masked_where(R_grid > R_max, Z)
+    
+    im = ax.pcolormesh(X, Y, Z, shading='auto', cmap=cmap)
+    fig.colorbar(im, ax=ax)
+    
+    ax.set_aspect('equal')
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    if title:
+        ax.set_title(title)
+    if save_name:
+        plt.savefig(save_name, bbox_inches="tight")
+    plt.show()
+
+def plot_spherical_harmonics_3d(X, Y, Z, R_sph, title=None, save_name=None):
+    plt._keep_3d_axes = True
+    plot_parametric_surface_3d(
+        X, Y, Z, color_values=R_sph, cmap="plasma", title=title, save_name=save_name
+    )
+    plt._keep_3d_axes = False

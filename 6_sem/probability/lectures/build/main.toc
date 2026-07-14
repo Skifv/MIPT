@@ -1,50 +1,60 @@
 \babel@toc {russian}{}\relax 
-\contentsline {chapter}{\numberline {1}Лекция 1: Математические основы непрерывных цепей Маркова}{4}{chapter.1}%
-\contentsline {section}{\numberline {1.1}Непрерывные цепи Маркова}{4}{section.1.1}%
-\contentsline {subsection}{\numberline {1.1.1}Основные понятия}{4}{subsection.1.1.1}%
-\contentsline {subsection}{\numberline {1.1.2}Допущение о регулярности траекторий}{5}{subsection.1.1.2}%
-\contentsline {subsection}{\numberline {1.1.3}Непрерывность переходных вероятностей в нуле}{5}{subsection.1.1.3}%
-\contentsline {subsection}{\numberline {1.1.4}Непрерывность на всей временной оси}{8}{subsection.1.1.4}%
-\contentsline {subsection}{\numberline {1.1.5}Дифференцируемость переходных вероятностей и матрица интенсивностей}{9}{subsection.1.1.5}%
-\contentsline {subsection}{\numberline {1.1.6}Дифференциальные уравнения Колмогорова — Феллера}{10}{subsection.1.1.6}%
-\contentsline {subsection}{\numberline {1.1.7}Вероятностный смысл элементов матрицы интенсивностей}{11}{subsection.1.1.7}%
-\contentsline {subsection}{\numberline {1.1.8}Время пребывания в состоянии и смысл величины $q_{ii}$}{12}{subsection.1.1.8}%
-\contentsline {subsubsection}{Проблема измеримости и переход к счётным множествам}{12}{figure.caption.3}%
-\contentsline {subsubsection}{Вывод распределения времени пребывания}{13}{figure.caption.3}%
-\contentsline {chapter}{\numberline {2}Лекция 2. Эргодические цепи Маркова и потоки событий}{16}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Вероятностный смысл элементов матрицы интенсивностей и механика скачков}{16}{section.2.1}%
-\contentsline {section}{\numberline {2.2}Эргодические непрерывные цепи Маркова}{17}{section.2.2}%
-\contentsline {subsection}{\numberline {2.2.1}Классификация состояний и их свойства}{18}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.2.2}Эргодические теоремы}{19}{subsection.2.2.2}%
-\contentsline {section}{\numberline {2.3}Примеры решения задач}{20}{section.2.3}%
-\contentsline {section}{\numberline {2.4}Потоки событий}{23}{section.2.4}%
-\contentsline {subsection}{\numberline {2.4.1}Марковская природа потоков без последействия}{24}{subsection.2.4.1}%
-\contentsline {subsection}{\numberline {2.4.2}Интенсивности переходов в потоке без последействия}{24}{subsection.2.4.2}%
-\contentsline {subsection}{\numberline {2.4.3}Ординарность и эквивалентные определения пуассоновского процесса}{26}{subsection.2.4.3}%
-\contentsline {chapter}{\numberline {3}Лекция 3. Введение в СМО, нотация Кендалла, формула Литтла}{28}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Примеры простейших систем массового обслуживания}{28}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Классификация систем массового обслуживания и нотация Кендалла}{33}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Формула Литтла}{34}{section.3.3}%
-\contentsline {chapter}{\numberline {4}Лекция 4. Свойство PASTA и система M|M|1}{38}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Применение формулы Литтла и соотношения в системах G/G/c}{38}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}Фундаментальные соотношения для систем G/G/c}{39}{subsection.4.1.1}%
-\contentsline {section}{\numberline {4.2}Напоминание: Пуассоновский процесс и порядковые статистики}{41}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Связь пуассоновского потока и равномерного распределения}{43}{section.4.3}%
-\contentsline {subsection}{\numberline {4.3.1}Интерпретация}{44}{subsection.4.3.1}%
-\contentsline {section}{\numberline {4.4}Свойство PASTA}{45}{section.4.4}%
-\contentsline {section}{\numberline {4.5}Система M|M|1}{45}{section.4.5}%
-\contentsline {chapter}{\numberline {5}Лекция 5. Системы M|M|1 и M|M|c}{48}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Характеристики эффективности системы M|M|1}{48}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Многоканальная система обслуживания M|M|c}{52}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Оптимальный выбор числа каналов и режимы масштабирования}{59}{section.5.3}%
-\contentsline {chapter}{\numberline {6}Лекция 6. Системы M|M|c|K и M|G|1}{62}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Система массового обслуживания M|M|c|K}{62}{section.6.1}%
-\contentsline {subsection}{\numberline {6.1.1}Распределение состояний в моменты поступления заявок}{66}{subsection.6.1.1}%
-\contentsline {subsection}{\numberline {6.1.2}Системы с отказами (M|M|c|c) и формула Эрланга}{68}{subsection.6.1.2}%
-\contentsline {section}{\numberline {6.2}Система массового обслуживания M|G|1 и формула Полячека — Хинчина}{70}{section.6.2}%
-\contentsline {chapter}{\numberline {7}Лекция 7. Система $M^{[X]}|M|1$}{78}{chapter.7}%
-\contentsline {chapter}{\numberline {8}Лекция 8. Система $M|Er_k|1$. Протоколы множественного доступа}{84}{chapter.8}%
-\contentsline {section}{\numberline {8.1}Системы с фазовым обслуживанием. Модель $M|Er_k|1$}{84}{section.8.1}%
-\contentsline {section}{\numberline {8.2}Протоколы множественного доступа. Алгоритмы ALOHA}{87}{section.8.2}%
-\contentsline {subsection}{\numberline {8.2.1}Асинхронная ALOHA}{88}{subsection.8.2.1}%
-\contentsline {subsection}{\numberline {8.2.2}Синхронная (слотированная) ALOHA}{90}{subsection.8.2.2}%
+\contentsline {chapter}{\numberline {1}Лекция 1: Математические основы непрерывных цепей Маркова}{5}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Непрерывные цепи Маркова}{5}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}Основные понятия}{5}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}Допущение о регулярности траекторий}{6}{subsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.1.3}Непрерывность переходных вероятностей в нуле}{6}{subsection.1.1.3}%
+\contentsline {subsection}{\numberline {1.1.4}Непрерывность на всей временной оси}{9}{subsection.1.1.4}%
+\contentsline {subsection}{\numberline {1.1.5}Дифференцируемость переходных вероятностей и матрица интенсивностей}{10}{subsection.1.1.5}%
+\contentsline {subsection}{\numberline {1.1.6}Дифференциальные уравнения Колмогорова — Феллера}{11}{subsection.1.1.6}%
+\contentsline {subsection}{\numberline {1.1.7}Вероятностный смысл элементов матрицы интенсивностей}{12}{subsection.1.1.7}%
+\contentsline {subsection}{\numberline {1.1.8}Время пребывания в состоянии и смысл величины $q_{ii}$}{13}{subsection.1.1.8}%
+\contentsline {subsubsection}{Проблема измеримости и переход к счётным множествам}{13}{figure.caption.3}%
+\contentsline {subsubsection}{Вывод распределения времени пребывания}{14}{figure.caption.3}%
+\contentsline {chapter}{\numberline {2}Лекция 2. Эргодические цепи Маркова и потоки событий}{17}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Вероятностный смысл элементов матрицы интенсивностей и механика скачков}{17}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Эргодические непрерывные цепи Маркова}{18}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Классификация состояний и их свойства}{19}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Эргодические теоремы}{20}{subsection.2.2.2}%
+\contentsline {section}{\numberline {2.3}Примеры решения задач}{21}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Потоки событий}{24}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Марковская природа потоков без последействия}{25}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Интенсивности переходов в потоке без последействия}{25}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.4.3}Ординарность и эквивалентные определения пуассоновского процесса}{27}{subsection.2.4.3}%
+\contentsline {chapter}{\numberline {3}Лекция 3. Введение в СМО, нотация Кендалла, формула Литтла}{29}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Примеры простейших систем массового обслуживания}{29}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Классификация систем массового обслуживания и нотация Кендалла}{34}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Формула Литтла}{35}{section.3.3}%
+\contentsline {chapter}{\numberline {4}Лекция 4. Свойство PASTA и система M|M|1}{39}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Применение формулы Литтла и соотношения в системах G/G/c}{39}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Фундаментальные соотношения для систем G/G/c}{40}{subsection.4.1.1}%
+\contentsline {section}{\numberline {4.2}Напоминание: Пуассоновский процесс и порядковые статистики}{42}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Связь пуассоновского потока и равномерного распределения}{44}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Интерпретация}{45}{subsection.4.3.1}%
+\contentsline {section}{\numberline {4.4}Свойство PASTA}{46}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Система M|M|1}{46}{section.4.5}%
+\contentsline {chapter}{\numberline {5}Лекция 5. Системы M|M|1 и M|M|c}{49}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Характеристики эффективности системы M|M|1}{49}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Многоканальная система обслуживания M|M|c}{53}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Оптимальный выбор числа каналов и режимы масштабирования}{60}{section.5.3}%
+\contentsline {chapter}{\numberline {6}Лекция 6. Системы M|M|c|K и M|G|1}{63}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Система массового обслуживания M|M|c|K}{63}{section.6.1}%
+\contentsline {subsection}{\numberline {6.1.1}Распределение состояний в моменты поступления заявок}{67}{subsection.6.1.1}%
+\contentsline {subsection}{\numberline {6.1.2}Системы с отказами (M|M|c|c) и формула Эрланга}{69}{subsection.6.1.2}%
+\contentsline {section}{\numberline {6.2}Система массового обслуживания M|G|1 и формула Полячека — Хинчина}{71}{section.6.2}%
+\contentsline {chapter}{\numberline {7}Лекция 7. Система $M^{[X]}|M|1$}{79}{chapter.7}%
+\contentsline {chapter}{\numberline {8}Лекция 8. Система $M|Er_k|1$. Протоколы множественного доступа}{85}{chapter.8}%
+\contentsline {section}{\numberline {8.1}Системы с фазовым обслуживанием. Модель $M|Er_k|1$}{85}{section.8.1}%
+\contentsline {section}{\numberline {8.2}Протоколы множественного доступа. Алгоритмы ALOHA}{88}{section.8.2}%
+\contentsline {subsection}{\numberline {8.2.1}Асинхронная ALOHA}{89}{subsection.8.2.1}%
+\contentsline {subsection}{\numberline {8.2.2}Синхронная (слотированная) ALOHA при бесконечном числе устройств}{91}{subsection.8.2.2}%
+\contentsline {subsection}{\numberline {8.2.3}Синхронная ALOHA при конечном числе устройств}{92}{subsection.8.2.3}%
+\contentsline {chapter}{\numberline {9}Лекция 9. Древовидные стек-алгоритмы и введение в CSMA}{95}{chapter.9}%
+\contentsline {section}{\numberline {9.1}Стек-алгоритмы}{95}{section.9.1}%
+\contentsline {section}{\numberline {9.2}Протоколы с прослушиванием несущей (CSMA)}{98}{section.9.2}%
+\contentsline {subsection}{\numberline {9.2.1}Ненастойчивый протокол CSMA (Non-persistent CSMA)}{102}{subsection.9.2.1}%
+\contentsline {subsection}{\numberline {9.2.2}1-настойчивый протокол CSMA (1-persistent CSMA)}{105}{subsection.9.2.2}%
+\contentsline {section}{\numberline {9.3}Анализ протоколов CSMA при разной топологии сети}{108}{section.9.3}%
+\contentsline {section}{\numberline {9.4}Анализ средней задержки передачи}{111}{section.9.4}%
+\contentsline {chapter}{\numberline {10}Лекция 10. Новый взгляд на цепи Маркова: полугруппы и генераторы}{113}{chapter.10}%
+\contentsline {section}{\numberline {10.1}Полугруппы операторов и инфинитезимальные генераторы}{113}{section.10.1}%

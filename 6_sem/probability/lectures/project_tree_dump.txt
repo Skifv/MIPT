@@ -7,6 +7,7 @@ DIRECTORY TREE:
 │   └── cats.png
 │   └── logo.png
 │   └── main.tex
+│   └── raw.tex
 │   └── table_of_contents.tex
 │   ├── custom/
 │   │   └── definitions.tex
@@ -25,6 +26,10 @@ DIRECTORY TREE:
 │   │   └── lec3.tex
 │   │   └── lec4.tex
 │   │   └── lec5.tex
+│   │   └── lec6.tex
+│   │   └── lec7.tex
+│   │   └── lec8.tex
+│   │   └── lec9.tex
 │   ├── pdfs/
 │   ├── settings/
 │   │   └── colors.tex
@@ -49,6 +54,7 @@ FILE CONTENTS:
 ----------------
 \input{include/setup}
 
+\DeclareUnicodeCharacter{00A0}{ }
 
 % TODO:
 % ------------------------------------------------------
@@ -69,47 +75,229 @@ FILE CONTENTS:
 \include{settings/title}
 \include{table_of_contents}
 
-\chapter{Лекция 1: Математические основы непрерывных цепей Маркова}
-% 1. Непрерывные цепи Маркова, уравнения Колмогорова-Чепмена.
-\input{lectures/lec1}
+% \chapter{Лекция 1: Математические основы непрерывных цепей Маркова}
+% % 1. Непрерывные цепи Маркова, уравнения Колмогорова-Чепмена.
+% \input{lectures/lec1}
 
-\chapter{Лекция 2. Эргодические цепи Маркова и потоки событий}
-% % 2. Эргодическая теорема, процесс рождения-гибели, потоки событий.
-\input{lectures/lec2}
+% \chapter{Лекция 2. Эргодические цепи Маркова и потоки событий}
+% % % 2. Эргодическая теорема, процесс рождения-гибели, потоки событий.
+% \input{lectures/lec2}
 
-\chapter{Лекция 3. Введение в СМО, нотация Кендалла, формула Литтла}
-% % 3. Введение в СМО, нотация Кендалла, формула Литтла.
-\input{lectures/lec3}
+% \chapter{Лекция 3. Введение в СМО, нотация Кендалла, формула Литтла}
+% % % 3. Введение в СМО, нотация Кендалла, формула Литтла.
+% \input{lectures/lec3}
 
-\chapter{Лекция 4. Свойство PASTA и система M|M|1}
-% % 4. Свойство PASTA и система M|M|1.
-\input{lectures/lec4}
+% \chapter{Лекция 4. Свойство PASTA и система M|M|1}
+% % % 4. Свойство PASTA и система M|M|1.
+% \input{lectures/lec4}
 
-\chapter{Лекция 4. Системы M|M|1 и M|M|c}
-% % 5. Система M|M|c и стратегии выбора серверов.
-\input{lectures/lec5}
+% \chapter{Лекция 5. Системы M|M|1 и M|M|c}
+% % % 5. Система M|M|c и стратегии выбора серверов.
+% \input{lectures/lec5}
 
-% % 6. Система M|M|c|K и формула Эрланга-B.
-% \input{lectures/lec6}
+% 6. Система M|M|c|K  и формула Эрланга-B.
+\chapter{Лекция 6. Системы M|M|c|K и M|G|1}
+\input{lectures/lec6}
 
-% \chapter{Системы общего вида и специальные входы}
-% % 7. Система M|G|1 и формула Полячека-Хинчина.
-% \input{lectures/lec7}
-% % 8. Системы с групповым входом (M^x|M|1) и фазовым обслуживанием.
-% \input{lectures/lec8}
+\chapter{Лекция 7. Система $M^{[X]}|M|1$}
+% 7. Системы с групповым входом (M^x|M|1)
+\input{lectures/lec7}
 
-% \chapter{Протоколы множественного доступа}
-% % 9. Система ALOHA (синхронная/асинхронная).
-% \input{lectures/lec9}
-% % 10. Алгоритмы разрешения коллизий (стек) и введение в CSMA.
-% \input{lectures/lec10}
-% % 11. Анализ эффективности и модели настойчивого/ненастойчивого CSMA.
+\chapter{Лекция 8. Система $M|Er_k|1$. Протоколы множественного доступа}
+% 8. Системы с фазовым обслуживанием. Протоколы множественного доступа
+\input{lectures/lec8}
+
+\chapter{Лекция 9. Древовидные стек-алгоритмы и введение в CSMA}
+% % 9. Алгоритмы разрешения коллизий (стек) и введение в CSMA.
+\input{lectures/lec9}
+
+% % 10. Анализ эффективности и модели настойчивого/ненастойчивого CSMA.
 % \input{lectures/lec11}
 
 % ------------------------------------------------------------------------
 
 \end{document}
 [END OF main.tex]
+
+
+[FILE]: raw.tex
+---------------
+\begin{itemize}
+    \item \underline{Стек-алгоритмы}
+\end{itemize}
+
+Рассмотрим один из возможных механизмов разрешения коллизий в рассмотренных системах.
+
+Предположим, что все терминалы слушают канал. В канале могут быть 3 вида событий:
+\begin{itemize}
+    \item успех --- когда в слоте передавал только 1 терминал,
+    \item коллизия --- когда в слоте передавало $\geqslant 2$ терминалов,
+    \item пустой слот.
+\end{itemize}
+
+Пусть исходно пыталось сделать передачу 4 терминала, начнём строить дерево коллизий; Терминалы, пришедшие в систему после начала построения дерева, ждут окончания его построения и уже после этого пытаются передавать.
+
+Построение дерева коллизий:
+
+\begin{center}
+\begin{tikzpicture}[every node/.style={font=\small}]
+    % Левая часть
+    \node[align=left] (left_list) at (0,0) {
+        $\bullet$ Успех \\
+        $\bullet$ Отсутствие \\
+        \hspace{0.3cm} информации
+    };
+    
+    % Стрелка
+    \node at (2,0) {\huge $\longrightarrow$};
+    
+    % Правая часть
+    \node[align=left] (right_list) at (4.5,0) {
+        $\bullet$ Успех \\
+        $\bullet$ Коллизия \\
+        $\bullet$ Пустой слот.
+    };
+\end{tikzpicture}
+\end{center}
+
+
+В момент изначального конфликта создается корневая вершина дерева, каждый из терминалов, который передавал в окне с корневой коллизией, с некоторой вероятностью выбирает передавать в следующем слоте или нет.
+
+Если терминал выбирает передавать, то он перемещается в левый потомок дерева, иначе --- в правый. Если конфликт происходит снова, то продолжаем строить дерево по тем же правилам. Если левая вершина оказалась концевой, то в следующем слоте начинает строиться правый потомок. Альтернативно, при наличии коллизии, сначала передаются обе ветви текущего уровня дерева, и только после этого, при наличии повторного конфликта, происходит дальнейшее ветвление. Однако среднее время разрешения изначальной коллизии в обоих вариантах одинаково.
+
+\begin{center}
+\begin{tikzpicture}[>=stealth, thick, 
+    slot_node/.style={draw, minimum width=1.2cm, inner sep=2pt, font=\small},
+    empty_node/.style={draw, dashed, minimum width=1.2cm, minimum height=0.5cm},
+    every node/.style={font=\small}
+]
+
+% Номера этапов и узлы дерева
+\node at (0,0) {1.}; \node[slot_node] (s1) at (1.5,0) {1 2 3 4};
+\node at (0,-1.5) {2.}; \node[slot_node] (s2) at (1.5,-1.5) {1 2 4};
+\node at (0,-3) {3.}; \node[empty_node] (s3) at (0.5,-3) {};
+\node at (0,-4.5) {4.}; \node[slot_node] (s4) at (1.5,-4.5) {1 2 4};
+\node at (0,-6) {5.}; \node[slot_node] (s5) at (0.5,-6) {1};
+\node at (0,-7.5) {6.}; \node[slot_node] (s6) at (1.5,-7.5) {2 4};
+\node at (0,-9) {7.}; \node[slot_node] (s7) at (0.5,-9) {2};
+\node at (0,-10.5) {8.}; \node[slot_node] (s8) at (1.5,-10.5) {4};
+\node at (2.5,-11.5) {9.}; \node[slot_node] (s9) at (3.5,-11.5) {3};
+
+% Ребра (переходы)
+\draw[->] (s1.south) -- (s2.north);
+\draw[->] (s1.south) .. controls (4,-2) and (4,-10) .. (s9.north);
+
+\draw[->] (s2.south) -- (s3.north);
+\draw[->] (s2.south) -- (s4.north);
+
+\draw[->] (s4.south) -- (s5.north);
+\draw[->] (s4.south) -- (s6.north);
+
+\draw[->] (s6.south) -- (s7.north);
+\draw[->] (s6.south) -- (s8.north);
+
+% Текстовые пояснения
+\node[align=left, font=\small, text width=5cm] at (-4.5, -3) {так как слот пустой \\ и до этого была коллизия, то и \\ далее будет коллизия \\ $\Downarrow$ \\ можно сразу ветвиться};
+
+\node[align=center, font=\small, text width=6cm] at (1, -12.5) {закончил строиться левый потомок изначальной коллизии.};
+
+\node[align=left, font=\small, text width=7cm] at (7.5, -13) {начал (и сразу закончил) строиться правый потомок изначальной коллизии, можно не считать за коллизию, а вообще будем разрешать коллизию (если есть) правого потомка в следующем цикле.};
+
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}[>=stealth, thick]
+    % Вспомогательная команда для отрисовки блоков пакетов
+    \newcommand{\packetbox}[3]{
+        \node[draw, anchor=south, inner sep=2pt, font=\small, minimum width=0.4cm] at (##1, 0) {\shortstack{##2}};
+    }
+
+    % Верхняя временная шкала (без оптимизации)
+    \draw[->, thick] (0,0) -- (10,0);
+    \foreach \x in {1,2,3,4,5,6,7,8,9} {
+        \draw (\x, 0.1) -- (\x, -0.1) node[below] {\x};
+    }
+    
+    \packetbox{1}{1\\2\\3\\4}
+    \packetbox{2}{1\\2\\4}
+    \node at (3, 0.2) {+}; % Пустой слот (idle)
+    \packetbox{4}{1\\2\\4}
+    \packetbox{5}{1}
+    \packetbox{6}{2\\4}
+    \packetbox{7}{2}
+    \packetbox{8}{4}
+    \packetbox{9}{3}
+
+    % Стрелка перехода к оптимизации
+    \draw[double, ->, thick] (5, -1.2) -- (6, -2.2);
+
+    % Нижняя временная шкала (с оптимизацией пропуска повторной коллизии)
+    \begin{scope}[yshift=-4cm]
+        \draw[->, thick] (0,0) -- (8,0);
+        \foreach \x in {1,2,3,4,5,6,7} {
+            \draw (\x, 0.1) -- (\x, -0.1) node[below] {\x};
+        }
+        
+        \packetbox{1}{1\\2\\3\\4}
+        \packetbox{2}{1\\2\\4}
+        \node at (3, 0.2) {+};
+        \packetbox{4}{1}
+        \packetbox{5}{2\\4}
+        \packetbox{6}{2}
+        \packetbox{7}{4}
+    \end{scope}
+\end{tikzpicture}
+\end{center}
+
+
+Однако, данный метод хоть и имеет очень высокую эффективность, но не используется из-за требования на канал обратной связи.
+
+
+Б. С. Цыбаков показал, что нормированная пропускная способность в системе синхронного случайного множественного доступа $\leqslant 0,587$, что грустно. Вместо того чтобы сокращать вероятности пустых и коллизионных слотов, давайте сокращать длительности простаивания канала и коллизий.
+
+$\Rightarrow$ 
+\begin{enumerate}
+    \item Прослушивание несущей.
+    \item Доступ по расписанию.
+\end{enumerate}
+
+$\rightarrow$ Если слот пустой, это становится ясно почти сразу: предполагаем, что все узлы находятся в зоне радиовидимости друг друга, время распространения сигнала между любыми двумя узлами $\ll$ длительности передачи пакета. Таким образом, прослушав канал в начале слота и не обнаружив передачу, узлы считают слот пустым. Так как до окончания слота ничего больше не произойдёт, то можно укоротить слот.
+
+Отличие между методами, которые будем рассматривать, состоит в действии, которое узлы должны предпринять для совершения попытки передачи пакета. Так как методы множественного доступа с прослушиванием предполагают, что узлы попеременно ведут приём/передачу, то введём предположение относительно их работы:
+
+время распространения сигнала между двумя самыми удалёнными станциями: $turn\_around\_time = \frac{l}{c}$, тогда длина слота $a > 2 \cdot \frac{l}{c}$, так как иначе у (1) будет сдвиг в логике протокола: для слота длины $a$ должна быть синхронность на MAC-уровне, то есть у двух станций может быть коллизия только если они выбрали один протокольный момент передачи.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[>=stealth, xscale=1.5, yscale=1.2]
+        % Оси времени
+        \draw[->] (0,1.5) -- (4,1.5) node[right] {$t_1$};
+        \draw[->] (0,0) -- (4,0) node[right] {$t_2$};
+        
+        % Станции
+        \node[circle, draw, inner sep=2pt] at (-0.3, 1.5) {1};
+        \node[circle, draw, inner sep=2pt] at (-0.3, 0) {2};
+        
+        % Фреймы/пакеты
+        \draw[thick] (0.2, 1.5) rectangle (1.2, 1.8) node[midway, font=\tiny] {frame 1};
+        \draw[thick] (0.2, 0) rectangle (1.2, -0.3) node[midway, font=\tiny] {frame 2};
+        
+        % Линии распространения
+        \draw[dashed, ->] (0.2, 1.5) -- (1.0, 0);
+        \draw[dashed, ->] (0.2, 0) -- (1.0, 1.5);
+        
+        % Обозначения моментов
+        \draw[->] (1.0, 1.9) -- (1.0, 1.6);
+        \draw (1.0, -0.1) -- (1.0, 0.1);
+        
+    \end{tikzpicture}
+\end{figure}
+
+Кроме этого, слот включает в себя время прослушивания, которое зависит от формы сигнала: $a > 2 \cdot \frac{l}{c} + hardware\_delay + channel\_listen$.
+
+\textcolor{red}{Почему производительность ALOHA не зависит от $a$?}
+[END OF raw.tex]
 
 
 [FILE]: table_of_contents.tex
@@ -510,190 +698,188 @@ FILE CONTENTS:
 [FILE]: custom\other.tex
 ------------------------
 
-% ╔══════════════════════════════════════╗
-% ║  Statements and other constructions  ║
-% ╚══════════════════════════════════════╝
+    % ╔══════════════════════════════════════╗
+    % ║  Statements and other constructions  ║
+    % ╚══════════════════════════════════════╝
 
-% Note 
-% -------------------------------------------------------------------------------------
-\newtcolorbox{note}[1][] {
-    %
-    % Layout
-    enhanced, breakable, before skip=10pt, after skip=10pt,
-    before upper = {\vspace{2mm}},
-    %
-    % Box
-    boxrule = 1pt,
-    colframe = SUB, 
-    colback = BG,
-    sharp corners,
-    % borderline = {1.5pt}{0mm}{SUB, dashed},
-    %
-    % Title
-    attach boxed title to top left = {
-        xshift=1.5cm, yshift=-3mm
-    },
-    boxed title style = {
-        frame hidden,
-        colframe = SUB, colback = BG,
-        % Adjusting ends of border break
-        overlay = {
-            \draw[color=SUB, line width = 1pt] ([xshift=1.1pt, yshift=-.15pt]frame.west)--([xshift=7pt, yshift=-.15pt]frame.west);
-            \draw[color=SUB, line width = 1pt] ([xshift=-7pt, yshift=-.15pt]frame.east)--([xshift=-1pt, yshift=-.15pt]frame.east);
+    % Note 
+    % -------------------------------------------------------------------------------------
+    \newtcolorbox{note}[1][]{
+        enhanced, breakable, 
+        before skip=10pt, after skip=10pt,
+        before upper = {\vspace{2mm}},
+        %
+        % Box Style
+        boxrule = 1pt,
+        colframe = SUB, 
+        colback = BG,
+        sharp corners,
+        %
+        % Title Positioning
+        attach boxed title to top left = {
+            xshift=1.5cm, yshift=-3mm
         },
-    },
-    boxed title size = title,
-    coltitle = SUB,
-    fonttitle = \bfseries,
-    title={\text{!\ \ Замечание\ \ !}},
+        boxed title style = {
+            frame hidden, % Скрываем стандартную рамку, но оставляем фон
+            outer arc=0pt, arc=0pt,
+            colback=BG,
+            left=2pt, right=2pt, % Небольшие отступы, чтобы линии не липли к буквам
+            %
+            overlay = {
+                % 1. Левая линия: от края бокса до левого края подложки заголовка
+                \draw[color=SUB, line width = 1pt] 
+                    ([xshift=-1.5cm, yshift=0pt]frame.west) -- (frame.west);
+                
+                % 2. Правая линия: от правого края подложки до правого края бокса
+                \draw[color=SUB, line width = 1pt] 
+                    (frame.east) -- ([xshift=\linewidth-1.5cm, yshift=0pt]frame.west);
+            },
+        },
+        boxed title size = title,
+        coltitle = SUB,
+        fonttitle = \bfseries,
+        title={!\ \ Замечание\ifstrempty{#1}{}{\ #1}\ \ !},
+        %
+        % Content
+        colupper = TEXT,
+        %
+        % Отрисовка разрывов (без изменений)
+        overlay first={ \draw[color=BG, line width = 2pt] (frame.south west)--(frame.south east); },
+        overlay middle={
+            \draw[color=BG, line width = 2pt] (frame.south west)--(frame.south east);
+            \draw[color=BG, line width=2pt] (frame.north west)--(frame.north east);
+        },
+        overlay last={ \draw[color=BG, line width=2pt] (frame.north west)--(frame.north east); },
+    }
     %
-    % Text
-    colupper = TEXT,
-    %
-    % Border fixes for multiple pages
-    overlay first={
-        \draw[color=BG, line width = 2pt] (frame.south west)--(frame.south east);
-    },
-    overlay middle={
-        \draw[color=BG, line width = 2pt] (frame.south west)--(frame.south east);
-        \draw[color=BG, line width=2pt] (frame.north west)--(frame.north east);
-    },
-    overlay last={
-        \draw[color=BG, line width=2pt] (frame.north west)--(frame.north east);
-    },
-    %
-    % User input parameters
-    #1
-}
-%
-% Usage:
-% \begin{note} [tcolorbox params]
-%     definition
-% \end{definition}
-% -------------------------------------------------------------------------------------
+    % Usage:
+    % \begin{note} [tcolorbox params]
+    %     definition
+    % \end{definition}
+    % -------------------------------------------------------------------------------------
 
 
-% Consequence
-% -------------------------------------------------------------------------------------
-\newtcolorbox{conseq}[1][] {
+    % Consequence
+    % -------------------------------------------------------------------------------------
+    \newtcolorbox{conseq}[1][] {
+        %
+        % Layout
+        enhanced, breakable, before skip=10pt, after skip=10pt,
+        before upper = {\vspace{2mm}},
+        %
+        % Box
+        opacityback = 0,
+        frame hidden,
+        %
+        % Consequence title
+        title = {Следствие.},
+        attach title to upper = {\ },
+        coltitle = SUB,
+        fonttitle = \bfseries,
+        %
+        % Text
+        colupper = TEXT,
+        %
+        % Arrow
+        overlay unbroken = {
+            % \draw [SUB, line width=2.5pt] ([xshift=1pt, yshift=-2pt]frame.north west) -- ([xshift=1pt, yshift=3pt]frame.north west);
+            \draw [SUB, line width=1pt, {Bracket[angle=70:4pt, reversed, round]}-{Turned Square[length=8pt, open, round]}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
+        },
+        overlay first = {
+            \draw [SUB, line width=1pt, {Bracket[angle=70:4pt, reversed, round]}-{}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
+        },
+        overlay middle = {
+            \draw [SUB, line width=1pt, -] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
+        },
+        overlay last = {
+            \draw [SUB, line width=1pt, -{Turned Square[length=8pt, open, round]}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
+        },
+        %
+        % User input parameters
+        #1
+    }
     %
-    % Layout
-    enhanced, breakable, before skip=10pt, after skip=10pt,
-    before upper = {\vspace{2mm}},
-    %
-    % Box
-    opacityback = 0,
-    frame hidden,
-    %
-    % Consequence title
-    title = {Следствие.},
-    attach title to upper = {\ },
-    coltitle = SUB,
-    fonttitle = \bfseries,
-    %
-    % Text
-    colupper = TEXT,
-    %
-    % Arrow
-    overlay unbroken = {
-        % \draw [SUB, line width=2.5pt] ([xshift=1pt, yshift=-2pt]frame.north west) -- ([xshift=1pt, yshift=3pt]frame.north west);
-        \draw [SUB, line width=1pt, {Bracket[angle=70:4pt, reversed, round]}-{Turned Square[length=8pt, open, round]}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
-    },
-    overlay first = {
-        \draw [SUB, line width=1pt, {Bracket[angle=70:4pt, reversed, round]}-{}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
-    },
-    overlay middle = {
-        \draw [SUB, line width=1pt, -] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
-    },
-    overlay last = {
-        \draw [SUB, line width=1pt, -{Turned Square[length=8pt, open, round]}] ([xshift=1pt]frame.north west) -- ([xshift=1pt]frame.south west);
-    },
-    %
-    % User input parameters
-    #1
-}
-%
-% Usage:
-% \begin{conseq}[tcolorbox params] 
-%    Text 
-% \end{conseq}
-% -------------------------------------------------------------------------------------
+    % Usage:
+    % \begin{conseq}[tcolorbox params] 
+    %    Text 
+    % \end{conseq}
+    % -------------------------------------------------------------------------------------
 
 
-% Statement
-% -------------------------------------------------------------------------------------
-\newtcolorbox{statement}[1][] {
+    % Statement
+    % -------------------------------------------------------------------------------------
+    \newtcolorbox{statement}[1][] {
+        %
+        % Layout
+        enhanced, breakable, before skip=10pt, after skip=0pt,
+        before upper = {\vspace{2mm}},
+        %
+        % Box
+        opacityback = 0,
+        frame hidden,
+        %
+        % Динамический заголовок:
+        % Если аргумент #1 пустой, пишет просто "Утв."
+        % Если аргумент #1 передан, пишет "Утв. [ #1 ]" с твоим оформлением
+        title = {Утв.\ifstrempty{#1}{}{~\textbf{[}~#1~\textbf{]}}},
+        %
+        attach title to upper = {\ },
+        coltitle = MAIN,
+        fonttitle = \bfseries,
+        %
+        % Text
+        colupper = TEXT,
+        %
+        % Твой значок (треугольник/молния)
+        overlay unbroken and first = {
+            \draw[MAIN, line width=1.2pt] ([yshift=-18pt, xshift=1pt]frame.north west) -- ++(-4pt, 8pt) -- ++(8pt, 0pt) -- ++(-4pt, -8pt) -- ++(-4pt, 8pt);
+        }
+    }
     %
-    % Layout
-    enhanced, breakable, before skip=10pt, after skip=0pt,
-    before upper = {\vspace{2mm}},
-    %
-    % Box
-    opacityback = 0,
-    frame hidden,
-    %
-    % Statement title
-    title = {Утв.},
-    attach title to upper = {\ },
-    coltitle = MAIN,
-    fonttitle = \bfseries,
-    %
-    % Text
-    colupper = TEXT,
-    %
-    % Circle
-    overlay unbroken and first = {
-        \draw[MAIN, line width=1.2pt] ([yshift=-18pt, xshift=1pt]frame.north west) -- ++(-4pt, 8pt) -- ++(8pt, 0pt) -- ++(-4pt, -8pt) -- ++(-4pt, 8pt);
-    },
-    %
-    % User input parameters
-    #1
-}
-%
-% Usage:
-% \begin{statement}[tcolorbox params] 
-%    Text 
-% \end{statement}
-% -------------------------------------------------------------------------------------
+    % Usage:
+    % \begin{statement}[tcolorbox params] 
+    %    Text 
+    % \end{statement}
+    % -------------------------------------------------------------------------------------
 
-% Statement proof
-% -------------------------------------------------------------------------------------
-\newtcolorbox{sproof}[1][] {
+    % Statement proof
+    % -------------------------------------------------------------------------------------
+    \newtcolorbox{sproof}[1][] {
+        %
+        % Layout
+        enhanced, breakable, before skip=0pt, after skip=10pt,
+        after upper = {\vspace{-2mm}},
+        %
+        % Box
+        opacityback = 0,
+        frame hidden,
+        %
+        % Proof title
+        title = {Доказательство.},
+        attach title to upper = {\ },
+        coltitle = MAIN,
+        fonttitle = \bfseries,
+        %
+        % Text
+        colupper = TEXT,
+        %
+        % Line
+        borderline west = {1.5pt}{0pt}{MAIN},
+        %
+        % Square
+        underlay unbroken and last = {
+            \fill[color=MAIN] ([yshift=1.5mm]frame.south east) rectangle ++(-3mm, 3mm);
+        },
+        %
+        % User input parameters
+        #1
+    }
     %
-    % Layout
-    enhanced, breakable, before skip=0pt, after skip=10pt,
-    after upper = {\vspace{-2mm}},
-    %
-    % Box
-    opacityback = 0,
-    frame hidden,
-    %
-    % Proof title
-    title = {Доказательство.},
-    attach title to upper = {\ },
-    coltitle = MAIN,
-    fonttitle = \bfseries,
-    %
-    % Text
-    colupper = TEXT,
-    %
-    % Line
-    borderline west = {1.5pt}{0pt}{MAIN},
-    %
-    % Square
-    underlay unbroken and last = {
-        \fill[color=MAIN] ([yshift=1.5mm]frame.south east) rectangle ++(-3mm, 3mm);
-    },
-    %
-    % User input parameters
-    #1
-}
-%
-% Usage:
-% \begin{sproof} [tcolorbox params] 
-%    Proof 
-% \end{sproof}
-% -------------------------------------------------------------------------------------
+    % Usage:
+    % \begin{sproof} [tcolorbox params] 
+    %    Proof 
+    % \end{sproof}
+    % -------------------------------------------------------------------------------------
 
 
 
@@ -740,6 +926,7 @@ FILE CONTENTS:
 \renewcommand{\C}{\mathbb{C}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Exp}{\mathrm{Exp}}
 % ----------------------------
 
 % Basic arrows
@@ -855,9 +1042,9 @@ FILE CONTENTS:
     frame hidden,
     %
     % CATS !!!!!!!!!!!!!
-    watermark graphics = cats.png,
-    watermark opacity = .1,
-    watermark overzoom = 1,
+    % watermark graphics = cats.png,
+    % watermark opacity = .1,
+    % watermark overzoom = 1,
     %
     % Proof title
     title = {Доказательство.},
@@ -977,6 +1164,13 @@ FILE CONTENTS:
 \input{settings/math}
 \input{settings/other}
 \input{settings/text}
+
+\tcbset{
+    % Этот параметр заставит боксы уважать настройки абзацев документа
+    parbox=false, 
+    % Или принудительно задайте интервал, если parbox=false не помогает:
+    % before upper = {\setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}
 [END OF include\setup.tex]
 
 
@@ -1175,7 +1369,6 @@ P(s, s+t) = P(0, t) \equiv P(t).
 \end{theorem}
 
 \begin{tproof}
-
     Согласно условию стандартности, при стремлении приращения времени к нулю матрица перехода стремится к единичной: $\lim_{h \to 0+0} P(h) = I$. Поскольку предел матрицы равен $I$, существует такая малая правая окрестность нуля, в которой определитель $\det P(h)$ отличен от нуля. Это гарантирует \textbf{обратимость} матрицы $P(h)$ при достаточно малых $h > 0$. Можно также показать, что для обратной матрицы выполняется аналогичное предельное соотношение:
     \[
     \lim_{h \to 0+0} P^{-1}(h) = I. %
@@ -1609,7 +1802,7 @@ P(s, s+t) = P(0, t) \equiv P(t).
     \end{enumerate}
 \end{definition}
 
-\begin{statement}{[Классификация состояний в конечных цепях]}
+\begin{statement}[Классификация состояний в конечных цепях]
     В конечной непрерывной цепи Маркова:
     \begin{itemize}
         \item Все состояния в закрытых классах являются положительно возвратными и существенными.
@@ -1780,12 +1973,14 @@ P(s, s+t) = P(0, t) \equiv P(t).
         \pi_k = \pi_0 \prod_{i=1}^k \frac{\lambda_{i-1}}{\mu_i}
     \end{equation}
     Вероятность $\pi_0$ находится из условия нормировки $\sum_{k=0}^{N-1} \pi_k = 1$:
+
+    \pagebreak
+
     \begin{equation}
         \pi_0 \left( 1 + \sum_{k=1}^{N-1} \prod_{i=1}^k \frac{\lambda_{i-1}}{\mu_i} \right) = 1 \implies \pi_0 = \left[ 1 + \sum_{k=1}^{N-1} \prod_{i=1}^k \frac{\lambda_{i-1}}{\mu_i} \right]^{-1}
     \end{equation}
+
 \end{eproof}
-
-
 
 \begin{definition}{Пуассоновский процесс (определение через процесс рождения)}
     Пусть $K(t), t \ge 0$ — непрерывная цепь Маркова с $S = \{0, 1, 2, \dots \}$, непрерывными справа траекториями, являющаяся процессом чистого рождения с постоянными интенсивностями:
@@ -1821,7 +2016,7 @@ P(s, s+t) = P(0, t) \equiv P(t).
 \begin{definition}{Свойства потоков}
     \begin{enumerate}
         \item Поток называется \textbf{однородным (стационарным)}, если распределения случайных величин $n(t_1, t_2)$ и $n(t_1 + s, t_2 + s)$ совпадают для любого $s > 0$. Для таких потоков вводится обозначение $n(t) \doteq n(0, t)$.
-        \item Рассмотрим моменты времени $0 = t_0 \le t_1 \le \dots \le t_{m+1}$ и соответствующие приращения $\xi_k = n(t_k, t_{k+1})$. Поток называется \textbf{потоком без последствия}, если совокупность случайных величин $\{\xi_0, \dots, \xi_m \}$ независима в совокупности.
+        \item Рассмотрим моменты времени $0 = t_0 \le t_1 \le \dots \le t_{m+1}$ и соответствующие приращения $\xi_k = n(t_k, t_{k+1})$. Поток называется \textbf{потоком без последействия}, если совокупность случайных величин $\{\xi_0, \dots, \xi_m \}$ независима в совокупности.
     \end{enumerate}
 \end{definition}
 
@@ -1829,11 +2024,11 @@ P(s, s+t) = P(0, t) \equiv P(t).
 
 Дополнительно введем ограничение: между любыми двумя событиями в потоке проходит конечное (но случайное) время. Это означает, что после наступления события наступает интервал положительной длительности, в течение которого новых событий не происходит, но по истечении которого событие обязательно наступит. Это допущение эквивалентно требованию \textbf{непрерывности справа} траекторий процесса $n(t)$.
 
-\subsection{Марковская природа потоков без последствия}
+\subsection{Марковская природа потоков без последействия}
 
 Исследуем структуру такого потока. Заметим, что:
 \begin{enumerate}
-    \item $n(t_k, t_{k+1}) = n(t_{k+1}) - n(t_k)$ независимы в совокупности по определению отсутствия последствия.
+    \item $n(t_k, t_{k+1}) = n(t_{k+1}) - n(t_k)$ независимы в совокупности по определению отсутствия последействия.
     \item Следовательно, $n(t)$ является процессом с \textbf{независимыми приращениями}.
     \item Любой процесс с независимыми приращениями обладает марковским свойством.
 \end{enumerate}
@@ -2530,7 +2725,7 @@ $$ \lim_{T \to \infty} \frac{\varepsilon(T)}{T} = 0. $$
         \node at (3,0.4) {$\mu$};
         
         % Arrow connection
-        \draw[->] (1.5, 0.4) -- (2.6, 0.4) node[midway, above] {$\lambda$};;
+        \draw[->] (1.5, 0.4) -- (2.6, 0.4) node[midway, above] {$\lambda$};
         
         % Out arrow
         \draw[->] (3.4, 0.4) -- (5, 0.4);
@@ -2685,7 +2880,7 @@ $$
 
 Ключевым свойством пуассоновского процесса, лежащим в основе многих методов теории массового обслуживания, является его «абсолютная случайность» на любом конечном интервале. Математически это выражается в том, что при фиксированном числе событий их моменты распределены равномерно.
 
-\begin{theorem}{О условном распределении моментов наступления событий}
+\begin{theorem}{Об условном распределении моментов наступления событий}
 Пусть $\{N(t), t \ge 0\}$ — пуассоновский процесс. Зафиксируем интервал $[0, T]$ и предположим, что на нем произошло ровно $k$ событий ($N(T) = k$). Обозначим моменты этих событий через $0 < \tau_1 < \tau_2 < \dots < \tau_k < T$.
 
 Тогда совместное распределение вектора $(\tau_1, \dots, \tau_k)$ совпадает с распределением $k$ \textbf{порядковых статистик} независимых случайных величин, равномерно распределенных на отрезке $[0, T]$.
@@ -2794,7 +2989,7 @@ $$
 \end{theorem}
 
 \textbf{Физический смысл:}
-Поскольку пуассоновские события разбросаны по оси времени равномерно (как показано в теореме 6), они сканируют состояние системы в случайные моменты времени. сам факт связи с равномерным распределением означает, что пуассоновский поток не имеет "предпочтительных" моментов времени или внутренней периодичности. Это означает, что входящий поток не «подгадывает» моменты, когда система пуста или перегружена (как это мог бы делать регулярный поток, синхронизированный с обслуживанием). Поэтому, в частности, средние характеристики системы, наблюдаемые в моменты поступления заявок, совпадают со средними характеристиками системы в целом.
+Поскольку пуассоновские события разбросаны по оси времени равномерно (как показано в теореме 6), они сканируют состояние системы в случайные моменты времени. Сам факт связи с равномерным распределением означает, что пуассоновский поток не имеет "предпочтительных" моментов времени или внутренней периодичности. Это означает, что входящий поток не «подгадывает» моменты, когда система пуста или перегружена (как это мог бы делать регулярный поток, синхронизированный с обслуживанием). Поэтому, в частности, средние характеристики системы, наблюдаемые в моменты поступления заявок, совпадают со средними характеристиками системы в целом.
 
 \begin{note}
 Это свойство не выполняется для других потоков. Например, если заявки поступают строго периодически (детерминированный поток $D$) каждые 10 минут, а обслуживание занимает ровно 9 минут, то каждая новая заявка всегда будет видеть систему свободной ($X(\tau_n) = 0$), хотя 90\% времени система занята. Пуассоновский поток лишен такой «синхронизации».
@@ -2899,10 +3094,10 @@ $$
 -------------------------
 \section{Характеристики эффективности системы M|M|1}
 
-На предыдущей лекции было установлено, что стационарное распределение вероятностей состояний классической одноканальной системы M|M|1 существует при условии $\rho = \frac{\lambda}{\mu} < 1$ и задается геометрическим законом: $p_n = (1 - \rho)\rho^n$. Опираясь на этот результат, определим ключевые макроскопические метрики эффективности функционирования системы.
+Ранее было установлено, что стационарное распределение вероятностей состояний классической одноканальной системы M|M|1 существует при условии $\rho = \frac{\lambda}{\mu} < 1$ и задается геометрическим законом: $p_n = (1 - \rho)\rho^n$. Опираясь на этот результат, определим ключевые макроскопические метрики эффективности функционирования системы.
 
-\begin{statement}{$\left[ \ \text{Стационарные характеристики системы M|M|1} \ \right]$}
-Для одноканальной системы обслуживания с пуассоновским входным потоком интенсивности $\lambda$ и экспоненциальным временем обслуживания интенсивности $\mu$ (при $\lambda < \mu$) справедливы следующие соотношения:
+\begin{statement}[Стационарные характеристики системы M|M|1]
+Для одноканальной системы массового обслуживания с пуассоновским входным потоком интенсивности $\lambda$ и экспоненциальным временем обслуживания интенсивности $\mu$ при $\lambda < \mu$ справедливы следующие соотношения:
 \begin{itemize}
     \item Среднее число заявок в системе: $L = \frac{\rho}{1 - \rho}$.
     \item Среднее число заявок в очереди: $L_q = \frac{\rho^2}{1 - \rho}$.
@@ -2912,11 +3107,11 @@ $$
 \end{statement}
 
 \begin{sproof}
-\textbf{1. Среднее число заявок в системе ($L$).} По определению математического ожидания дискретной случайной величины $N$ (числа заявок) имеем:
+\textbf{1. Среднее число заявок в системе ($L$).} По определению математического ожидания дискретной случайной величины $N$ имеем:
 $$
 L = \E[N] = \sum_{n=0}^{\infty} n \cdot p_n = (1 - \rho) \sum_{n=0}^{\infty} n \rho^n.
 $$
-Для вычисления суммы ряда воспользуемся стандартным методом дифференцирования степенного ряда по параметру $\rho$. Вынесем $\rho$ за знак суммы:
+Для вычисления суммы ряда воспользуемся методом дифференцирования по параметру $\rho$. Вынесем $\rho$ за знак суммы:
 $$
 \sum_{n=0}^{\infty} n \rho^n = \rho \sum_{n=1}^{\infty} n \rho^{n-1} = \rho \frac{\partial}{\partial \rho} \left( \sum_{n=1}^{\infty} \rho^n \right).
 $$
@@ -2924,21 +3119,21 @@ $$
 $$
 \frac{\partial}{\partial \rho} \left( \frac{\rho}{1-\rho} \right) = \frac{1 \cdot (1-\rho) - \rho \cdot (-1)}{(1-\rho)^2} = \frac{1}{(1-\rho)^2}.
 $$
-Подставляя полученный результат в исходное выражение для $L$, окончательно получаем:
+Подставляя полученный результат в исходное выражение для $L$, получаем:
 $$
 L = (1 - \rho) \cdot \rho \cdot \frac{1}{(1-\rho)^2} = \frac{\rho}{1-\rho} = \frac{\lambda}{\mu - \lambda}.
 $$
 
-\textbf{2. Среднее число заявок в очереди ($L_q$).} Случайная величина длины очереди $N_q$ связана с общим числом заявок соотношением $N_q = \max(0, N - 1)$. Используя линейность математического ожидания, запишем:
+\textbf{2. Среднее число заявок в очереди ($L_q$).} Длина очереди $N_q$ связана с общим числом заявок соотношением $N_q = \max(0, N - 1)$. Используя линейность математического ожидания:
 $$
 L_q = \E[N_q] = \sum_{n=1}^{\infty} (n - 1) p_n = \sum_{n=1}^{\infty} n p_n - \sum_{n=1}^{\infty} p_n = \E[N] - (1 - p_0).
 $$
-Так как вероятность простоя системы $p_0 = 1 - \rho$, получаем $1 - p_0 = \rho$ (смысл этой величины — вероятность занятости прибора). Отсюда:
+Так как вероятность простоя системы $p_0 = 1 - \rho$, то $1 - p_0 = \rho$. Отсюда:
 $$
 L_q = L - \rho = \frac{\rho}{1-\rho} - \rho = \frac{\rho - \rho(1-\rho)}{1-\rho} = \frac{\rho^2}{1-\rho} = \frac{\lambda^2}{\mu(\mu - \lambda)}.
 $$
 
-\textbf{3. Временные характеристики ($W$ и $W_q$).} Применим универсальную формулу Литтла ($L = \lambda W$), связывающую среднее число заявок со средним временем:
+\textbf{3. Временные характеристики ($W$ и $W_q$).} Применим формулу Литтла ($L = \lambda W$):
 $$
 W = \frac{L}{\lambda} = \frac{\lambda}{\lambda(\mu - \lambda)} = \frac{1}{\mu - \lambda}.
 $$
@@ -2946,204 +3141,727 @@ $$
 $$
 W_q = \frac{L_q}{\lambda} = \frac{\lambda^2}{\lambda \mu (\mu - \lambda)} = \frac{\lambda}{\mu(\mu - \lambda)}.
 $$
-Легко видеть, что выполняется тождество $W = W_q + \frac{1}{\mu}$, что физически означает: среднее время в системе складывается из времени ожидания и среднего времени самого обслуживания.
 \end{sproof}
 
-Отдельный аналитический интерес представляет исследование длины очереди при условии, что она физически существует (то есть поступающая заявка застает прибор занятым и вынуждена ожидать).
+Отдельный интерес представляет исследование длины очереди при условии, что она физически существует (поступающая заявка застает прибор занятым).
 
 \begin{conseq}
-Среднее число заявок в очереди при условии, что очередь не пуста, задается выражением:
+Среднее число заявок в очереди при условии, что очередь не пуста, равно:
 $$
 L_q' = \frac{1}{1-\rho}.
 $$
 \end{conseq}
 
 \begin{sproof}
-Введем условное математическое ожидание $L_q' = \E[N_q \mid N_q > 0]$. Очередь не пуста тогда и только тогда, когда в системе находится не менее двух заявок ($n \ge 2$, из которых одна на обслуживании, а остальные в очереди). Вычислим вероятность этого события:
+Введем условное математическое ожидание $L_q' = \E[N_q \mid N_q > 0]$. Очередь не пуста, когда в системе находится $n \ge 2$ заявок. Вероятность этого события:
 $$
-\P(N \ge 2) = 1 - p_0 - p_1 = 1 - (1-\rho) - (1-\rho)\rho = 1 - 1 + \rho - \rho + \rho^2 = \rho^2.
+\P(N \ge 2) = 1 - p_0 - p_1 = 1 - (1-\rho) - (1-\rho)\rho = \rho^2.
 $$
 По определению условного математического ожидания:
 $$
 L_q' = \sum_{n=2}^{\infty} (n-1) \frac{p_n}{\P(N \ge 2)} = \frac{1}{\rho^2} \sum_{n=2}^{\infty} (n-1)p_n.
 $$
-Заметим, что ряд в числителе в точности совпадает с безусловным математическим ожиданием длины очереди $L_q$, так как при $n=1$ слагаемое $(n-1)p_n$ обращается в нуль:
+Ряд в числителе совпадает с безусловным ожиданием $L_q$ (так как при $n=1$ слагаемое зануляется):
 $$
-\sum_{n=2}^{\infty} (n-1)p_n = \sum_{n=1}^{\infty} (n-1)p_n = L_q = \frac{\rho^2}{1-\rho}.
-$$
-Выполняя подстановку, немедленно получаем:
-$$
-L_q' = \frac{1}{\rho^2} \cdot \frac{\rho^2}{1-\rho} = \frac{1}{1-\rho}.
+L_q' = \frac{L_q}{\rho^2} = \frac{1}{\rho^2} \cdot \frac{\rho^2}{1-\rho} = \frac{1}{1-\rho}.
 $$
 \end{sproof}
 
 \begin{note}
-Полученные формулы демонстрируют важнейший эффект нелинейного роста очередей. Зависимость метрик $L$ и $L_q$ от коэффициента загрузки $\rho$ имеет вид гиперболы с вертикальной асимптотой при $\rho = 1$. Это означает, что даже при детерминированных характеристиках серверов, из-за стохастической природы входящего потока, малейшее приближение загрузки к 100\% провоцирует лавинообразный, асимптотический рост числа ожидающих заявок.
+Зависимость метрик $L, L_q, W, W_q$ от коэффициента загрузки $\rho$ имеет гиперболический характер с вертикальной асимптотой при $\rho = 1$. Это означает неограниченный рост очередей и задержек при приближении загрузки к 100\%.
 \end{note}
 
-\vspace{5mm}
 \begin{center}
-    \begin{tikzpicture}[scale=1.5, >=stealth, thick]
-    % Координаты
-        \coordinate (O) at (0,0);
-        \coordinate (X) at (5.5,0);
-        \coordinate (Y) at (0,5.5);
-        \def\rhoOne{4.5} % Положение асимптоты rho=1 на оси X
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}
+    \begin{axis}[
+        width=\linewidth,
+        height=6cm,
+        xlabel={Загрузка $\rho$},
+        ylabel={Среднее число заявок},
+        xmin=0, xmax=1,
+        ymin=0, ymax=10,
+        grid=major,
+        legend pos=north west,
+        legend style={font=\footnotesize},
+        tick label style={font=\footnotesize},
+        label style={font=\small}
+    ]
+        % L = rho / (1-rho)
+        \addplot[DeepSkyBlue4, thick, domain=0:0.9] {x/(1-x)};
+        \addlegendentry{$L$}
         
-        % Сетка (опционально, можно оставить закомментированной)
-        %\draw[very thin, gray!10] (0,0) grid (5.5,5.5);
+        % Lq = rho^2 / (1-rho)
+        \addplot[Red3, thick, dashed, domain=0:0.9] {x^2/(1-x)};
+        \addlegendentry{$L_q$}
         
-        % Оси
-        \draw[->, thick] (-0.2,0) -- (X) node[below] {Коэффициент загрузки $\rho$};
-        \draw[->, thick] (0,-0.2) -- (Y) node[above right, align=left] {Среднее число\\заявок};
+        \draw[dashed, gray] (axis cs:1,0) -- (axis cs:1,10);
+    \end{axis}
+    \end{tikzpicture}
+    \captionof*{figure}{\small Число заявок в системе и очереди}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}
+    \begin{axis}[
+        width=\linewidth,
+        height=6cm,
+        xlabel={Загрузка $\rho$},
+        ylabel={Норм. время $\mu W, \mu W_q$},
+        xmin=0, xmax=1,
+        ymin=0, ymax=10,
+        grid=major,
+        legend pos=north west,
+        legend style={font=\footnotesize},
+        tick label style={font=\footnotesize},
+        label style={font=\small}
+    ]
+        % W*mu = 1 / (1-rho)
+        \addplot[DeepSkyBlue4, thick, domain=0:0.9] {1/(1-x)};
+        \addlegendentry{$W \cdot \mu$}
         
-        % Асимптота \rho = 1
-        \draw[dashed, red!80!black, thick] (\rhoOne,0) -- (\rhoOne,5);
-        \node[below, red!80!black] at (\rhoOne,0) {$\rho = 1$};
-        \draw[thick] (\rhoOne,-0.05) -- (\rhoOne,0.05); % Засечка на оси
-        \node[below left] at (O) {$0$};
+        % Wq*mu = rho / (1-rho)
+        \addplot[Red3, thick, dashed, domain=0:0.9] {x/(1-x)};
+        \addlegendentry{$W_q \cdot \mu$}
         
-        % Графики функций
-        % L = \rho / (1-\rho)
-        % Рисуем до x = 3.9 (что соответствует \rho = 0.86)
-        \draw[DeepSkyBlue4, thick, domain=0:3.8, samples=100] 
-            plot (\x, { (\x/\rhoOne) / (1 - \x/\rhoOne) }) 
-            node[left, xshift=-2pt] {$L = \frac{\rho}{1-\rho}$};
-                
-        % L_q = \rho^2 / (1-\rho)
-        % Рисуем чуть дальше, до x = 4.15, чтобы разнести концы графиков
-        \draw[SpringGreen4, thick, domain=0:4.1, samples=100] 
-            plot (\x, { (\x/\rhoOne)^2 / (1 - \x/\rhoOne) }) 
-            node[right, xshift=2pt] {$L_q = \frac{\rho^2}{1-\rho}$};
+        \draw[dashed, gray] (axis cs:1,0) -- (axis cs:1,10);
+    \end{axis}
+    \end{tikzpicture}
+    \captionof*{figure}{\small Временные характеристики}
+\end{minipage}
+\end{center}
+
+\subsection*{Распределение времени ожидания и пребывания в системе M|M|1}
+
+До сих пор макроскопические характеристики системы вычислялись без учета дисциплины обслуживания. Однако для анализа распределения времени ожидания конкретной заявки необходимо зафиксировать дисциплину очереди. Предположим, что заявки обслуживаются в порядке поступления (FCFS — First-Come, First-Served). 
+
+Обозначим через $T_q$ случайную величину времени ожидания заявки в очереди, а через $T$ — полное время ее пребывания в системе. Соответствующие функции распределения задаются как $W_q(t) = \P(T_q \le t)$ и $W(t) = \P(T \le t)$.
+
+\begin{statement}[Функции распределения времени задержки M|M|1]
+Для системы M|M|1 с дисциплиной обслуживания FCFS функции распределения времени ожидания и времени пребывания имеют вид:
+\begin{align*}
+    W_q(t) &= \begin{cases}
+        0, & t < 0, \\
+        1 - \rho, & t = 0, \\
+        1 - \rho e^{-(\mu - \lambda)t}, & t > 0;
+    \end{cases} \\[2mm]
+    W(t) &= \begin{cases}
+        0, & t \le 0, \\
+        1 - e^{-(\mu - \lambda)t}, & t > 0.
+    \end{cases}
+\end{align*}
+\end{statement}
+
+\begin{sproof}
+Случайная величина $T_q$ имеет смешанное распределение. Пусть $N$ — число заявок в системе в момент поступления новой заявки. Применим формулу полной вероятности:
+$$
+W_q(t) = \P(T_q \le t) = \sum_{n=0}^{\infty} \P(T_q \le t \mid N = n) \P(N = n).
+$$
+
+В силу свойства PASTA вероятности состояний в момент прибытия совпадают со стационарными: $\P(N = n) = p_n$.
+
+С вероятностью $p_0 = 1 - \rho$ поступающая заявка застает систему пустой ($N = 0$) и немедленно принимается к обслуживанию. В этом случае время ожидания равно нулю, и $\P(T_q \le t \mid N = 0) = 1$ для любого $t \ge 0$. Отсюда возникает дискретный скачок функции распределения в нуле: 
+$$
+W_q(0) = \P(T_q = 0) = p_0 = 1 - \rho.
+$$
+
+Пусть $t > 0$ и $n \ge 1$. Поскольку рассматривается FCFS, заявка перейдет к обслуживанию за время $\le t$, если суммарное время обслуживания всех $n$ заявок, находящихся перед ней, не превзойдет $t$. Так как времена обслуживания независимы и экспоненциально распределены, время суммарного обслуживания $n$ заявок подчиняется распределению Эрланга порядка $n$ с плотностью $f_n(x) = \frac{\mu^n}{(n-1)!} x^{n-1} e^{-\mu x}$. Таким образом:
+$$
+\P(T_q \le t \mid N = n) = \int_0^t f_n(x) dx.
+$$
+
+Подставляя полученные выражения в формулу полной вероятности, имеем:
+$$
+W_q(t) = 1 - \rho + \sum_{n=1}^{\infty} p_n \int_0^t f_n(x) dx = 1 - \rho + \sum_{n=1}^{\infty} (1 - \rho)\rho^n \int_0^t \frac{\mu^n x^{n-1}}{(n-1)!} e^{-\mu x} dx.
+$$
+
+Поменяем порядок суммирования и интегрирования, вынеся независимые от $n$ множители за знак суммы:
+$$
+W_q(t) = 1 - \rho + \int_0^t \mu (1 - \rho) \rho e^{-\mu x} \left( \sum_{n=1}^{\infty} \frac{(\mu \rho x)^{n-1}}{(n-1)!} \right) dx.
+$$
+
+Сделав замену индекса суммирования $k = n - 1$, замечаем, что ряд в скобках сводится к разложению экспоненты:
+$$
+\sum_{n=1}^{\infty} \frac{(\mu \rho x)^{n-1}}{(n-1)!} = \sum_{k=0}^{\infty} \frac{(\mu \rho x)^k}{k!} = e^{\mu \rho x} = e^{\lambda x}.
+$$
+
+Подставив свернутый ряд в интеграл, находим:
+$$
+W_q(t) = 1 - \rho + \rho \int_0^t \mu (1 - \rho) e^{-(\mu - \lambda)x} dx = 1 - \rho + \rho \left( 1 - e^{-(\mu - \lambda)t} \right) = 1 - \rho e^{-(\mu - \lambda)t}.
+$$
+
+Проверим согласованность результата, вычислив математическое ожидание времени ожидания через интеграл от функции надежности:
+$$
+W_q = \E[T_q] = \int_0^{\infty} (1 - W_q(t)) dt = \int_0^{\infty} \rho e^{-(\mu - \lambda)t} dt = \frac{\rho}{\mu - \lambda}.
+$$
+Полученное значение совпадает с формулой, выведенной ранее из закона Литтла.
+
+Для функции распределения полного времени пребывания в системе $W(t)$ логика аналогична. Отличие состоит в том, что для ухода заявки из системы к моменту времени $t$ должно завершиться обслуживание $n+1$ заявок (включая саму прибывшую). Учитывая отсутствие дискретной компоненты в нуле ($W(0) = 0$), суммирование плотности Эрланга порядка $n+1$ с весами $p_n$ дает строго непрерывное экспоненциальное распределение:
+$$
+W(t) = 1 - e^{-(\mu - \lambda)t}.
+$$
+\end{sproof}
+
+\begin{center}
+    \pgfplotsset{compat=1.9}
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.85\textwidth, height=7cm,
+            xlabel={Время $t$}, ylabel={$\P(\cdot \le t)$},
+            xmin=0, xmax=5, ymin=0, ymax=1.1,
+            grid=major,
+            legend pos=south east,
+            legend style={font=\small},
+            title={Функции распределения (для $\mu=2, \lambda=1 \Rightarrow \rho=0.5$)}
+        ]
+            % W(t) - пребывание
+            \addplot[Red3, very thick, domain=0:5, samples=100] expression {1 - exp(-(2-1)*x)};
+            \addlegendentry{$W(t)$ (Пребывание)}
+            
+            % W_q(t) - ожидание
+            \addplot[DeepSkyBlue4, very thick, domain=0:5, samples=100] expression {1 - 0.5*exp(-(2-1)*x)};
+            \addlegendentry{$W_q(t)$ (Ожидание)}
+            
+            % Визуализация скачка функции в нуле
+            \draw[DeepSkyBlue4, fill=white, thick] (axis cs:0, 0.5) circle (2pt);
+            \draw[DeepSkyBlue4, fill=DeepSkyBlue4, thick] (axis cs:0, 0.5) circle (1.5pt);
+            
+        \end{axis}
     \end{tikzpicture}
     
     \vspace{2mm}
-    \small\textit{Зависимость среднего числа заявок в системе ($L$) и в очереди ($L_q$) от загрузки системы.}
+    \small\textit{Сравнение функций распределения времени ожидания и пребывания.}
 \end{center}
 
-\section{Распределение времени ожидания и пребывания в системе}
+\section{Многоканальная система обслуживания M|M|c}
 
-До настоящего момента анализ ограничивался вычислением средних характеристик (в терминах математических ожиданий), которые в силу закона Литтла инвариантны относительно дисциплины обслуживания. Однако при исследовании функций распределения времени ожидания в очереди и времени пребывания в системе порядок выбора заявок становится принципиальным. В дальнейшем предполагается использование классической дисциплины FCFS (First Come, First Served).
+Обобщим результаты на случай многоканальной системы, состоящей из $c$ идентичных параллельных серверов. На вход поступает пуассоновский поток заявок с интенсивностью $\lambda$. Времена обслуживания на серверах независимы и распределены экспоненциально с параметром $\mu$. 
 
-Рассмотрим случайную величину $T_q$, определяющую время ожидания заявки в очереди, и её функцию распределения $W_q(t) = \P(T_q \le t)$.
+Напомним ключевые характеристики нагрузки: 
+\begin{itemize}
+    \item $r = \frac{\lambda}{\mu}$ — приведенная интенсивность потока (нагрузка в Эрлангах);
+    \item $\rho = \frac{r}{c} = \frac{\lambda}{c\mu}$ — коэффициент загрузки системы.
+\end{itemize}
 
-\begin{statement}{$\left[ \ \text{Функции распределения времени ожидания в очереди и времени пребывания в системе} \ \right]$}
-Для системы обслуживания M|M|1 с дисциплиной FCFS время ожидания в очереди $T_q$ имеет смешанное распределение:
+\begin{statement}[Стационарное распределение системы M|M|c]
+Необходимым и достаточным условием существования стационарного режима является $\rho < 1$. Вероятности состояний $p_n$ задаются формулами:
 $$
-W_q(t) = 
-\begin{cases}
-    1 - \rho, & t = 0, \\
-    1 - \rho e^{-(\mu - \lambda)t}, & t > 0.
+p_n = 
+\begin{cases} 
+    \dfrac{r^n}{n!} p_0, & 0 \le n < c, \\[3mm]
+    \dfrac{r^n}{c! c^{n-c}} p_0, & n \ge c,
 \end{cases}
 $$
-Время полного пребывания в системе $T$ является абсолютно непрерывной случайной величиной с показательным распределением:
+где вероятность простоя системы:
 $$
-W(t) = \P(T \le t) = 1 - e^{-(\mu - \lambda)t}, \quad t \ge 0.
+p_0 = \left( \sum_{n=0}^{c-1} \frac{r^n}{n!} + \frac{r^c}{c!(1 - \rho)} \right)^{-1}.
 $$
 \end{statement}
 
 \begin{sproof}
-\textbf{1. Время ожидания в очереди ($T_q$).} 
-Случайная величина $T_q$ принимает нулевое значение, если поступающая заявка застает систему абсолютно пустой. Обозначим через $q_n$ вероятность того, что вновь прибывшая заявка застает в системе ровно $n$ пакетов на обслуживание. В силу свойства PASTA (Poisson Arrivals See Time Averages), распределение состояний системы в моменты скачков пуассоновского процесса совпадает со стационарным распределением времени: $q_n = p_n$.
-Следовательно, вероятность нулевого ожидания равна вероятности простоя системы:
-$$
-W_q(0) = \P(T_q = 0) = q_0 = p_0 = 1 - \rho.
-$$
-
-Пусть $t > 0$. Если прибывающая заявка застает в системе $n \ge 1$ пакетов (один на обслуживании и $n-1$ в очереди), ей придется ожидать завершения ровно $n$ независимых экспоненциальных фаз обслуживания с параметром $\mu$, поскольку рассматривается FCFS система. Время ожидания в этом случае распределено по закону Эрланга $n$-го порядка с плотностью:
-$$
-f_n(x) = \frac{\mu(\mu x)^{n-1}}{(n-1)!} e^{-\mu x}, \quad x > 0.
-$$
-По формуле полной вероятности, функция распределения $W_q(t)$ для $t > 0$ складывается из вероятности нулевого ожидания и суммы вероятностей того, что $n$ фаз обслуживания завершатся за время, не превосходящее $t$:
-$$
-W_q(t) = W_q(0) + \sum_{n=1}^{\infty} q_n \int_0^t f_n(x) dx.
-$$
-Подставим стационарные вероятности $q_n = (1 - \rho)\rho^n$ и плотность распределения Эрланга:
-$$
-W_q(t) = (1 - \rho) + \sum_{n=1}^{\infty} (1 - \rho)\rho^n \int_0^t \frac{\mu(\mu x)^{n-1}}{(n-1)!} e^{-\mu x} dx.
-$$
-Внесем не зависящие от индекса суммирования множители под знак интеграла и поменяем местами интегрирование и суммирование:
-$$
-W_q(t) = (1 - \rho) + \rho \int_0^t \mu (1 - \rho) e^{-\mu x} \left( \sum_{n=1}^{\infty} \frac{(\rho \mu x)^{n-1}}{(n-1)!} \right) dx.
-$$
-Заметим, что выражение в скобках представляет собой стандартный ряд Тейлора для экспоненты $e^{\rho \mu x}$. Выполняя свертку, получаем:
-$$
-W_q(t) = (1 - \rho) + \rho \int_0^t \mu (1 - \rho) e^{-\mu x} e^{\rho \mu x} dx = (1 - \rho) + \rho \int_0^t \mu(1 - \rho) e^{-\mu(1 - \rho)x} dx.
-$$
-Интеграл от экспоненциальной плотности $\alpha e^{-\alpha x}$ (где $\alpha = \mu(1-\rho) = \mu - \lambda$) берется элементарно:
-$$
-W_q(t) = (1 - \rho) + \rho \left[ -e^{-(\mu - \lambda)x} \right]_0^t = (1 - \rho) + \rho \left( 1 - e^{-(\mu - \lambda)t} \right).
-$$
-Раскрывая скобки, приходим к финальному выражению:
-$$
-W_q(t) = 1 - \rho e^{-(\mu - \lambda)t}.
-$$
-
-\textbf{2. Время пребывания в системе ($T$).} 
-Для вычисления времени полного пребывания рассуждения аналогичны, однако если заявка застает в системе $n$ пакетов на обслуживание, для завершения её собственного обслуживания должно пройти $n+1$ экспоненциальных фаз (ожидание + собственное обслуживание). Интегрирование ряда Эрланга с учетом сдвига индекса приводит к чисто показательному распределению $W(t) = 1 - e^{-(\mu - \lambda)t}$ с вырезанным нулем.
+Используется общее решение для процессов рождения и гибели. Для $n < c$ интенсивность обслуживания равна $n\mu$, для $n \ge c$ она стабилизируется на уровне $c\mu$. Вывод формул проводится прямой подстановкой интенсивностей в произведение $\prod \frac{\lambda_{i-1}}{\mu_i}$ и суммированием геометрической прогрессии для нахождения константы нормировки $p_0$, аналогично тому, как это было сделано ранее для M|M|1.
 \end{sproof}
 
+\begin{statement}[Стационарные характеристики системы M|M|c]
+Для многоканальной системы массового обслуживания, состоящей из $c$ приборов, с пуассоновским входным потоком интенсивности $\lambda$ и экспоненциальным временем обслуживания интенсивности $\mu$ при коэффициенте загрузки $\rho = \frac{\lambda}{c\mu} < 1$ справедливы следующие соотношения:
+\begin{itemize}
+    \item Среднее число заявок в очереди: $\displaystyle L_q = \frac{p_0 r^c \rho}{c! (1-\rho)^2}$.
+    \item Среднее число заявок в системе: $\displaystyle L  = L_q + r = \frac{p_0 r^c \rho}{c! (1-\rho)^2} + r$.
+    \item Среднее время ожидания заявки в очереди: $\displaystyle W_q = \frac{L_q}{\lambda} = \frac{p_0 r^c}{c \cdot c! \mu (1-\rho)^2}$.
+    \item Среднее время пребывания заявки в системе: $\displaystyle W = W_q + \frac{1}{\mu} = \frac{p_0 r^c}{c \cdot c! \mu (1-\rho)^2} + \frac{1}{\mu}$.
+\end{itemize}
+где $r = \frac{\lambda}{\mu}$ — приведенная интенсивность потока, а $p_0$ — вероятность простоя системы.
+\end{statement}
+
+\begin{sproof}
+\textbf{1. Среднее число заявок в очереди ($L_q$).} По определению математического ожидания дискретной случайной величины длины очереди $N_q = \max(0, N - c)$ имеем:
+$$
+L_q = \E[N_q] = \sum_{n=c}^{\infty} (n - c) p_n = \sum_{n=c+1}^{\infty} (n - c) p_n.
+$$
+Подставим выражение для вероятностей состояний $p_n$ при $n \ge c$, заданное формулой $p_n = \frac{r^n}{c! c^{n-c}} p_0$, и введем новый индекс суммирования $m = n - c$:
+$$
+L_q = \sum_{m=1}^{\infty} m p_{c+m} = \sum_{m=1}^{\infty} m \frac{r^{c+m}}{c! c^m} p_0.
+$$
+Вынесем независимые от $m$ множители за знак суммы и сгруппируем члены, зависящие от $m$, используя соотношение $\rho = \frac{r}{c}$:
+$$
+L_q = \frac{p_0 r^c}{c!} \sum_{m=1}^{\infty} m \left(\frac{r}{c}\right)^m = \frac{p_0 r^c}{c!} \sum_{m=1}^{\infty} m \rho^m.
+$$
+Ряд $\dsum_{m=1}^{\infty} m \rho^m$ равен $\frac{\rho}{(1-\rho)^2}$. Подставляя это значение, получаем окончательное выражение для длины очереди:
+$$
+L_q = \frac{p_0 r^c \rho}{c! (1-\rho)^2}.
+$$
+
+\textbf{2. Временные характеристики ($W$ и $W_q$).} По закону Литтла, примененному непосредственно к подсистеме очереди, среднее время ожидания равно:
+$$
+W_q = \frac{L_q}{\lambda} = \frac{p_0 r^c \rho}{\lambda c! (1-\rho)^2}.
+$$
+Используя определение коэффициента загрузки $\rho = \frac{\lambda}{c\mu}$, заменяем отношение $\frac{\rho}{\lambda}$ на $\frac{1}{c\mu}$:
+$$
+W_q = \frac{p_0 r^c}{c \cdot c! \mu (1-\rho)^2}.
+$$
+Полное время пребывания заявки в системе $T$ складывается из времени ожидания в очереди $T_q$ и времени непосредственного обслуживания. Поскольку время обслуживания экспоненциально с параметром $\mu$, его математическое ожидание равно $\frac{1}{\mu}$. Из линейности математического ожидания следует:
+$$
+W = \E[T] = \E[T_q] + \E[\text{время обслуживания}] = W_q + \frac{1}{\mu} = \frac{p_0 r^c}{c \cdot c! \mu (1-\rho)^2} + \frac{1}{\mu}.
+$$
+
+\textbf{3. Среднее число заявок в системе ($L$).} Применим универсальный закон Литтла к системе в целом ($L = \lambda W$) и подставим найденное выражение для $W$:
+$$
+L = \lambda W = \lambda \left( W_q + \frac{1}{\mu} \right) = \lambda W_q + \frac{\lambda}{\mu}.
+$$
+Учитывая, что по закону Литтла для очереди $\lambda W_q = L_q$, а по определению $\frac{\lambda}{\mu} = r$, приходим к искомому результату:
+$$
+L = L_q + r = \frac{p_0 r^c \rho}{c! (1-\rho)^2} + r.
+$$
+\end{sproof}
+
+\begin{example}{Аналитический расчет характеристик для малого числа каналов}
+Продемонстрируем зависимость макроскопических метрик от $c$ в явном виде, выразив вероятность простоя $p_0$ и длину очереди $L_q$ исключительно через коэффициент загрузки $\rho$. Напомним, что приведенная нагрузка связана с загрузкой соотношением $r = c\rho$.
+
+\textbf{Случай $c=1$ (одноканальная СМО):}
+Вероятность простоя вычисляется сворачиванием геометрической прогрессии:
+$$
+p_0 = \left( 1 + \frac{\rho}{1-\rho} \right)^{-1} = (1 - \rho).
+$$
+Подставляя $p_0$ в общую формулу длины очереди, получаем классический результат:
+$$
+L_q^{(1)} = \frac{(1-\rho) \rho \cdot \rho}{1! (1-\rho)^2} = \frac{\rho^2}{1-\rho}.
+$$
+
+\textbf{Случай $c=2$ (двухканальная СМО):}
+Ряд для нормировочной константы $p_0$ обрывается на втором слагаемом перед переходом к бесконечной сумме. Подставим $r = 2\rho$:
+$$
+p_0 = \left( 1 + \frac{2\rho}{1!} + \frac{(2\rho)^2}{2!(1-\rho)} \right)^{-1} = \left( 1 + 2\rho + \frac{2\rho^2}{1-\rho} \right)^{-1}.
+$$
+Приведем выражение в скобках к общему знаменателю:
+$$
+1 + 2\rho + \frac{2\rho^2}{1-\rho} = \frac{1 - \rho + 2\rho - 2\rho^2 + 2\rho^2}{1-\rho} = \frac{1 + \rho}{1-\rho} \implies p_0 = \frac{1-\rho}{1+\rho}.
+$$
+Подставляя найденное $p_0$ в формулу для очереди, находим:
+$$
+L_q^{(2)} = \frac{\frac{1-\rho}{1+\rho} (2\rho)^2 \rho}{2! (1-\rho)^2} = \frac{4\rho^3 (1-\rho)}{2(1+\rho)(1-\rho)^2} = \frac{2\rho^3}{1-\rho^2}.
+$$
+
+\textbf{Случай $c=4$ (четырехканальная СМО):}
+Аналогичные алгебраические преобразования (суммирование четырех членов ряда и прогрессии для остатка) приводят к появлению полиномиальной дроби:
+$$
+p_0 = \frac{1-\rho}{1 + 3\rho + 4\rho^2 + \frac{8}{3}\rho^3}.
+$$
+Отсюда длина очереди выражается как:
+$$
+L_q^{(4)} = \frac{32 \rho^5}{3 (1-\rho) \left( 1 + 3\rho + 4\rho^2 + \frac{8}{3}\rho^3 \right)}.
+$$
+
+Именно эти нелинейные полиномиальные соотношения определяют поведение кривых на графиках эффективности. Можно заметить, что при фиксированной загрузке $\rho \to 1$ наличие дополнительных каналов не меняет порядка асимптоты $O((1-\rho)^{-1})$, но существенно уменьшает константу перед ней.
+\end{example}
+
 \begin{center}
-    \begin{tikzpicture}[
-        scale=1.5,
-        >=stealth,
-        thick
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \pgfplotsset{compat=1.9}
+    \begin{tikzpicture}
+    \begin{axis}[
+        width=\linewidth,
+        height=7.5cm,
+        xlabel={Загрузка $\rho$},
+        ylabel={Среднее число заявок},
+        xmin=0, xmax=1,
+        ymin=0, ymax=10,
+        grid=major,
+        legend pos=north west,
+        legend style={font=\scriptsize, cells={anchor=west}},
+        legend columns=2,
+        tick label style={font=\footnotesize},
+        label style={font=\small}
     ]
-        % Оси
-        \draw[->] (-0.2, 0) -- (4.5, 0) node[below] {$t$};
-        \draw[->] (0, -0.2) -- (0, 2.5) node[right] {$W_q(t)$};
+        % c=1 (DeepSkyBlue4)
+        \addplot[DeepSkyBlue4, thick, domain=0:0.9] {x/(1-x)};
+        \addlegendentry{$L \ (c=1)$}
+        \addplot[DeepSkyBlue4, thick, dashed, domain=0:0.9] {x^2/(1-x)};
+        \addlegendentry{$L_q \ (c=1)$}
+        
+        % c=2 (Red3)
+        \addplot[Red3, thick, domain=0:0.9] {2*x/(1-x^2)};
+        \addlegendentry{$L \ (c=2)$}
+        \addplot[Red3, thick, dashed, domain=0:0.9] {2*x^3/(1-x^2)};
+        \addlegendentry{$L_q \ (c=2)$}
+        
+        % c=4 (SpringGreen4)
+        \addplot[SpringGreen4, thick, domain=0:0.9] {(32/3*x^5)/((1-x)*(1+3*x+4*x^2+8/3*x^3)) + 4*x};
+        \addlegendentry{$L \ (c=4)$}
+        \addplot[SpringGreen4, thick, dashed, domain=0:0.9] {(32/3*x^5)/((1-x)*(1+3*x+4*x^2+8/3*x^3))};
+        \addlegendentry{$L_q \ (c=4)$}
+        
+        \draw[dashed, gray] (axis cs:1,0) -- (axis cs:1,10);
+    \end{axis}
+    \end{tikzpicture}
+    \captionof*{figure}{\small Число заявок в системе и очереди}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \pgfplotsset{compat=1.9}
+    \begin{tikzpicture}
+    \begin{axis}[
+        width=\linewidth,
+        height=7.5cm,
+        xlabel={Загрузка $\rho$},
+        ylabel={Норм. время $\mu W, \mu W_q$},
+        xmin=0, xmax=1,
+        ymin=0, ymax=10,
+        grid=major,
+        legend pos=north west,
+        legend style={font=\scriptsize, cells={anchor=west}},
+        legend columns=2,
+        tick label style={font=\footnotesize},
+        label style={font=\small}
+    ]
+        % c=1 (DeepSkyBlue4)
+        \addplot[DeepSkyBlue4, thick, domain=0:0.9] {1/(1-x)};
+        \addlegendentry{$W \ (c=1)$}
+        \addplot[DeepSkyBlue4, thick, dashed, domain=0:0.9] {x/(1-x)};
+        \addlegendentry{$W_q \ (c=1)$}
+        
+        % c=2 (Red3)
+        \addplot[Red3, thick, domain=0:0.9] {1/(1-x^2)};
+        \addlegendentry{$W \ (c=2)$}
+        \addplot[Red3, thick, dashed, domain=0:0.9] {x^2/(1-x^2)};
+        \addlegendentry{$W_q \ (c=2)$}
+        
+        % c=4 (SpringGreen4)
+        \addplot[SpringGreen4, thick, domain=0:0.9] {(8/3*x^4)/((1-x)*(1+3*x+4*x^2+8/3*x^3)) + 1};
+        \addlegendentry{$W \ (c=4)$}
+        \addplot[SpringGreen4, thick, dashed, domain=0:0.9] {(8/3*x^4)/((1-x)*(1+3*x+4*x^2+8/3*x^3))};
+        \addlegendentry{$W_q \ (c=4)$}
+        
+        \draw[dashed, gray] (axis cs:1,0) -- (axis cs:1,10);
+    \end{axis}
+    \end{tikzpicture}
+    \captionof*{figure}{\small Время пребывания и ожидания}
+\end{minipage}
+\end{center}
 
-        % Асимптота y = 1 (в масштабе TikZ пусть 1 это 2)
-        \draw[dashed, gray] (0, 2) -- (4.2, 2);
-        \node[left] at (0, 2) {$1$};
+\begin{definition}{Вероятность задержки}
+Вероятность того, что поступающая заявка застанет все серверы занятыми и будет вынужден ожидать в очереди, обозначается $C(c, r)$.
+\end{definition}
 
-        % Дискретный скачок (атом) в нуле
-        \draw[DeepSkyBlue4, ultra thick] (0, 0) -- (0, 0.8);
-        \filldraw[DeepSkyBlue4] (0, 0.8) circle (1.5pt);
-        \node[left] at (0, 0.8) {$1-\rho$};
+\begin{statement}[Формула Эрланга-C]
+Вероятность задержки заявки вычисляется по формуле:
+$$
+C(c, r) \ \dot{=} \ \P(T_q > 0) = \frac{p_0 r^c}{c!(1-\rho)}.
+$$
+\end{statement}
 
-        % Непрерывная часть графика 1 - \rho * exp(-k*t)
-        % Если 1 это y=2, \rho = 0.6, 1-\rho = 0.4 -> y=0.8. Функция: 2 - 1.2 * exp(-1.2 * x)
-        \draw[DeepSkyBlue4, domain=0:4, samples=100] 
-            plot (\x, { 2 - 1.2 * exp(-1.2 * \x) });
+\begin{sproof}
+Заявка вынуждена ждать, если в момент ее прибытия в системе находится $n \ge c$ других заявок. Суммируя вероятности стационарного распределения:
+$$
+\P(T_q > 0) = \sum_{n=c}^{\infty} p_n = \sum_{n=c}^{\infty} \frac{r^n}{c! c^{n-c}} p_0 = \frac{p_0 r^c}{c!} \sum_{m=0}^{\infty} \rho^m = \frac{p_0 r^c}{c!(1-\rho)}.
+$$
+\end{sproof}
+
+Это соотношение характеризует эффект масштаба: при фиксированном коэффициенте загрузки $\rho$ система с б\'{о}льшим числом серверов обеспечивает меньшую вероятность задержки, то есть обладает более высокой стабильностью под нагрузкой. Визуализация этого феномена представлена на графике ниже.
+
+\begin{center}
+    \definecolor{MyPurple}{RGB}{102, 51, 153}
+    \pgfplotsset{compat=1.9}
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.85\textwidth,
+            height=8cm,
+            xlabel={Коэффициент загрузки $\rho$},
+            ylabel={Вероятность задержки $C(c, c\rho)$},
+            xmin=0, xmax=1,
+            ymin=0, ymax=1.05,
+            grid=major,
+            legend pos=north west,
+            legend columns=2,
+            legend style={font=\footnotesize, fill=white, fill opacity=0.8, draw opacity=1},
+            tick label style={font=\footnotesize},
+            label style={font=\small},
+            title={Вероятность ожидания (Формула Эрланга-C)}
+        ]
+            % c=1: C = x
+            \addplot[Red3, very thick, domain=0:1, samples=50] {x};
+            \addlegendentry{$c=1$}
             
-        \node[right, DeepSkyBlue4] at (1.5, 1.4) {$W_q(t) = 1 - \rho e^{-(\mu-\lambda)t}$};
+            % c=2: C = 2x^2 / (1+x)
+            \addplot[orange, very thick, domain=0:1, samples=50] {(2*x^2)/(1 + x)};
+            \addlegendentry{$c=2$}
+            
+            % c=3
+            \addplot[Tan1, very thick, domain=0:1, samples=50] 
+            {(4.5*x^3) / ( (1-x)*(1 + 3*x + 4.5*x^2) + 4.5*x^3 )};
+            \addlegendentry{$c=3$}
+            
+            % c=4
+            \addplot[SpringGreen4, very thick, domain=0:1, samples=50] 
+            {((32/3)*x^4) / ( (1-x)*(1 + 4*x + 8*x^2 + (32/3)*x^3) + (32/3)*x^4 )};
+            \addlegendentry{$c=4$}
+            
+            % c=5
+            \addplot[SeaGreen, very thick, domain=0:1, samples=50] 
+            {((625/24)*x^5) / ( (1-x)*(1 + 5*x + 12.5*x^2 + (125/6)*x^3 + (625/24)*x^4) + (625/24)*x^5 )};
+            \addlegendentry{$c=5$}
+            
+            % c=6 (Здесь 64.8 — конечное точное число, можно оставить десятичным)
+            \addplot[DeepSkyBlue4, very thick, domain=0:1, samples=50] 
+            {(64.8*x^6) / ( (1-x)*(1 + 6*x + 18*x^2 + 36*x^3 + 54*x^4 + 64.8*x^5) + 64.8*x^6 )};
+            \addlegendentry{$c=6$}
+            
+            % c=7
+            \addplot[RoyalBlue, very thick, domain=0:1, samples=50] 
+            {((117649/720)*x^7) / ( (1-x)*(1 + 7*x + 24.5*x^2 + (343/6)*x^3 + (2401/24)*x^4 + (16807/120)*x^5 + (117649/720)*x^6) + (117649/720)*x^7 )};
+            \addlegendentry{$c=7$}
+            
+            % c=8
+            \addplot[MyPurple, very thick, domain=0:1, samples=100]
+            {((131072/315)*x^8) / ( (1-x)*(1 + 8*x + 32*x^2 + (256/3)*x^3 + (512/3)*x^4 + (4096/15)*x^5 + (16384/45)*x^6 + (131072/315)*x^7) + (131072/315)*x^8 )};
+            \addlegendentry{$c=8$}
+            
+        \end{axis}
     \end{tikzpicture}
     
     \vspace{2mm}
-    \small\textit{Смешанная функция распределения времени ожидания $W_q(t)$ со скачком в нуле.}
+    {\small \textit{Зависимость вероятности ожидания от коэффициента загрузки $\rho$ при различном числе каналов. Все кривые асимптотически стремятся к $1$ при $\rho \to 1$.}}
 \end{center}
 
+\subsection*{Распределение времени ожидания и пребывания в системе M|M|c}
+
+Аналогично системе с одним каналом, знание стационарного распределения и вероятности задержки позволяет получить функции распределения времени ожидания $W_q(t)$ и полного времени пребывания в системе $W(t)$ при условии использования дисциплины обслуживания FCFS.
+
+\begin{statement}[Распределение времени ожидания и пребывания в M|M|c]
+Для многоканальной системы M|M|c с дисциплиной обслуживания FCFS функции распределения времени ожидания $W_q(t) = \P(T_q \le t)$ и времени пребывания $W(t) = \P(T \le t)$ задаются выражениями (для $t \ge 0$):
+\begin{itemize}
+    \item $W_q(t) = 1 - C(c, r) e^{-c\mu(1-\rho)t}$;
+    \item $W(t) = 1 - e^{-\mu t} - \dfrac{C(c, r)}{c(1-\rho) - 1} \left( e^{-\mu t} - e^{-c\mu(1-\rho)t} \right), \quad \text{если } c(1-\rho) \neq 1$.
+\end{itemize}
+В сингулярном случае, когда $c(1-\rho) = 1$, распределение полного времени имеет вид:
+$$
+W(t) = 1 - e^{-\mu t} - C(c, r) \mu t e^{-\mu t}.
+$$
+\end{statement}
+
+\begin{sproof}
+Пусть $N$ — число заявок в системе в момент прибытия новой заявки. Применим формулу полной вероятности:
+$$
+W_q(t) = \sum_{n=0}^{\infty} \P(T_q \le t \mid N = n) p_n.
+$$
+Если $n < c$, заявка немедленно поступает на свободный прибор, следовательно, $T_q = 0$. Сумма стационарных вероятностей для всех состояний до образования очереди равна $1 - \P(T_q > 0) = 1 - C(c, r)$.
+
+Если $n \ge c$, заявка становится в очередь. Пусть $k = n - c \ge 0$ — число заявок, находящихся перед ней в очереди. Для того чтобы наша заявка перешла к обслуживанию, система должна завершить обработку $k+1$ заявок. Поскольку все $c$ каналов заняты, поток обслуживания является пуассоновским с интенсивностью $c\mu$. Время обработки $k+1$ заявок распределено по закону Эрланга порядка $k+1$ с параметром $c\mu$. Плотность этого распределения:
+$$
+f_{k+1}(x) = \frac{(c\mu)^{k+1}}{k!} x^k e^{-c\mu x}.
+$$
+Тогда функция распределения $W_q(t)$ принимает вид:
+$$
+W_q(t) = 1 - C(c, r) + \sum_{k=0}^{\infty} p_{c+k} \int_0^t \frac{(c\mu)^{k+1}}{k!} x^k e^{-c\mu x} dx.
+$$
+Используя свойство стационарных вероятностей $p_{c+k} = p_c \rho^k = C(c, r)(1-\rho)\rho^k$, поменяем порядок интегрирования и суммирования:
+$$
+W_q(t) = 1 - C(c, r) + \int_0^t C(c, r)(1-\rho) c\mu e^{-c\mu x} \left( \sum_{k=0}^{\infty} \frac{(c\mu\rho x)^k}{k!} \right) dx.
+$$
+Ряд сходится к экспоненте $e^{c\mu\rho x} = e^{\lambda x}$. Сводя показатели степеней, получаем интеграл:
+$$
+W_q(t) = 1 - C(c, r) + C(c, r) \int_0^t c\mu(1-\rho) e^{-c\mu(1-\rho)x} dx.
+$$
+Вычисляя интеграл, приходим к требуемому выражению:
+$$
+W_q(t) = 1 - C(c, r) + C(c, r) \left( 1 - e^{-c\mu(1-\rho)t} \right) = 1 - C(c, r) e^{-c\mu(1-\rho)t}.
+$$
+
+Для нахождения $W(t)$ воспользуемся тем, что полное время пребывания $T = T_q + T_{serv}$ есть сумма независимых случайных величин. Покажем, что плотность суммы независимых непрерывных величин $X$ и $Y$ вычисляется как свертка их плотностей. Вероятность попадания суммы в интервал определяется интегралом от совместной плотности по полуплоскости $x + y \le t$:
+$$
+F_{X+Y}(t) = \P(X+Y \le t) = \iint_{x+y \le t} f_{X,Y}(x,y) dx dy.
+$$
+В силу независимости $f_{X,Y}(x,y) = f_X(x)f_Y(y)$. Зафиксируем $x$ и проинтегрируем по $y$ от $-\infty$ до $t-x$:
+$$
+F_{X+Y}(t) = \int_{-\infty}^{\infty} f_X(x) \left( \int_{-\infty}^{t-x} f_Y(y) dy \right) dx = \int_{-\infty}^{\infty} f_X(x) F_Y(t-x) dx.
+$$
+Дифференцируя данное выражение по параметру $t$, получаем формулу свертки плотностей:
+$$
+f_{X+Y}(t) = \int_{-\infty}^{\infty} f_X(x) f_Y(t-x) dx = (f_X * f_Y)(t).
+$$
+
+Применим этот результат. Плотность времени обслуживания $f_{serv}(y) = \mu e^{-\mu y}$. Случайная величина $T_q$ принимает значение 0 с вероятностью $1 - C(c, r)$, поэтому ее плотность содержит дискретную компоненту. С использованием функции Дирака плотность времени ожидания записывается как:
+$$
+f_{T_q}(x) = (1 - C(c, r))\delta(x+0) + C(c, r) c\mu(1-\rho) e^{-c\mu(1-\rho)x}, \quad x \ge 0.
+$$
+Сдвиг аргумента дельта-функции $x+0$ означает, что центр распределения смещен бесконечно мало влево от нуля. Это необходимо для обеспечения непрерывности $W(t)$ в нуле справа. Для краткости обозначим $\gamma = c\mu(1-\rho)$. Подставим плотности в формулу свертки, интегрируя от $0-$ до $t$:
+$$
+f_T(t) = \int_{0-}^t \left[ (1 - C(c, r))\delta(x+0) + C(c, r) \gamma e^{-\gamma x} \right] \mu e^{-\mu(t-x)} dx.
+$$
+Интеграл распадается на два слагаемых. Первое вычисляется благодаря фильтрующему свойству функции Дирака, второе преобразуется путем вынесения экспоненты от $t$:
+$$
+f_T(t) = (1 - C(c, r))\mu e^{-\mu t} + C(c, r) \gamma \mu e^{-\mu t} \int_0^t e^{-(\gamma - \mu)x} dx.
+$$
+
+Рассмотрим общий случай $\gamma \neq \mu$ (то есть $c(1-\rho) \neq 1$). Вычисляя интеграл, получаем плотность:
+$$
+f_T(t) = (1 - C(c, r))\mu e^{-\mu t} + C(c, r) \frac{\gamma \mu}{\gamma - \mu} \left( e^{-\mu t} - e^{-\gamma t} \right).
+$$
+Интегрируя плотность $f_T(\tau)$ по отрезку $[0, t]$, находим функцию распределения полного времени $W(t)$:
+$$
+W(t) = \int_0^t f_T(\tau) d\tau = (1 - C(c, r))(1 - e^{-\mu t}) + C(c, r) \frac{\gamma \mu}{\gamma - \mu} \int_0^t \left( e^{-\mu \tau} - e^{-\gamma \tau} \right) d\tau.
+$$
+Беря первообразные, находим:
+$$
+W(t) = (1 - C(c, r))(1 - e^{-\mu t}) + C(c, r) \frac{\gamma}{\gamma - \mu} (1 - e^{-\mu t}) - C(c, r) \frac{\mu}{\gamma - \mu} (1 - e^{-\gamma t}).
+$$
+Сгруппируем слагаемые, содержащие множитель $(1 - e^{-\mu t})$:
+$$
+1 - C(c, r) + C(c, r) \frac{\gamma}{\gamma - \mu} = 1 + C(c, r) \left( \frac{\gamma}{\gamma - \mu} - 1 \right) = 1 + C(c, r) \frac{\mu}{\gamma - \mu}.
+$$
+Подставляя это обратно в выражение для $W(t)$ и раскрывая скобки:
+\begin{align*}
+    W(t) &= \left( 1 + C(c, r) \frac{\mu}{\gamma - \mu} \right) (1 - e^{-\mu t}) - C(c, r) \frac{\mu}{\gamma - \mu} (1 - e^{-\gamma t}) \\[2mm]
+    &= 1 - e^{-\mu t} + C(c, r) \frac{\mu}{\gamma - \mu} - C(c, r) \frac{\mu}{\gamma - \mu} e^{-\mu t} - C(c, r) \frac{\mu}{\gamma - \mu} + C(c, r) \frac{\mu}{\gamma - \mu} e^{-\gamma t} \\[2mm]
+    &= 1 - e^{-\mu t} - C(c, r) \frac{\mu}{\gamma - \mu} \left( e^{-\mu t} - e^{-\gamma t} \right).
+\end{align*}
+Подставляя обратно определение множителя $\frac{\mu}{\gamma - \mu} = \frac{\mu}{c\mu(1-\rho) - \mu} = \frac{1}{c(1-\rho) - 1}$, приходим к итоговой формуле для $W(t)$.
+
+В сингулярном случае вырождения корней $\gamma = \mu$ интеграл в выражении для плотности вырождается в $\int_0^t 1 dx = t$. Плотность принимает вид распределения Эрланга:
+$$
+f_T(t) = (1 - C(c, r))\mu e^{-\mu t} + C(c, r) \mu^2 t e^{-\mu t}.
+$$
+Функция распределения находится интегрированием по частям $\left( \int \mu^2 \tau e^{-\mu \tau} d\tau = 1 - e^{-\mu t} - \mu t e^{-\mu t} \right)$:
+\begin{align*}
+    W(t) &= (1 - C(c, r))(1 - e^{-\mu t}) + C(c, r) \left( 1 - e^{-\mu t} - \mu t e^{-\mu t} \right) \\[2mm]
+    &= (1 - e^{-\mu t}) - C(c, r) \mu t e^{-\mu t}.
+\end{align*}
+\end{sproof}
+
+\begin{center}
+    \pgfplotsset{compat=1.9}
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.9\textwidth, height=8cm,
+            xlabel={Время $t$}, ylabel={$\P(\cdot \le t)$},
+            xmin=0, xmax=8, ymin=0, ymax=1.05,
+            grid=major,
+            legend pos=south east,
+            legend style={font=\tiny, cells={anchor=west}},
+            legend columns=2,
+            title={CDF времени ожидания ($W_q$) и пребывания ($W$) в $M|M|c$ ($\rho=0.75, \mu=1$)}
+        ]
+            % --- c=1 (DeepSkyBlue4) ---
+            % W(t) = 1 - exp(-(1-0.75)*x) = 1 - exp(-0.25*x)
+            \addplot[DeepSkyBlue4, thick, domain=0:8, samples=100] {1 - exp(-0.25*x)};
+            \addlegendentry{$W, c=1$}
+            % Wq(t) = 1 - 0.75*exp(-0.25*x)
+            \addplot[DeepSkyBlue4, thick, dashed, domain=0:8, samples=100] {1 - 0.75*exp(-0.25*x)};
+            \addlegendentry{$W_q, c=1$}
+
+            % --- c=2 (Red3) ---
+            % C(2, 1.5) = 0.6428. gamma = 2*1*0.25 = 0.5. 
+            % W(t) = 1 - exp(-x) - (0.6428 / (2*0.25 - 1)) * (exp(-x) - exp(-0.5*x))
+            % Т.к. 2(1-rho)-1 = -0.5, формула: 1 - exp(-x) + 1.2856*(exp(-x) - exp(-0.5*x))
+            \addplot[Red3, thick, domain=0:8, samples=100] {1 - exp(-x) + 1.2856*(exp(-x) - exp(-0.5*x))};
+            \addlegendentry{$W, c=2$}
+            % Wq(t) = 1 - 0.6428*exp(-0.5*x)
+            \addplot[Red3, thick, dashed, domain=0:8, samples=100] {1 - 0.6428*exp(-0.5*x)};
+            \addlegendentry{$W_q, c=2$}
+
+            % --- c=4 (SpringGreen4) ---
+            % C(4, 3) = 0.5094. gamma = 4*1*0.25 = 1.0. 
+            % ВНИМАНИЕ: Здесь gamma = mu = 1 (сингулярный случай).
+            % W(t) = 1 - exp(-x) - 0.5094*x*exp(-x)
+            \addplot[SpringGreen4, thick, domain=0:8, samples=100] {1 - exp(-x) - 0.5094*x*exp(-x)};
+            \addlegendentry{$W, c=4$}
+            % Wq(t) = 1 - 0.5094*exp(-1.0*x)
+            \addplot[SpringGreen4, thick, dashed, domain=0:8, samples=100] {1 - 0.5094*exp(-x)};
+            \addlegendentry{$W_q, c=4$}
+
+            % Точки разрыва в нуле для Wq
+            \draw[DeepSkyBlue4, fill=white] (axis cs:0, 0.25) circle (1.5pt); % 1-0.75
+            \draw[Red3, fill=white] (axis cs:0, 0.3572) circle (1.5pt);       % 1-0.6428
+            \draw[SpringGreen4, fill=white] (axis cs:0, 0.4906) circle (1.5pt); % 1-0.5094
+            
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\section{Оптимальный выбор числа каналов и режимы масштабирования}
+
+Одной из ключевых задач при проектировании систем массового обслуживания является выбор числа обслуживающих приборов $c$ для заданной нагрузки $r = \lambda/\mu$. Этот выбор определяется компромиссом между качеством обслуживания (минимизацией вероятности ожидания $C(c, r)$) и эффективностью использования ресурсов (максимизацией коэффициента загрузки $\rho$).
+
+Условие стационарности $c > r$ позволяет представить число каналов в виде $c = r + \Delta$, где $\Delta > 0$ — избыточный ресурс (резерв) производительности.
+
+\begin{example}{Задача масштабирования}
+Рассмотрим систему $M|M|c$ с нагрузкой $r_0 = 9$ Эрланг и числом каналов $c_0 = 12$. В исходном состоянии коэффициент загрузки $\rho_0 = 0.75$, а вероятность задержки $C(12, 9) \approx 0.266$.
+
+Пусть нагрузка возрастает в 4 раза: $r_{new} = 36$. Необходимо определить новое число каналов $c_{new}$ исходя из различных стратегий управления ресурсами.
+\end{example}
+
+\begin{eproof}
+Рассмотрим три асимптотических режима масштабирования при $r \to \infty$:
+
+\begin{enumerate}
+    \item \textbf{Режим качества (Quality Domain, QD).} 
+    Фиксируется коэффициент загрузки: $\rho = \text{const} < 1$. Тогда $c_{QD} = r/\rho$. Для $r=36$ и $\rho=0.75$ получаем $c = 48$. При $r \to \infty$ вероятность задержки экспоненциально убывает $C(c, r) \to 0$. Система обладает избыточной надежностью, что экономически неэффективно из-за низкого использования ресурсов.
+
+    \item \textbf{Режим эффективности (Efficiency Domain, ED).}
+    Фиксируется абсолютный резерв каналов: $\Delta = c - r = \text{const}$. Тогда $c_{ED} = r + \Delta$. Для $r=36$ и $\Delta = 3$ получаем $c = 39$. При $r \to \infty$ загрузка $\rho \to 1$, однако вероятность задержки $C(c, r) \to 1$, что ведет к деградации качества обслуживания.
+
+    \item \textbf{Сбалансированный режим (Quality-and-Efficiency Domain, QED).}
+    Фиксируется вероятность обслуживания без задержек $C(c, r) = \text{const}$. Применение режима QED позволяет сохранить вероятность обслуживания без задержек на заданном уровне при одновременном повышении эффективности использования каналов. Известный как режим Халфина-Уитта, данный подход предполагает, что резерв каналов растет пропорционально квадратному корню из нагрузки:
+    $$
+    c_{QED} \approx r + \beta\sqrt{r}, \quad \beta > 0.
+    $$
+    Для исходной системы ($r_0=9, c_0=12$) параметр $\beta = (12 - 9)/\sqrt{9} = 1$. Тогда для новой нагрузки $r_{new}=36$ получаем:
+    $$
+    c_{new} \approx 36 + 1 \cdot \sqrt{36} = 42.
+    $$
+    При таком выборе вероятность задержки остается практически неизменной ($C(42, 36) \approx 0.27$), а коэффициент загрузки возрастает до $\rho = 36/42 \approx 0.857$.
+\end{enumerate}
+\end{eproof}
+
+Математическое обоснование режима QED дает следующая предельная теорема.
+
+\begin{theorem}{Теорема Халфина-Уитта (Halfin-Whitt)}
+Рассмотрим последовательность систем $M|M|n$ с интенсивностью нагрузки $r_n$, где $n \to \infty$ и $r_n \to \infty$ так, что существует конечный предел:
+$$
+\lim_{n \to \infty} \frac{n - r_n}{\sqrt{r_n}} = \beta, \quad \beta > 0.
+$$
+Тогда предельная вероятность ожидания заявки в очереди существует и определяется соотношением:
+$$
+\lim_{n \to \infty} C(n, r_n) = \alpha(\beta) = \left[ 1 + \frac{\beta \Phi(\beta)}{\phi(\beta)} \right]^{-1},
+$$
+где $\phi(x)$ и $\Phi(x)$ — плотность и функция распределения стандартного нормального закона $\mathcal{N}(0,1)$ соответственно:
+$$
+\phi(x) = \frac{1}{\sqrt{2\pi}} e^{-\frac{x^2}{2}}, \quad \Phi(x) = \int_{-\infty}^{x} \phi(t) dt.
+$$
+\end{theorem}
+
 \begin{note}
-Для верификации полученной функции распределения вычислим среднее время ожидания $W_q = \E[T_q]$. Известно, что для неотрицательной случайной величины математическое ожидание равно интегралу от её функции надежности (дополнения к функции распределения):
+С практической точки зрения сбалансированный подход (QED) реализуется через решение задачи дискретной оптимизации. Если задан максимально допустимый уровень вероятности задержки в очереди (Quality of Service) $\alpha \in (0, 1)$, оптимальное число каналов определяется как:
 $$
-W_q = \E[T_q] = \int_0^{+\infty} (1 - W_q(t)) dt.
+c^* = \min \{ c \in \N : C(c, r) \le \alpha \}.
 $$
-Подставляя найденное $W_q(t)$, имеем:
-$$
-W_q = \int_0^{+\infty} \rho e^{-(\mu - \lambda)t} dt = \rho \left[ -\frac{1}{\mu - \lambda} e^{-(\mu - \lambda)t} \right]_0^{+\infty} = \frac{\rho}{\mu - \lambda}.
-$$
-Для полного времени в системе $W = \E[T]$:
-$$
-W = \int_0^{+\infty} e^{-(\mu - \lambda)t} dt = \frac{1}{\mu - \lambda}.
-$$
-Полученные значения строго совпадают с результатами, выведенными ранее с помощью закона Литтла, что подтверждает корректность построенных распределений.
+В режиме масштабирования Халфина-Уитта эта задача сводится к поиску соответствующего параметра $\beta$, который определяет необходимый избыток производительности (safety staffing).
 \end{note}
+[END OF lectures\lec5.tex]
 
-\section{Многоканальная система обслуживания M|M|c}
 
-Обобщим результаты предыдущей лекции на случай многоканальной системы. Рассмотрим систему массового обслуживания, состоящую из $c$ идентичных параллельных серверов ($c > 1$). На вход поступает пуассоновский поток заявок с интенсивностью $\lambda$. Времена обслуживания на каждом сервере независимы и распределены экспоненциально с параметром $\mu$. Дисциплина очереди — FCFS, емкость буфера ожидания не ограничена.
+[FILE]: lectures\lec6.tex
+-------------------------
+\section{Система массового обслуживания M|M|c|K}
 
-Пусть $N(t)$ — число заявок в системе в момент времени $t$. Данный процесс является процессом рождения и гибели. Интенсивность поступления заявок не зависит от состояния: $\lambda_n = \lambda$ для всех $n \ge 0$. Интенсивность обслуживания $\mu_n$ зависит от числа заявок: если $n \le c$, работают $n$ серверов; если $n > c$, работают все $c$ серверов, а остальные заявки ожидают в очереди. Таким образом:
+\begin{definition}{Система с ограниченной емкостью (M|M|c|K)}
+Многоканальная система массового обслуживания, состоящая из $c$ идентичных приборов и буфера ограниченной емкости. Максимально допустимое число заявок в системе равно $K$ (из них $c$ могут находиться на обслуживании, а $K-c$ — в очереди). Если в момент поступления новой заявки в системе уже находится $N = K$ заявок, вновь прибывшая заявка получает отказ и покидает систему необслуженной.
+\end{definition}
+
+Интенсивность входного потока зависит от текущего состояния системы и задается следующим образом:
 $$
-\mu_n = 
+\lambda_n = 
 \begin{cases} 
-    n \mu, & 1 \le n \le c, \\ 
-    c \mu, & n > c. 
+\lambda, & 0 \le n < K, \\ 
+0, & n \ge K.
 \end{cases}
 $$
 
-\vspace{2mm}
+Поскольку пространство состояний марковской цепи конечно ($N \in \{0, 1, \dots, K\}$), стационарное распределение вероятностей существует при любых значениях интенсивностей $\lambda$ и $\mu$. В отличие от систем с бесконечной очередью, ограничение $\rho < 1$ здесь не является обязательным: система сохраняет стабильность даже при сверхвысоких нагрузках за счет отбрасывания избыточных заявок.
+
 \begin{center}
     \begin{tikzpicture}[
         scale=1.5,
@@ -3152,269 +3870,1457 @@ $$
         every node/.style={font=\small}
     ]
         % Состояния
-        \node[state] (s0) at (0,0) {$0$};
-        \node[state] (s1) at (1.5,0) {$1$};
-        \node[state] (s2) at (3,0) {$2$};
-        \node (dots1) at (4.5,0) {\Large $\dots$};
-        \node[state] (sc) at (6,0) {$c$};
-        \node[state] (scp1) at (7.6,0) {$c\text{+}1$};
-        \node (dots2) at (9.1,0) {\Large $\dots$};
+        \node[state] (skm1) at (-2,0) {$K-1$};
+        \node[state] (sk) at (0,0) {$K$};
+        \node[state, dashed, text=gray, draw=gray] (sk1) at (2.5,0) {$K+1$};
 
-        % Верхние переходы (рождение)
-        \draw[->, thick, DeepSkyBlue4] (s0) to[bend left=35] node[midway, above] {$\lambda$} (s1);
-        \draw[->, thick, DeepSkyBlue4] (s1) to[bend left=35] node[midway, above] {$\lambda$} (s2);
-        \draw[->, thick, DeepSkyBlue4] (s2) to[bend left=35] node[midway, above] {$\lambda$} (dots1);
-        \draw[->, thick, DeepSkyBlue4] (dots1) to[bend left=35] node[midway, above] {$\lambda$} (sc);
-        \draw[->, thick, DeepSkyBlue4] (sc) to[bend left=35] node[midway, above] {$\lambda$} (scp1);
-        \draw[->, thick, DeepSkyBlue4] (scp1) to[bend left=35] node[midway, above] {$\lambda$} (dots2);
+        % Переходы до K
+        \draw[->, thick] (-3.5, 0.2) to[bend left=20] node[midway, above] {$\lambda$} (skm1);
+        \draw[<-, thick] (-3.5, -0.2) to[bend right=20] node[midway, below] {$c\mu$} (skm1);
 
-        % Нижние переходы (гибель)
-        \draw[<-, thick, Red3] (s0) to[bend right=35] node[midway, below] {$\mu$} (s1);
-        \draw[<-, thick, Red3] (s1) to[bend right=35] node[midway, below] {$2\mu$} (s2);
-        \draw[<-, thick, Red3] (s2) to[bend right=35] node[midway, below] {$3\mu$} (dots1);
-        \draw[<-, thick, Red3] (dots1) to[bend right=35] node[midway, below] {$c\mu$} (sc);
-        \draw[<-, thick, Red3] (sc) to[bend right=35] node[midway, below] {$c\mu$} (scp1);
-        \draw[<-, thick, Red3] (scp1) to[bend right=35] node[midway, below] {$c\mu$} (dots2);
+        \draw[->, thick] (skm1) to[bend left=30] node[midway, above] {$\lambda$} (sk);
+        \draw[<-, thick] (skm1) to [bend right=30] node[midway, below] {$c\mu$} (sk);
+
+        % Запрещенные переходы за K
+        \path[draw, ->, thick, gray, dashed] (sk) to [bend left=30] coordinate[midway] (cross1) (sk1);
+        \path[draw, <-, thick, gray, dashed] (sk) to[bend right=30] coordinate[midway] (cross2) (sk1);
+        
+        % Красные кресты на переходах
+        \draw[red, ultra thick] ($(cross1)+(-0.15, -0.15)$) -- ($(cross1)+(0.15, 0.15)$);
+        \draw[red, ultra thick] ($(cross1)+(-0.15, 0.15)$) -- ($(cross1)+(0.15, -0.15)$);
+        
+        \draw[red, ultra thick] ($(cross2)+(-0.15, -0.15)$) -- ($(cross2)+(0.15, 0.15)$);
+        \draw[red, ultra thick] ($(cross2)+(-0.15, 0.15)$) -- ($(cross2)+(0.15, -0.15)$);
+
+        \node[red, font=\footnotesize] at (1.25, 0.8) {$\lambda_K = 0$};
     \end{tikzpicture}
-    
-    \vspace{2mm}
-    \small\textit{Граф интенсивностей переходов для системы M|M|c.}
+    \captionof*{figure}{\small Фрагмент графа состояний системы M|M|c|K. Переходы в состояния $n > K$ заблокированы.}
 \end{center}
 
-Введем две ключевые характеристики нагрузки: 
-\begin{itemize}
-    \item $r = \frac{\lambda}{\mu}$ — приведенная интенсивность потока (предложенная нагрузка в Эрлангах);
-    \item $\rho = \frac{r}{c} = \frac{\lambda}{c\mu}$ — коэффициент загрузки системы (загрузка одного сервера).
-\end{itemize}
-
-\begin{statement}{Стационарное распределение системы M|M|c}
-Необходимым и достаточным условием существования стационарного режима является условие $\rho < 1$. В этом случае вероятности состояний $p_n$ задаются формулами:
+\begin{statement}[Стационарное распределение системы M|M|c|K]
+Для многоканальной системы с ограничением емкости $K$ вероятности состояний задаются формулами:
 $$
 p_n = 
 \begin{cases} 
-    \dfrac{r^n}{n!} p_0, & 0 \le n < c, \\[3mm]
-    \dfrac{r^n}{c! c^{n-c}} p_0, & n \ge c,
+\displaystyle \frac{r^n}{n!} p_0, & 0 \le n < c, \\
+\displaystyle \frac{r^n}{c^{n-c} c!} p_0, & c \le n \le K,
 \end{cases}
 $$
-где вероятность простоя системы равна:
+где $r = \frac{\lambda}{\mu}$ — приведенная нагрузка, $\rho = \frac{r}{c}$ — коэффициент загрузки. Вероятность простоя системы вычисляется как:
 $$
-p_0 = \left( \sum_{n=0}^{c-1} \frac{r^n}{n!} + \frac{r^c}{c!(1 - \rho)} \right)^{-1}.
+p_0 = \left( \sum_{n=0}^{c-1} \frac{r^n}{n!} + \frac{r^c}{c!} S_K(\rho) \right)^{-1}, \quad \text{где} \quad S_K(\rho) = 
+\begin{cases} 
+\displaystyle \frac{1 - \rho^{K-c+1}}{1 - \rho}, & \rho \ne 1, \\ 
+K - c + 1, & \rho = 1.
+\end{cases}
 $$
 \end{statement}
 
 \begin{sproof}
-Воспользуемся общим решением для процессов рождения и гибели $p_n = p_0 \prod_{i=1}^n \frac{\lambda_{i-1}}{\mu_i}$.
-Для $n < c$ имеем произведение одинаковых числителей $\lambda$ и растущих знаменателей $1\mu, 2\mu, \dots, n\mu$:
-$$
-p_n = p_0 \frac{\lambda^n}{n! \mu^n} = \frac{r^n}{n!} p_0.
-$$
-Для $n \ge c$ знаменатель перестает наращивать факториал, и каждый последующий переход добавляет множитель $c\mu$:
-$$
-p_n = p_0 \frac{\lambda^n}{c! \mu^c \cdot (c\mu)^{n-c}} = \frac{r^n}{c! c^{n-c}} p_0.
-$$
-Вероятность $p_0$ находится из условия нормировки $\dsum_{n=0}^\infty p_n = 1$. Разобьем сумму на две части:
-$$
-p_0^{-1} = \sum_{n=0}^{c-1} \frac{r^n}{n!} + \sum_{n=c}^{\infty} \frac{r^n}{c! c^{n-c}}.
-$$
-Рассмотрим второй ряд. Вынесем константу $\frac{r^c}{c!}$ и сделаем замену индекса $m = n - c$:
-$$
-\sum_{n=c}^{\infty} \frac{r^n}{c! c^{n-c}} = \frac{r^c}{c!} \sum_{n=c}^{\infty} \left(\frac{r}{c}\right)^{n-c} = \frac{r^c}{c!} \sum_{m=0}^{\infty} \rho^m.
-$$
-Получен геометрический ряд, который сходится при $\rho < 1$. Его сумма равна $\frac{1}{1-\rho}$. Подставляя это значение, приходим к искомой формуле для $p_0$.
+Решение уравнений глобального баланса для процессов рождения и гибели дает стандартное выражение вероятностей через $p_0$. Нормировочная константа $p_0$ находится из условия $\sum_{n=0}^K p_n = 1$. Сумма геометрической прогрессии $S_K(\rho) = \sum_{n=c}^{K} \rho^{n-c}$ вычисляется по стандартной формуле суммы конечной геометрической прогрессии при $\rho \ne 1$, а при $\rho = 1$ сводится к сумме $(K - c + 1)$ единиц.
 \end{sproof}
 
-Определим основные макроскопические метрики системы через найденное распределение.
+\begin{note}
+Ключевым отличием систем с отказами от классических систем является понятие \textbf{эффективной интенсивности входного потока} $\lambda_{\text{eff}}$. Поскольку заявки, поступающие в момент, когда система находится в состоянии $K$ (с вероятностью $p_K$), отбрасываются, фактический поток заявок, принимаемых к обслуживанию, меньше номинального $\lambda$. Следовательно:
+$$
+\lambda_{\text{eff}} = \lambda (1 - p_K).
+$$
+Все глобальные макроскопические характеристики системы (в частности, закон Литтла) обязаны строиться исключительно с использованием $\lambda_{\text{eff}}$, так как отброшенные заявки не задерживаются в системе.
+\end{note}
 
-\begin{theorem}{Характеристики эффективности M|M|c}
-В стационарном режиме средняя длина очереди $L_q$ и среднее время ожидания $W_q$ равны:
-$$
-L_q = \frac{p_0 r^c \rho}{c! (1-\rho)^2}, \quad W_q = \frac{L_q}{\lambda}.
-$$
-Остальные метрики восстанавливаются по формуле Литтла: $W = W_q + \frac{1}{\mu}$ и $L = L_q + r$.
-\end{theorem}
+\begin{statement}[Макроскопические характеристики системы M|M|c|K]
+Для макроскопических метрик эффективности справедливы следующие соотношения:
+\begin{itemize}
+    \item Среднее число заявок в очереди: 
+    $$ L_q = \begin{cases}
+    \displaystyle \frac{p_0 r^c \rho}{c! (1 - \rho)^2} \Big[ 1 - \rho^{K-c+1} - (1 - \rho) (K - c + 1) \rho^{K-c} \Big], & \rho \ne 1, \\
+    \displaystyle \frac{p_0 r^c}{c!} \cdot \frac{(K - c)(K - c + 1)}{2}, & \rho = 1.
+    \end{cases} $$
+    \item Среднее число заявок в системе: $\displaystyle L = L_q + \frac{\lambda_{\text{eff}}}{\mu}$.
+    \item Среднее время пребывания в системе: $\displaystyle W = \frac{L}{\lambda_{\text{eff}}} = \frac{L}{\lambda(1 - p_K)}$.
+    \item Среднее время ожидания в очереди: $\displaystyle W_q = \frac{L_q}{\lambda_{\text{eff}}} = W - \frac{1}{\mu}$.
+\end{itemize}
+\end{statement}
 
-\begin{tproof}
-По определению математического ожидания, среднее число заявок в очереди есть:
+\begin{sproof}
+\textbf{1. Среднее число заявок в очереди ($L_q$).} По определению математического ожидания имеем:
 $$
-L_q = \sum_{n=c+1}^{\infty} (n-c) p_n.
+L_q = \sum_{n=c+1}^{K} (n - c) p_n = \frac{p_0 r^c}{c!} \sum_{n=c+1}^{K} (n - c) \rho^{n-c}.
 $$
-Подставим выражение для $p_n$ при $n \ge c$ и введем новый индекс $m = n - c$:
+Введем новый индекс суммирования $j = n - c$. Тогда граница суммирования изменится от $j = 1$ до $N = K - c$:
 $$
-L_q = \sum_{m=1}^{\infty} m p_{c+m} = \sum_{m=1}^{\infty} m \frac{r^{c+m}}{c! c^m} p_0 = \frac{p_0 r^c}{c!} \sum_{m=1}^{\infty} m \left(\frac{r}{c}\right)^m = \frac{p_0 r^c}{c!} \sum_{m=1}^{\infty} m \rho^m.
+L_q = \frac{p_0 r^c}{c!} \sum_{j=1}^{N} j \rho^j.
 $$
-Как было доказано в лекции для системы M|M|1, ряд $\dsum_{m=1}^{\infty} m \rho^m$ равен $\frac{\rho}{(1-\rho)^2}$. Отсюда немедленно следует:
+Рассмотрим случай $\rho \ne 1$. Применим метод дифференцирования по параметру $\rho$:
 $$
-L_q = \frac{p_0 r^c}{c!} \frac{\rho}{(1-\rho)^2}.
+\sum_{j=1}^{N} j \rho^j = \rho \sum_{j=1}^{N} j \rho^{j-1} = \rho \frac{d}{d\rho} \left( \sum_{j=1}^{N} \rho^j \right) = \rho \frac{d}{d\rho} \left( \frac{\rho - \rho^{N+1}}{1 - \rho} \right).
 $$
-Времена $W_q, W$ и $L$ определяются напрямую из структурных свойств системы и универсального закона Литтла.
-\end{tproof}
+Вычислим производную дроби:
+$$
+\frac{d}{d\rho} \left( \frac{\rho - \rho^{N+1}}{1 - \rho} \right) = \frac{(1 - (N+1)\rho^N)(1 - \rho) - (\rho - \rho^{N+1})(-1)}{(1 - \rho)^2} = \frac{1 - (N+1)\rho^N + N\rho^{N+1}}{(1 - \rho)^2}.
+$$
+Умножая на $\rho$ и возвращаясь к исходным обозначениям ($N = K - c$), преобразуем числитель:
+$$
+1 - (K - c + 1)\rho^{K-c} + (K - c)\rho^{K-c+1} = 1 - \rho^{K-c+1} - (1 - \rho)(K - c + 1)\rho^{K-c}.
+$$
+Подставляя это в выражение для $L_q$, получаем требуемую формулу для $\rho \ne 1$.
 
-Центральным понятием теории многоканальных систем является вероятность того, что поступающая заявка застанет все серверы занятыми и будет вынуждена ожидать в очереди.
-
-\begin{definition}{Формула Эрланга-C (Erlang C Formula)}
-Вероятность задержки заявки в очереди (вероятность того, что время ожидания $T_q > 0$) обозначается $C(c, r)$ и вычисляется как:
+Для случая $\rho = 1$ ряд представляет собой сумму арифметической прогрессии:
 $$
-C(c, r) = \P(T_q > 0) = \frac{p_0 r^c}{c!(1-\rho)}.
+\sum_{j=1}^{K-c} j \cdot 1^j = \frac{(K - c)(K - c + 1)}{2}, \quad \text{откуда} \quad L_q = \frac{p_0 r^c}{c!} \frac{(K - c)(K - c + 1)}{2}.
+$$
+
+\textbf{2. Временные характеристики.} Формулы для $L, W$ и $W_q$ прямо следуют из применения универсального закона Литтла к системе с отбрасыванием заявок. В качестве интенсивности потока выступает величина $\lambda_{\text{eff}}$.
+\end{sproof}
+
+\begin{conseq}
+В частном случае одноканальной системы с ограничением ($c=1$, система M|M|1|K) уравнение глобального баланса интенсивностей принимает наглядный вид. Среднее число заявок $L = L_q + (1 - p_0)$, где $(1 - p_0)$ — вероятность того, что прибор занят. Из соотношения $L = L_q + \lambda_{\text{eff}}/\mu$ немедленно следует:
+$$
+\underbrace{\mu (1 - p_0)}_{\substack{\text{эффективная интенсивность} \\ \text{обслуживания}}} = \underbrace{\lambda (1 - p_K)}_{\substack{\text{эффективная интенсивность} \\ \text{входящего потока}}}.
+$$
+Система достигает равновесия, при котором средняя скорость обработки находящихся в приборе заявок строго равна скорости поступления новых (принятых) заявок.
+\end{conseq}
+
+\begin{example}{Аналитический расчет вероятности отказа для системы M|M|1|K}
+Рассмотрим одноканальную систему с ограниченным буфером (общая емкость системы равна $K$, число приборов $c=1$). Продемонстрируем вывод явной аналитической зависимости вероятности потери заявки $p_K$ от коэффициента загрузки $\rho$ и исследуем ее поведение при высоких нагрузках ($\rho \ge 1$).
+\end{example}
+
+\begin{eproof}
+Для одноканальной системы $c=1$, следовательно, множители $c! = 1$ и $c^{n-c} = 1$. Общая формула для стационарных вероятностей $p_n$ существенно упрощается на всем диапазоне состояний $0 \le n \le K$:
+$$
+p_n = \rho^n p_0.
+$$
+Используя условие нормировки $\sum_{n=0}^K p_n = 1$, находим константу $p_0$ через сумму конечной геометрической прогрессии. Для $\rho \ne 1$ получаем:
+$$
+p_0 \sum_{n=0}^K \rho^n = p_0 \frac{1 - \rho^{K+1}}{1 - \rho} = 1 \quad \implies \quad p_0 = \frac{1 - \rho}{1 - \rho^{K+1}}.
+$$
+Вероятность того, что система полностью заполнена (и поступающая заявка получит отказ), вычисляется подстановкой $n = K$:
+$$
+p_K = \rho^K p_0 = \frac{\rho^K (1 - \rho)}{1 - \rho^{K+1}} = \frac{\rho^K (\rho - 1)}{\rho^{K+1} - 1}.
+$$
+В отличие от систем с бесконечной очередью, где при $\rho \to 1$ длина очереди стремится к бесконечности (асимптота), система M|M|1|K сохраняет стабильность при любых нагрузках. Рассмотрим два критических режима:
+
+\begin{itemize}
+    \item \textbf{Пограничная загрузка ($\rho = 1$):} Возникает неопределенность вида $\left[ \frac{0}{0} \right]$. Раскрывая ее по правилу Лопиталя (или подставляя $\rho=1$ напрямую в исходную сумму $\sum_{n=0}^K 1^n = K+1$), получаем строго конечную вероятность отказа:
+    $$
+    p_K \Big|_{\rho=1} = \frac{1}{K+1}.
+    $$
+    
+    \item \textbf{Режим перегрузки ($\rho > 1$):} При интенсивностях входного потока, превышающих скорость обслуживания, очередь не возрастает бесконечно, а стабилизируется за счет отбрасывания лишних заявок. Разделив числитель и знаменатель дроби на $\rho^K$, получим:
+    $$
+    p_K = \frac{\rho - 1}{\rho - \rho^{-K}}.
+    $$
+    При сильной перегрузке ($\rho \gg 1$) экспоненциально убывающим слагаемым $\rho^{-K}$ можно пренебречь. Это дает следующую асимптотику вероятности отказа:
+    $$
+    p_K \approx \frac{\rho - 1}{\rho} = 1 - \frac{1}{\rho}.
+    $$
+\end{itemize}
+
+Данный математический результат имеет строгий физический смысл. Вычислим эффективную интенсивность потока, проходящего через систему в режиме перегрузки:
+$$
+\lambda_{\text{eff}} = \lambda (1 - p_K) \approx \lambda \left( 1 - \left( 1 - \frac{1}{\rho} \right) \right) = \lambda \cdot \frac{1}{\rho} = \lambda \cdot \frac{\mu}{\lambda} = \mu.
+$$
+Система автоматически адаптируется к любой перегрузке: она работает на абсолютном пределе своей производительности (обслуживая $\mu$ заявок в единицу времени), а весь избыточный трафик отбрасывается на входе.
+\end{eproof}
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        width=0.8\textwidth, height=7.5cm,
+        xlabel={Коэффициент загрузки $\rho$}, 
+        ylabel={Вероятность отказа $p_K$},
+        xmin=0, xmax=2.5, ymin=0, ymax=0.8,
+        grid=major,
+        legend pos=north west,
+        samples=100, thick,
+        cycle list={
+            {Red3, solid},
+            {DeepSkyBlue4, dashed},
+            {SpringGreen4, dotted},
+            {black, dashdotted}
+        }
+    ]
+        % Формула для K=2
+        \addplot+[domain=0.01:2.5] {x^2*(1-x)/(1-x^3)};
+        \addlegendentry{$K=2$}
+        
+        % Формула для K=5
+        \addplot+[domain=0.01:2.5] {x^5*(1-x)/(1-x^6)};
+        \addlegendentry{$K=5$}
+        
+        % Формула для K=10
+        \addplot+[domain=0.01:2.5] {x^10*(1-x)/(1-x^11)};
+        \addlegendentry{$K=10$}
+        
+        % Асимптота 1 - 1/\rho для \rho > 1
+        \addplot+[domain=1.001:2.5] {1 - 1/x};
+        \addlegendentry{Асимптота $1 - \rho^{-1}$}
+        
+    \end{axis}
+\end{tikzpicture}
+\captionof*{figure}{\small Зависимость вероятности потери заявки $p_K$ от загрузки $\rho$ для различной емкости буфера. Черной штрихпунктирной линией показана предельная асимптота при $K \to \infty$ в режиме перегрузки ($\rho > 1$).}
+\end{center}
+
+\subsection{Распределение состояний в моменты поступления заявок}
+
+В системах с ограничением емкости буфера необходимо строго различать три типа распределений:
+\begin{enumerate}
+    \item $p_n$ — стационарное распределение (доля времени, которую система проводит в состоянии $n$).
+    \item $q_n$ — распределение вероятностей состояний, которые застает \textit{произвольная} поступающая заявка.
+    \item $q_n^*$ — распределение вероятностей состояний, которые застает \textit{успешно принятая} в систему заявка.
+\end{enumerate}
+
+Согласно свойству PASTA (Poisson Arrivals See Time Averages), пуассоновский поток заявок «видит» систему в стационарном состоянии, поэтому $q_n = p_n$. Однако для систем $M|M|c|K$ факт приема заявки зависит от ее состояния: если $n = K$, заявка будет отброшена. Следовательно, распределение успешно принятых заявок $q_n^*$ является \textbf{условным} распределением и не совпадает с $q_n$.
+
+\begin{note}
+Напомним \textbf{формулу Байеса} для условной вероятности гипотез. Если $H_i$ задает полную группу несовместных гипотез, а $A$ является некоторым событием, то апостериорная вероятность гипотезы $H_n$ вычисляется как:
+$$
+\P(H_n \mid A) = \frac{\P(A \mid H_n) \P(H_n)}{\dsum_{i} \P(A \mid H_i) \P(H_i)}.
+$$
+\end{note}
+
+\begin{statement}[Связь вероятностей $p_n$ и  $q_n^*$]
+Вероятность того, что успешно принятая в систему $M|M|c|K$ заявка застанет в ней ровно $n$ заявок, определяется выражением:
+$$
+q_n^* = 
+\begin{cases}
+\displaystyle \frac{p_n}{1 - p_K}, & 0 \le n \le K-1, \\
+0, & n = K.
+\end{cases}
+$$
+\end{statement}
+
+\begin{sproof}
+Зафиксируем произвольный момент времени $t$ в стационарном режиме. Рассмотрим малый интервал $(t, t + \Delta t)$. 
+Пусть гипотеза $H_n$ заключается в том, что в момент $t$ система находится в состоянии $n$. Вероятности этих гипотез по определению суть стационарные вероятности: $\P(H_n) = p_n$.
+
+Определим событие $A$ как «на интервале $(t, t + \Delta t)$ в систему пришла и была \textbf{успешно принята} новая заявка». Согласно определению условной вероятности:
+$$
+\P(A \mid H_n) = \frac{\P(A \cap H_n)}{\P(H_n)}.
+$$
+
+Рассмотрим числитель для случаев $n \in \{0, \dots, K-1\}$. В этих состояниях система имеет хотя бы одно свободное место, поэтому любая пришедшая заявка принимается с вероятностью $1$. Следовательно, при $n < K$ пересечение $A \cap H_n$ совпадает с пересечением $\{\text{на интервале } \Delta t \text{ пришла 1 заявка}\} \cap H_n$. Используя свойства пуассоновского потока, получаем:
+$$
+\P(A \mid H_n) = \frac{\P(\{\text{пришла 1 заявка}\} \cap H_n)}{\P(H_n)} = \frac{(\lambda \Delta t + o(\Delta t)) \cdot p_n}{p_n} = \lambda \Delta t + o(\Delta t).
+$$
+
+Для состояния $n = K$ система полностью заполнена. Любая пришедшая заявка получает отказ, то есть событие $A$ в состоянии $K$ невозможно: $A \cap H_K = \varnothing$, откуда $\P(A \mid H_K) = 0$.
+
+Запишем условные вероятности в виде системы:
+$$
+\P(A \mid H_n) = 
+\begin{cases}
+\lambda \Delta t + o(\Delta t), & 0 \le n \le K-1, \\
+0, & n = K.
+\end{cases}
+$$
+
+Воспользуемся формулой Байеса для нахождения искомой вероятности $q_n^*$:
+$$
+q_n^* \doteq \lim_{\Delta t \to 0} \P(H_n \mid A) = \lim_{\Delta t \to 0} \frac{\P(A \mid H_n) \P(H_n)}{\dsum_{i=0}^{K} \P(A \mid H_i) \P(H_i)} = \lim_{\Delta t \to 0} \frac{\P(A \mid H_n) \cdot p_n}{\dsum_{i=0}^{K-1} (\lambda \Delta t + o(\Delta t)) p_i + 0 \cdot p_K}.
+$$
+
+Для любого $n \le K-1$ подставим значение $\P(A \mid H_n)$:
+$$
+q_n^* = \lim_{\Delta t \to 0} \frac{(\lambda \Delta t + o(\Delta t)) p_n}{(\lambda \Delta t + o(\Delta t)) \dsum_{i=0}^{K-1} p_i} = \lim_{\Delta t \to 0} \frac{\left(\lambda + \frac{o(\Delta t)}{\Delta t}\right) p_n}{\left(\lambda + \frac{o(\Delta t)}{\Delta t}\right) \dsum_{i=0}^{K-1} p_i}.
+$$
+
+Переходя к пределу при $\Delta t \to 0$, находим:
+$$
+q_n^* = \frac{\lambda p_n}{\lambda \dsum_{i=0}^{K-1} p_i} = \frac{p_n}{\dsum_{i=0}^{K-1} p_i}.
+$$
+В силу нормировочного условия $\dsum_{i=0}^{K} p_i = 1$, сумма в знаменателе равна $1 - p_K$. Следовательно:
+$$
+q_n^* = \frac{p_n}{1 - p_K}, \quad n \in \{0, \dots, K-1\}.
+$$
+Для состояния $n = K$ числитель под знаком предела тождественно равен нулю в силу $\P(A \mid H_K) = 0$, откуда $q_K^* = 0$.
+\end{sproof}
+
+\begin{conseq}
+Из полученной формулы следует соотношение $q_n^* (1 - p_K) = p_n$. При устремлении емкости системы к бесконечности ($K \to \infty$) мы переходим к классической системе $M|M|c|\infty$. В этом случае вероятность отказа стремится к нулю ($p_K \to 0$), и знаменатель дроби стремится к единице. Следовательно, $q_n^* \to p_n$. Аналитически это означает, что в системах с бесконечной очередью все заявки принимаются, и условное распределение совпадает с безусловным стационарным распределением.
+\end{conseq}
+
+\begin{note}
+Поскольку для процессов с непрерывным временем вероятность поступления заявки в строго зафиксированный момент $t$ равна нулю, прямое вычисление условной вероятности \linebreak $\P(H_n \mid \{ \text{поступление заявки в момент } t \})$ невозможно. Введение предельного перехода при $\Delta t \to 0$ позволяет корректно определить условную вероятность относительно события нулевой меры и формализовать понятие состояния системы непосредственно перед моментом прибытия заявки.
+\end{note}
+
+\subsection{Системы с отказами (M|M|c|c) и формула Эрланга}
+
+Особый теоретический и практический интерес (в частности, в телефонии и инфокоммуникационных сетях) представляет вырожденный случай системы с ограниченной емкостью, в которой места для ожидания полностью отсутствуют.
+
+\begin{definition}{Система с явными потерями (M|M|c|c)}
+Многоканальная система массового обслуживания, состоящая из $c$ приборов, в которой емкость буфера равна нулю. Максимально допустимое число заявок в системе в точности совпадает с числом приборов ($K = c$). Любая заявка, заставшая все $c$ каналов занятыми, мгновенно получает отказ и покидает систему.
+\end{definition}
+
+\begin{statement}[Первая формула Эрланга]
+Для системы $M|M|c|c$ стационарное распределение вероятностей состояний задается формулой:
+$$
+p_n = \frac{\displaystyle \frac{r^n}{n!}}{\displaystyle \sum_{i=0}^c \frac{r^i}{i!}}, \quad n \in \{0, 1, \dots, c\},
+$$
+где $r = \frac{\lambda}{\mu}$ — приведенная нагрузка. 
+Вероятность того, что все каналы заняты (вероятность блокировки или потери заявки), обозначается как $B(c, r)$ и называется \textbf{формулой потерь Эрланга} (Erlang-B formula):
+$$
+B(c, r) \equiv p_c = \frac{\displaystyle \frac{r^c}{c!}}{\displaystyle \sum_{i=0}^c \frac{r^i}{i!}}.
+$$
+\end{statement}
+
+\begin{sproof}
+Поскольку $K = c$, состояния с наличием очереди ($n > c$) не существуют. Воспользуемся общим решением для системы $M|M|c|K$. При $n \le c$ интенсивность обслуживания линейна и равна $n\mu$. Уравнения глобального баланса дают $p_n = \frac{r^n}{n!} p_0$. 
+
+Применяя условие нормировки $\dsum_{n=0}^c p_n = 1$, вычисляем вероятность простоя системы:
+$$
+p_0 = \left[ \dsum_{i=0}^c \frac{r^i}{i!} \right]^{-1}.
+$$
+Подстановка $p_0$ в выражение для $p_n$ напрямую приводит к искомой формуле. Полагая $n = c$, получаем выражение для $B(c, r)$.
+\end{sproof}
+
+\begin{note}[1]
+    Стационарное распределение $p_n$ обладает свойством инвариантности по отношению к форме распределения времени обслуживания. Согласно теореме Севастьянова, формулы Эрланга остаются справедливыми для системы общего вида $M|G|c|c$. Вероятности состояний зависят от распределения времени обслуживания исключительно через его математическое ожидание $\E[S]$ (посредством параметра нагрузки $r = \lambda \E[S]$).
+\end{note}    
+
+\begin{note}[2]
+    Вероятность блокировки заявки тождественно совпадает со стационарной вероятностью $p_c$ в силу свойства PASTA. Данное свойство применимо к исходному пуассоновскому потоку всех поступающих заявок (как успешно принимаемых системой, так и получающих отказ), в отличие от условного потока только принятых заявок.
+\end{note}
+
+\begin{note}[3]
+    Прямое вычисление вероятности отказа по формуле Эрланга $B(c, r) = p_c$ при больших значениях $c$ приводит к вычислительным трудностям из-за наличия факториалов. Для численного нахождения стационарных вероятностей применяют рекуррентное соотношение:
+    $$
+    B(c, r) = \frac{r B(c-1, r)}{c + r B(c-1, r)}, \quad B(0, r) = 1.
+    $$
+\end{note}
+
+\section{Система массового обслуживания M|G|1 и формула Полячека — Хинчина}
+
+Рассмотрим одноканальную систему массового обслуживания с пуассоновским входным потоком заявок и произвольным (General) распределением времени обслуживания. Дисциплина обслуживания — FCFS (First Come, First Served). 
+
+\begin{definition}{Система с произвольным обслуживанием (M|G|1)}
+Система, в которой интенсивность входного пуассоновского потока равна $\lambda$, а времена обслуживания отдельных заявок $\{S_1, S_2, \dots, S_n, \dots\}$ образуют последовательность независимых одинаково распределенных случайных величин с функцией распределения $B(t) = \P(S_n \le t)$. Среднее время обслуживания и коэффициент загрузки системы определяются как:
+$$
+\mu \doteq \frac{1}{\E[S]}, \quad \rho \doteq \frac{\lambda}{\mu} < 1.
 $$
 \end{definition}
 
-\begin{sproof}
-Заявка вынуждена ждать, если в момент её прибытия в системе находится $n \ge c$ других заявок (свойство PASTA гарантирует, что вероятности состояний в моменты прибытия равны $p_n$). Вычислим вероятность этого события прямым суммированием:
+\begin{note}[1]
+Поскольку время обслуживания может иметь как непрерывный, так и дискретный характер (или их комбинацию), математическое ожидание $\E[S]$ строго определяется через \textbf{интеграл Лебега — Стилтьеса}:
 $$
-\P(T_q > 0) = \sum_{n=c}^{\infty} p_n = \sum_{n=c}^{\infty} \frac{r^n}{c! c^{n-c}} p_0 = \frac{p_0 r^c}{c!} \sum_{m=0}^{\infty} \rho^m = \frac{p_0 r^c}{c!} \cdot \frac{1}{1-\rho}.
+\E[S] = \int_{0}^{+\infty} t \, dB(t).
 $$
-\end{sproof}
-
-Используя формулу Эрланга-C, мы можем записать функцию распределения времени ожидания $T_q$ в компактном виде. Условное время ожидания при условии, что заявка попала в очередь, распределено экспоненциально с параметром обслуживания всей группы серверов $(c\mu - \lambda)$. Безусловная функция распределения имеет вид:
-$$
-W_q(t) = \P(T_q \le t) = 1 - C(c, r) e^{-(c\mu - \lambda)t}, \quad t \ge 0.
-$$
-
-\begin{note}
-Формула Эрланга-C наглядно демонстрирует \textbf{эффект масштаба} (trunking efficiency) в теории массового обслуживания. При фиксированном коэффициенте загрузки $\rho$, система с бóльшим числом каналов $c$ обеспечивает меньшую вероятность задержки по сравнению с одноканальной системой.
+Данный интеграл обобщает классический интеграл Римана и сумму для дискретных величин, выполняя интегрирование по вероятностной мере, порожденной функцией распределения $B(t)$. В случае абсолютно непрерывного распределения с плотностью $b(t)$ он сводится к $\int t b(t) dt$.
 \end{note}
 
-Для иллюстрации этого эффекта построим зависимость вероятности задержки $C(c, r)$ от коэффициента загрузки $\rho$ для систем с $c=1$ и $c=2$. 
-Для $c=1$ формула сводится к $C(1, \rho) = \rho$. 
-Для $c=2$ (учитывая $r = 2\rho$ и вычисляя $p_0$) вероятность принимает вид $C(2, 2\rho) = \frac{2\rho^2}{1+\rho}$.
+\begin{note}[2]
+Требование независимости и одинаковой распределенности величин $S_n$ является критически важным. Если в реальной системе присутствует физический износ оборудования (время обработки растет с номером заявки $n$) или адаптивность (скорость обслуживания зависит от текущей длины очереди $X_n$), распределение $S_{n+1}$ начинает зависеть от предыстории, делая приведенные ниже выкладки непригодными.
+\end{note}
 
-\vspace{5mm}
+Для анализа классической системы $M|G|1$ применение стандартного аппарата уравнений Колмогорова напрямую невозможно. Случайный процесс $X(t)$, описывающий число заявок в системе в момент времени $t$, не обладает марковским свойством: вероятность перехода в новое состояние зависит не только от текущего числа заявок, но и от того, \textit{сколько времени} уже обслуживается текущая заявка (поскольку произвольное распределение времени обслуживания не обладает свойством отсутствия памяти, в отличие от экспоненциального). 
+
+Для преодоления этой проблемы Дэвид Кендалл предложил метод дискретизации времени, при котором эволюция системы рассматривается исключительно в строго определенные, «регенеративные» моменты.
+
+\begin{definition}{Вложенная цепь Маркова (метод Кендалла)}
+Пусть $t_n$ — моменты окончания обслуживания $n$-й заявки. Рассмотрим дискретный процесс $X_n \doteq X(t_n+0)$, описывающий число заявок в системе \textit{непосредственно после} ухода $n$-й заявки. Последовательность случайных величин $\{X_n\}_{n=1}^{\infty}$ образует дискретную однородную цепь Маркова, называемую \textbf{вложенной}.
+\end{definition}
+
+\begin{note}[1]
+В классических марковских цепях с дискретным временем индекс $n$ обычно соответствует детерминированным шагам (например, фиксированным интервалам $\Delta t$). В методе Кендалла физическое время $t_n(\omega)$ окончания обслуживания $n$-й заявки является случайной величиной, зависящей от конкретной реализации $\omega$. 
+
+Корректность построения цепи обеспечивается сменой индексного множества. Параметр $n \in \mathbb{N}$ здесь выступает не как физическое время, а как \textbf{порядковый номер ухода $n$-й заявки}. Переход от непрерывного процесса $X(t)$ к дискретной последовательности $\{X_n\}_{n=1}^{\infty}$ абстрагируется от того, \textit{когда именно} произошли переходы. Поскольку индексы $n$ пробегают фиксированное детерминированное множество $\mathbb{N}$, $\{X_n\}$ представляет собой корректно определенный случайный процесс с дискретным временем.
+\end{note}
+
+\begin{note}[2]
+Строгое доказательство марковости вложенной цепи опирается на алгебраическое уравнение эволюции:
+$$
+X_{n+1} = \max(0, X_n - 1) + A_{n+1},
+$$
+где $A_{n+1}$ — число заявок, поступивших в систему за время $S_{n+1}$ (обслуживание $(n+1)$-й заявки). 
+
 \begin{center}
-    \begin{tikzpicture}[scale=1.5, >=stealth, thick]
-        % Сетка и оси
-        \draw[->] (-0.2,0) -- (4.5,0) node[below] {Коэффициент загрузки $\rho$};
-        \draw[->] (0,-0.2) -- (0,4.5) node[right, align=left] {Вероятность\\задержки $C(c, r)$};
+    \begin{tikzpicture}[
+        scale=1.2,
+        >={Stealth[length=2.5mm]},
+        every node/.style={font=\small},
+        % Подключаем библиотеку декораций в преамбуле: \usetikzlibrary{decorations.pathreplacing, arrows.meta}
+    ]
+        % Ось времени
+        \draw[->, thick] (0,0) -- (10,0) node[right] {$t$};
         
-        % Единичные отметки (пусть \rho=1 это x=4, P=1 это y=4)
-        \draw[dashed, gray] (4,0) -- (4,4) -- (0,4);
-        \node[below] at (4,-0.1) {$1$};
-        \node[left] at (0,4) {$1$};
-        \node[below left] at (0,0) {$0$};
+        % Моменты прихода (стрелки вниз)
+        \draw[<-, DeepSkyBlue4, thick] (1.5,0.1) -- (1.5,1) node[above] {Новые заявки};
+        \draw[<-, DeepSkyBlue4, thick] (3.8,0.1) -- (3.8,1);
+        \draw[<-, DeepSkyBlue4, thick] (5.2,0.1) -- (5.2,1);
+        \draw[<-, DeepSkyBlue4, thick] (7.9,0.1) -- (7.9,1);
+        
+        % Моменты ухода (стрелки вверх и узлы t_n)
+        % Смещаем t_{n-1} чуть левее, чтобы не мешать скобке
+        \draw[->, Red3, thick] (2.5,-1.2) node[left] {$t_{n-1}$} -- (2.5,-0.1);
+        \filldraw (2.5,0) circle (1.5pt);
+        \node[above right, xshift=2pt] at (2.5, 0) {$X_{n-1}$};
 
-        % График для c=1: y = x (прямая)
-        \draw[DeepSkyBlue4, domain=0:4, samples=10] 
-            plot (\x, {\x}) 
-            node[pos=0.6, above left] {$c=1$};
+        \draw[->, Red3, thick] (6.5,-1.2) node[left] {$t_n$} -- (6.5,-0.1);
+        \filldraw (6.5,0) circle (1.5pt);
+        \node[above right, xshift=2pt] at (6.5, 0) {$X_n$};
+        
+        \draw[->, Red3, thick] (9.0,-1.2) node[right] {$t_{n+1}$} -- (9.0,-0.1);
+        \filldraw (9.0,0) circle (1.5pt);
+        \node[above right, xshift=2pt] at (9.0, 0) {$X_{n+1}$};
 
-        % График для c=2: C = 2\rho^2 / (1+\rho) -> y = 4 * (2*(x/4)^2) / (1 + x/4)
-        \draw[Red3, domain=0:4, samples=100] 
-            plot (\x, { 4 * (2*(\x/4)*(\x/4)) / (1 + \x/4) }) 
-            node[pos=0.75, below right] {$c=2$};
+        % Интервалы обслуживания (опущены ниже и увеличен отступ текста)
+        \draw[decorate, decoration={brace, amplitude=5pt, mirror}] (2.6,-1.4) -- (6.4,-1.4) 
+            node[midway, below=8pt] {$S_n$};
+        
+        \draw[decorate, decoration={brace, amplitude=5pt, mirror}] (6.6,-1.4) -- (8.9,-1.4) 
+            node[midway, below=8pt] {$S_{n+1}$};
+        
+        % Поступившие заявки A_n
+        \draw[decorate, decoration={brace, amplitude=5pt}] (6.5, 1.2) -- (9.0, 1.2) 
+            node[midway, above=8pt] {$A_{n+1}$ заявок прибыло};
             
-        % Дополнительная аннотация
-        \draw[<->, thin, gray] (2.5, 2.5) -- (2.5, 1.53) node[midway, right, align=left, font=\footnotesize] {Выигрыш от\\объединения};
     \end{tikzpicture}
-    
-    \vspace{2mm}
-    \small\textit{Сравнение вероятности задержки в очереди для систем M|M|1 и M|M|2.}
+    \captionof*{figure}{\small Временная диаграмма процесса обслуживания. Марковская цепь формируется путем фиксации состояний $X_n$ строго в моменты ухода заявок.}
 \end{center}
 
-\section{Оптимальный выбор числа серверов и масштабирование системы}
+Поскольку моменты наблюдения $t_n$ строго привязаны к окончанию обслуживания, в момент начала обработки следующей заявки ее «таймер» стартует с нуля. Количество прибывших заявок $A_{n+1}$ зависит исключительно от длительности интервала $S_{n+1}$ и интенсивности пуассоновского потока $\lambda$. В силу фундаментальной аксиомы о том, что времена $\{S_n\}$ независимы от предыстории системы, величина $A_{n+1}$ также стохастически независима от прошлых состояний $X_{n-1}, X_{n-2}, \dots$.
 
-Фундаментальной задачей проектирования многоканальных систем массового обслуживания является определение оптимального числа серверов $c$, обеспечивающего строгий баланс между качеством обслуживания (минимизацией вероятности задержки) и экономической эффективностью (максимизацией загрузки оборудования). 
-
-Для существования стационарного режима необходимо выполнение условия $c > r$. Следовательно, число выделяемых каналов всегда можно представить в виде:
+Таким образом, распределение случайной величины $X_{n+1}$ полностью и однозначно определяется текущим состоянием $X_n$:
 $$
-c = r + \Delta,
+\P(X_{n+1} = j \mid X_n, X_{n-1}, \dots, X_0) = \P(X_{n+1} = j \mid X_n).
 $$
-где $\Delta > 0$ — абсолютный резерв (запас) производительности системы.
+Однородность данной цепи (независимость переходных вероятностей от шага $n$) вытекает из стационарности пуассоновского потока и идентичности распределений $B(t)$ для всех заявок.
+\end{note}
 
-\begin{example}{Масштабирование системы}
-Рассмотрим исходную систему обслуживания, в которой предложенная нагрузка составляет $r = 9$ Эрланг. Выделено $c = 12$ серверов. Коэффициент загрузки в такой системе составляет $\rho = \frac{9}{12} = 0.75$, а вероятность задержки по формуле Эрланга-С равна $C(12, 9) \approx 0.266$. 
+\begin{theorem}{Формула Полячека — Хинчина}
+Для системы $M|G|1$ стационарное распределение вероятностей состояний существует тогда и только тогда, когда коэффициент загрузки $\rho < 1$. В стационарном режиме среднее число заявок в системе определяется формулой:
+$$
+L = \rho + \frac{\rho^2 + \lambda^2 \sigma_B^2}{2(1-\rho)},
+$$
+где $\sigma_B^2 = \mathbb{D}[S]$ — дисперсия времени обслуживания.
+\end{theorem}
 
-Предположим, что входящий поток заявок возрастает в четыре раза: $r_{new} = 36$. Требуется определить новое число серверов $c_{new}$, адекватно отвечающее возросшей нагрузке.
-\end{example}
+\begin{tproof}
+Пусть $A_{n+1}$ — число заявок, поступивших в систему за время обслуживания $(n+1)$-й заявки. Эволюция состояний вложенной цепи Маркова описывается разностным стохастическим уравнением:
+$$
+X_{n+1} = 
+\begin{cases} 
+X_n - 1 + A_{n+1}, & X_n \ge 1, \\ 
+A_{n+1}, & X_n = 0.
+\end{cases}
+$$
+Введем индикаторную функцию события $\{X_n > 0\}$, обозначаемую $\mathbb{I}_{\{X_n > 0\}}$, равную $1$ при $X_n > 0$ и $0$ при $X_n = 0$. Уравнение эволюции принимает единый алгебраический вид:
+\begin{equation}\label{eq:main}
+    X_{n+1} = X_n - \mathbb{I}_{\{X_n > 0\}} + A_{n+1} \tag{$*$}
+\end{equation}
 
-Существуют три принципиально различных асимптотических подхода к масштабированию систем при неограниченном росте нагрузки ($r \to \infty$).
+Предположим, что марковская цепь эргодична. В стационарном режиме распределения $X_{n+1}$ и $X_n$ совпадают, следовательно, их начальные моменты равны. Обозначим искомое математическое ожидание числа заявок в момент ухода как $\E[X_{n+1}] = \E[X_n] \doteq L^{(D)}$. Верхний индекс $(D)$ (от англ. \textit{Departure} — уход) подчеркивает, что данная величина есть среднее число заявок в системе, наблюдаемое исключительно в моменты завершения обслуживания. В общем случае она может не совпадать со средним числом заявок в произвольный момент времени $L$.
 
+\textbf{1. Первый начальный момент и вероятность непустой системы.}
+Применим оператор математического ожидания к обеим частям уравнения \eqref{eq:main}:
+$$
+L^{(D)} = L^{(D)} - \E[\mathbb{I}_{\{X_n > 0\}}] + \E[A_{n+1}] \quad \implies \quad \E[\mathbb{I}_{\{X_n > 0\}}] = \E[A_{n+1}].
+$$
+По свойствам индикаторной функции ее математическое ожидание равно вероятности соответствующего события: $\E[\mathbb{I}_{\{X_n > 0\}}] = \P(X_n > 0) = 1 - \pi_0$, где $\pi_0$ — стационарная вероятность того, что система пуста в моменты ухода. Иными словами, это вероятность того, что уходящая заявка оставляет после себя непустую систему.
+
+Вычислим $\E[A_{n+1}]$, применяя формулу полного математического ожидания по длительности обслуживания $S_{n+1}$. В силу свойств пуассоновского потока условное распределение $\{A_{n+1} \mid S_{n+1} = t\} \sim \text{Poiss}(\lambda t)$:
+$$
+\E[A_{n+1}] = \int_{0}^{+\infty} \E[A_{n+1} \mid S_{n+1} = t] \, dB(t) = \int_{0}^{+\infty} \lambda t \, dB(t) = \lambda \E[S_{n+1}] = \rho.
+$$
+Отсюда немедленно следует важный результат: $1 - \pi_0 = \rho$. Поскольку для существования стационарного режима вероятность пустого состояния должна быть строго положительной ($\pi_0 > 0$), из этого тождества аналитически вытекает \textbf{необходимое условие стационарности: $\rho < 1$}. (В пункте 4 мы строго докажем равенство распределений по временам ухода и в произвольный момент времени $\pi_0 = p_0$. Это придаст величине $\rho$ классический физический смысл — доли времени занятости прибора в непрерывном времени).
+
+\textbf{2. Второй начальный момент и длина очереди.}
+Возведем уравнение \eqref{eq:main} в квадрат. Учитывая идемпотентность индикатора $\mathbb{I}_{\{X_n > 0\}}^2 = \mathbb{I}_{\{X_n > 0\}}$ и свойство $X_n \mathbb{I}_{\{X_n > 0\}} = X_n$, получаем:
+\begin{align*}
+X_{n+1}^2 &= \big(X_n - \mathbb{I}_{\{X_n > 0\}} + A_{n+1}\big)^2 \\
+&= X_n^2 + \mathbb{I}_{\{X_n > 0\}}^2 + A_{n+1}^2 - 2X_n\mathbb{I}_{\{X_n > 0\}} - 2A_{n+1}\mathbb{I}_{\{X_n > 0\}} + 2A_{n+1}X_n \\
+&= X_n^2 + \mathbb{I}_{\{X_n > 0\}} + A_{n+1}^2 - 2X_n - 2A_{n+1}\mathbb{I}_{\{X_n > 0\}} + 2A_{n+1}X_n.
+\end{align*}
+Перейдем к математическим ожиданиям. В силу стационарности $\E[X_{n+1}^2] = \E[X_n^2]$. Приращение пуассоновского потока $A_{n+1}$ зависит только от длительности $S_{n+1}$ и строго не зависит от предыстории процесса (состояния $X_n$ и индикатора $\mathbb{I}_{\{X_n > 0\}}$). Следовательно, математическое ожидание произведений распадается на произведение математических ожиданий:
+\begin{align*}
+0 &= \E[\mathbb{I}_{\{X_n > 0\}}] + \E[A_{n+1}^2] - 2\E[X_n] - 2\E[A_{n+1}]\E[\mathbb{I}_{\{X_n > 0\}}] + 2\E[A_{n+1}]\E[X_n].
+\end{align*}
+Подставляя найденные ранее значения ($\E[\mathbb{I}_{\{X_n > 0\}}] = \rho$, $\E[A_{n+1}] = \rho$, $\E[X_n] = L^{(D)}$), приводим уравнение к виду:
+$$
+0 = \rho + \E[A_{n+1}^2] - 2L^{(D)} - 2\rho^2 + 2\rho L^{(D)}.
+$$
+Группируя слагаемые с $L^{(D)}$, находим:
+$$
+2L^{(D)}(1 - \rho) = \rho - 2\rho^2 + \E[A_{n+1}^2].
+$$
+Поскольку доказанное ранее условие стационарности $\rho < 1$ выполнено, разделим обе части на $2(1-\rho)$ и выразим длину очереди:
+$$
+L^{(D)} = \frac{\rho - 2\rho^2 + \E[A_{n+1}^2]}{2(1-\rho)}.
+$$
+
+\textbf{3. Вычисление дисперсии приращений.}
+Определим $\E[A_{n+1}^2]$ через формулу полной дисперсии:
+$$
+\mathbb{D}[A_{n+1}] = \E[\mathbb{D}[A_{n+1} \mid S_{n+1}]] + \mathbb{D}[\E[A_{n+1} \mid S_{n+1}]].
+$$
+Для пуассоновского закона условное математическое ожидание и дисперсия равны $\lambda S_{n+1}$:
+$$
+\mathbb{D}[A_{n+1}] = \E[\lambda S_{n+1}] + \mathbb{D}[\lambda S_{n+1}] = \lambda \E[S_{n+1}] + \lambda^2 \mathbb{D}[S_{n+1}] = \rho + \lambda^2 \sigma_B^2.
+$$
+Переходя ко второму начальному моменту:
+$$
+\E[A_{n+1}^2] = \mathbb{D}[A_{n+1}] + \big(\E[A_{n+1}]\big)^2 = \rho + \lambda^2 \sigma_B^2 + \rho^2.
+$$
+Подстановка данного выражения в формулу для $L^{(D)}$ дает искомый результат:
+$$
+L^{(D)} = \frac{\rho - 2\rho^2 + (\rho + \lambda^2 \sigma_B^2 + \rho^2)}{2(1-\rho)} = \frac{2\rho - \rho^2 + \lambda^2 \sigma_B^2}{2(1-\rho)} = \rho + \frac{\rho^2 + \lambda^2 \sigma_B^2}{2(1-\rho)}.
+$$
+
+\textbf{4. Совпадение распределений и эквивалентность средних.}
+
+Для завершения доказательства необходимо обосновать равенство $L = L^{(D)}$. Введем три распределения вероятностей состояний системы:
 \begin{itemize}
-    \item \textbf{Подход 1. Режим качества (Quality Domain).} 
-    Основан на жесткой фиксации коэффициента загрузки: $\rho = \mathrm{const}$. 
-    Поскольку исходно $\rho = 0.75$, для новой нагрузки выбираем $c_{new} = \frac{36}{0.75} = 48$ серверов. 
-    Резерв производительности $\Delta = c - r = r\left(\frac{1}{\rho} - 1\right)$ растет линейно. При $r \to \infty$ вероятность задержки стремится к нулю: $C(c, r) \to 0$. Задержки практически исчезают, однако система работает с колоссальным избытком простаивающих мощностей, что экономически неэффективно.
-
-    \item \textbf{Подход 2. Режим эффективности (Efficiency Domain).} 
-    Основан на фиксации абсолютного резерва производительности: $\Delta = \mathrm{const}$.
-    Исходно резерв составлял $\Delta = 12 - 9 = 3$. Для новой нагрузки принимаем $c_{new} = 36 + 3 = 39$ серверов.
-    При $r \to \infty$ загрузка системы $\rho = \frac{r}{r + \Delta} \to 1$. В этом асимптотическом пределе $C(c, r) \to 1$. Система оказывается перманентно перегруженной, и практически каждая заявка попадает в очередь.
-
-    \item \textbf{Подход 3. Сбалансированный режим (Quality-and-Efficiency Driven, QED).}
-    Основан на сохранении степени перегрузки системы, то есть удержании вероятности задержки на постоянном уровне: $C(c, r) \approx \mathrm{const} \in (0, 1)$.
-    Для сохранения исходной вероятности $C \approx 0.266$ при $r = 36$ требуется выделить $c_{new} = 42$ сервера.
+    \item $p_n$ — стационарная вероятность того, что в произвольный момент времени в системе находится $n$ заявок;
+    \item $q_n$ — вероятность того, что \textit{прибывающая} заявка застает в системе $n$ заявок;
+    \item $\pi_n$ — вероятность того, что \textit{уходящая} после обслуживания заявка оставляет в системе $n$ заявок.
 \end{itemize}
 
-С практической точки зрения сбалансированный подход реализуется через решение задачи дискретной оптимизации. Если задан максимально допустимый уровень вероятности встретить непустую очередь $\alpha$, оптимальное число каналов определяется как:
-$$
-c^* = \min \{ c \in \N : C(c, r) \le \alpha \}.
-$$
+Рассмотрим некоторую реализацию процесса $X(t)$ на достаточно большом интервале времени $[0, T]$. В силу того, что приходы и уходы заявок в системе $M|G|1$ являются одиночными событиями, изменения состояния системы происходят только в виде скачков $\pm 1$. 
 
-\begin{statement}{Правило квадратного корня (Square-Root Staffing Rule)}
-Для обеспечения баланса в режиме QED (когда $C(c, r) \approx \mathrm{const}$ при $r \to \infty$), абсолютный резерв производительности $\Delta$ должен расти пропорционально квадратному корню из предложенной нагрузки:
+Зафиксируем уровень $n$ и введем счетчики переходов:
+\begin{itemize}
+    \item $A_n(T)$ — число переходов вида $n \to n+1$ (приход заявки в систему, находящуюся в состоянии $n$);
+    \item $D_n(T)$ — число переходов вида $n+1 \to n$ (уход заявки, оставляющей после себя $n$ заявок).
+\end{itemize}
+
+Поскольку для повторного совершения скачка «вверх» система обязана предварительно совершить скачок «вниз» (и наоборот), значения этих счетчиков для любой реализации процесса могут отличаться не более чем на единицу: $|A_n(T) - D_n(T)| \le 1$.
+
+\begin{center}
+\begin{tikzpicture}[
+    scale=1.3,
+    >={Stealth[length=2.5mm]},
+    every node/.style={font=\small},
+    grid_style/.style={gray!15, thin}
+]
+    % Сетка
+    \draw[grid_style] (0,0) grid (9.5,4);
+
+    % Оси
+    \draw[->, thick] (0,0) -- (10,0) node[right] {$t$};
+    \draw[->, thick] (0,0) -- (0,4.2) node[above] {$X(t)$};
+    
+    % Вертикальная ось (состояния)
+    \foreach \y/\label in {0.5/n-1, 1.5/n, 2.5/n+1, 3.5/n+2} {
+        \draw[thick] (0.05,\y) -- (-0.05,\y) node[left] {$\label$};
+    }
+
+    % Горизонтальная ось (моменты событий tau_i)
+    \foreach \x in {1,2,...,9} {
+        \draw[thick] (\x,0.05) -- (\x,-0.05) node[below] {$\tau_{\x}$};
+    }
+
+    % Референтный уровень n
+    \draw[thick, DeepSkyBlue4, opacity=0.9] (0,1.5) -- (9.5,1.5) node[right, font=\bfseries\footnotesize] {Уровень $n$};
+    \draw[dashed, gray!60] (0,2.5) -- (9.5,2.5);
+
+    % Траектория процесса X(t)
+    \draw[ultra thick, Red3] 
+        (0,0.5) -- (1,0.5) -- 
+        (1,1.5) -- (2,1.5) -- % Приход A_n=1 (D_n=0)
+        (2,2.5) -- (3,2.5) -- % Уход D_n=1   (A_n=1)
+        (3,1.5) -- (4,1.5) -- % Приход A_n=2 (D_n=1)
+        (4,2.5) -- (5,2.5) -- 
+        (5,3.5) -- (6,3.5) -- 
+        (6,2.5) -- (7,2.5) -- % Уход D_n=2   (A_n=2)
+        (7,1.5) -- (8,1.5) -- 
+        (8,0.5) -- (9,0.5) -- 
+        (9,1.5) -- (9.5,1.5);
+
+    % Обозначения An (Приходы, заставшие n) с текущим Dn
+    % tau_2: A_n=1, D_n=0
+    \fill[Red3] (2, 1.5) circle (2pt);
+    \draw[<-, thick, Red3] (2, 1.6) -- (2, 3.1);
+    \node[Red3, fill=white, draw=Red3, thin, rounded corners=1pt, font=\scriptsize\bfseries, align=center] at (2, 3.4) {$A_n = 1$ \\ \color{gray}$D_n = 0$};
+
+    % tau_4: A_n=2, D_n=1
+    \fill[Red3] (4, 1.5) circle (2pt);
+    \draw[<-, thick, Red3] (4, 1.6) -- (4, 3.1);
+    \node[Red3, fill=white, draw=Red3, thin, rounded corners=1pt, font=\scriptsize\bfseries, align=center] at (4, 3.4) {$A_n = 2$ \\ \color{gray}$D_n = 1$};
+
+    % Обозначения Dn (Уходы, оставившие n) с текущим An
+    % tau_3: D_n=1, A_n=1
+    \fill[DeepSkyBlue4] (3, 2.5) circle (2pt);
+    \draw[<-, thick, DeepSkyBlue4] (3, 2.4) -- (3, 0.9);
+    \node[DeepSkyBlue4, fill=white, draw=DeepSkyBlue4, thin, rounded corners=1pt, font=\scriptsize\bfseries, align=center] at (3, 0.6) {$D_n = 1$ \\ \color{gray}$A_n = 1$};
+
+    % tau_7: D_n=2, A_n=2
+    \fill[DeepSkyBlue4] (7, 2.5) circle (2pt);
+    \draw[<-, thick, DeepSkyBlue4] (7, 2.4) -- (7, 0.9);
+    \node[DeepSkyBlue4, fill=white, draw=DeepSkyBlue4, thin, rounded corners=1pt, font=\scriptsize\bfseries, align=center] at (7, 0.6) {$D_n = 2$ \\ \color{gray}$A_n = 2$};
+
+\end{tikzpicture}
+\end{center}
+
+Пусть $A(T)$ — общее число прибывших заявок, а $D(T)$ — общее число обслуженных заявок за время $T$. Очевидно, что баланс числа заявок в системе задается соотношением:
+\begin{equation}\label{eq:balance_total}
+    D(T) = A(T) + X(0) - X(T).
+\end{equation}
+
+Вычислим вероятность $\pi_n$ как предел отношения частот при $T \to \infty$:
+\begin{equation}\label{eq:limit_derivation}
+    \pi_n = \lim_{T \to \infty} \frac{D_n(T)}{D(T)} = \lim_{T \to \infty} \frac{A_n(T) + \overbrace{[D_n(T) - A_n(T)]}^{= 0, \pm 1}}{A(T) + \underbrace{X(0) - X(T)}_{\in O(1)}}.
+\end{equation}
+В стационарном состоянии случайная величина $X(T)$ ограничена (состояние системы не уходит в бесконечность почти наверняка при $\rho < 1$). Следовательно, разность $X(0) - X(T)$ остается ограниченной константой. При $T \to \infty$ общее число поступивших заявок $A(T) \to \infty$. Разделив числитель и знаменатель на $A(T)$, получаем:
+\begin{equation*}
+    \pi_n = \lim_{T \to \infty} \frac{\frac{A_n(T)}{A(T)} + \frac{0, \pm 1}{A(T)}}{1 + \frac{O(1)}{A(T)}} = \lim_{T \to \infty} \frac{A_n(T)}{A(T)} = q_n.
+\end{equation*}
+
+Таким образом, вероятность найти систему в состоянии $n$ в моменты ухода ($\pi_n$) тождественно равна вероятности застать систему в этом же состоянии в моменты прихода ($q_n$). 
+
+Согласно \textbf{свойству PASTA} (Poisson Arrivals See Time Averages), пуассоновский входной поток «видит» систему в стационарном состоянии, что означает $q_n = p_n$. Объединяя результаты, получаем:
+\begin{equation*}
+    p_n = q_n = \pi_n \quad \implies \quad L = L^{(D)}.
+\end{equation*}
+
+Окончательно подставляем выведенное ранее значение $L^{(D)}$ и получаем \textbf{формулу Полячека — Хинчина}:
+\begin{equation*}
+    \fbox{$\displaystyle L = \rho + \frac{\rho^2 + \lambda^2 \sigma_B^2}{2 (1 - \rho)}$}
+\end{equation*}
+\end{tproof}
+
+\begin{conseq}
+Применение универсального закона Литтла ($L = \lambda W$) к полученному результату позволяет определить все остальные макроскопические метрики системы $M|G|1$:
+\begin{itemize}
+    \item Среднее время пребывания в системе: $\displaystyle W = \frac{L}{\lambda} = \frac{1}{\mu} + \frac{\rho^2 + \lambda^2 \sigma_B^2}{2\lambda(1-\rho)}$.
+    \item Средняя длина очереди: $\displaystyle L_q = L - \rho = \frac{\rho^2 + \lambda^2 \sigma_B^2}{2(1-\rho)}$.
+    \item Среднее время ожидания в очереди: $\displaystyle W_q = W - \frac{1}{\mu} = \frac{L_q}{\lambda}$.
+\end{itemize}
+\end{conseq}
+
+\begin{example}{Сравнение систем M|M|1 и M|D|1}
+Формула Полячека — Хинчина позволяет аналитически оценить влияние разброса времени обслуживания на длину очереди. Рассмотрим два случая: систему с показательным временем обслуживания ($M|M|1$) и систему с детерминированным временем обслуживания постоянной длительности ($M|D|1$).
+\end{example}
+
+\begin{eproof}
+
+\textbf{Случай 1 (система $M|M|1$).}
+
+Время обслуживания имеет экспоненциальное распределение с параметром $\mu$. Дисперсия экспоненциального распределения равна квадрату математического ожидания: $\sigma_B^2 = \frac{1}{\mu^2}$. Подставляя это в формулу Полячека — Хинчина, выделим слагаемое, отвечающее за очередь:
+
+$$L_{M|M|1} = \rho + \frac{\rho^2 + \lambda^2 \frac{1}{\mu^2}}{2(1-\rho)} = \rho + \frac{2\rho^2}{2(1-\rho)} = \rho + \underbrace{\frac{\rho^2}{1-\rho}}_{L_q}.$$
+
+\textbf{Случай 2 (система $M|D|1$).}
+
+Время обслуживания строго фиксировано: $S = a = \text{const}$. Дисперсия константы равна нулю ($\sigma_B^2 = 0$). При подстановке получаем:
+
+$$L_{M|D|1} = \rho + \frac{\rho^2 + 0}{2(1-\rho)} = \rho + \underbrace{\frac{1}{2} \cdot \frac{\rho^2}{1-\rho}}_{L_q}.$$
+
+Сравнивая вторые слагаемые в обоих случаях, видим, что среднее число заявок в очереди для системы с детерминированным обслуживанием ровно в два раза меньше, чем в простейшей системе с тем же коэффициентом загрузки $\rho$.
+
+Таким образом, устранение стохастичности (вариативности) времени обслуживания позволяет сократить длину очереди вдвое при неизменной интенсивности потока и прибора.
+\end{eproof}
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        width=0.8\textwidth, height=8cm,
+        xlabel={Коэффициент загрузки $\rho$}, 
+        ylabel={Среднее число заявок $L$},
+        xmin=0, xmax=1, ymin=0, ymax=20,
+        grid=major,
+        legend pos=north west,
+        samples=100, thick,
+        domain=0:0.99
+    ]
+        % Формула для M|M|1
+        \addplot[Red3, solid] {x/(1-x)};
+        \addlegendentry{$M|M|1$ (Экспоненциальное время)}
+        
+        % Формула для M|D|1
+        \addplot[DeepSkyBlue4, dashed] {x + (x^2)/(2*(1-x))};
+        \addlegendentry{$M|D|1$ (Детерминированное время)}
+        
+        % Произвольная система с высокой дисперсией (для наглядности M|G|1)
+        % Допустим sigma_B^2 = 3 / mu^2 => lambda^2 sigma_B^2 = 3 rho^2
+        \addplot[black, dashdotted] {x + (x^2 + 3*x^2)/(2*(1-x))};
+        \addlegendentry{$M|G|1$ (Высокая дисперсия, $\sigma_B^2 = 3/\mu^2$)}
+    \end{axis}
+\end{tikzpicture}
+\captionof*{figure}{\small Зависимость среднего числа заявок в системе от коэффициента загрузки. График демонстрирует, что очереди формируются не только из-за высокой загрузки, но и из-за дисперсии временных параметров.}
+\end{center}
+[END OF lectures\lec6.tex]
+
+
+[FILE]: lectures\lec7.tex
+-------------------------
+\begin{definition}{Система $M^{[X]}|M|1$}
+Система массового обслуживания, на вход которой поступает пуассоновский поток событий с интенсивностью $\lambda$. В данной модели каждое событие инициирует поступление не одиночной заявки, а группы (пакета). 
+
+Размер группы является дискретной случайной величиной $X$. Предполагается, что размеры последовательно поступающих групп представляют собой независимые в совокупности и одинаково распределенные случайные величины. Закон распределения размера группы задается вероятностями:
+$$ \P(X=n) = c_n, \quad n \in \N, $$
+где $\dsum_{n=1}^{\infty} c_n = 1$. Интенсивность поступления групп, состоящих строго из $n$ заявок, составляет $\lambda_n = \lambda c_n$. Время обслуживания отдельной заявки распределено по экспоненциальному закону с параметром $\mu$.
+\end{definition}
+
+Вследствие группового поступления заявок граф переходов марковской цепи содержит дуги, соответствующие скачкам процесса на произвольное число состояний вправо.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[
+        scale=1.5,
+        >={Stealth[length=3mm]},
+        state/.style={circle, draw, minimum size=0.8cm, thick},
+        every node/.style={font=\small}
+    ]
+        % Состояния
+        \node[state] (s0) at (0,0) {0};
+        \node[state] (s1) at (2,0) {1};
+        \node[state] (s2) at (4,0) {2};
+        \node[state] (s3) at (6,0) {3};
+        \node (dots) at (7.5,0) {\Large $\dots$};
+
+        % Переходы \lambda_1
+        \draw[->, thick] (s0) to [bend left=30] node[midway, fill=Snow2, inner sep=1.5pt] {$\lambda_1$} (s1);
+        \draw[->, thick] (s1) to [bend left=30] node[midway, fill=Snow2, inner sep=1.5pt] {$\lambda_1$} (s2);
+        \draw[->, thick] (s2) to [bend left=30] node[midway, fill=Snow2, inner sep=1.5pt] {$\lambda_1$} (s3);
+
+        % Переходы \lambda_2
+        \draw[->, thick] (s0) to [bend left=50] node[midway, fill=Snow2, inner sep=1.5pt] {$\lambda_2$} (s2);
+        \draw[->, thick] (s1) to [bend left=50] node[midway, fill=Snow2, inner sep=1.5pt] {$\lambda_2$} (s3);
+
+        % Обслуживание \mu
+        \draw[->, thick] (s1) to [bend left=30] node[midway, below] {$\mu$} (s0);
+        \draw[->, thick] (s2) to [bend left=30] node[midway, below] {$\mu$} (s1);
+        \draw[->, thick] (s3) to [bend left=30] node[midway, below] {$\mu$} (s2);
+    \end{tikzpicture}
+    \caption{Граф интенсивностей переходов для системы с групповым поступлением заявок. Проиллюстрированы приходы групп размера 1 и 2.}
+\end{figure}
+
+\begin{statement}
+Производящая функция стационарного распределения вероятностей состояний системы $P(z) = \dsum_{n=0}^{\infty} p_n z^n$ имеет вид:
+$$ P(z) = \frac{p_0}{1 - \frac{\lambda}{\mu} z \overline{C}(z)}, $$
+где $\overline{C}(z) = \frac{1 - C(z)}{1 - z}$, $C(z)$ — производящая функция распределения размера группы $X$.
+Вероятность простоя системы равна $p_0 = 1 - \rho$, где коэффициент загрузки $\rho = \frac{\lambda}{\mu}\E[X] < 1$.
+
+Стационарное распределение полностью определяется данной функцией: вероятности состояний $\{p_n\}_{n=0}^{\infty}$ вычисляются как коэффициенты разложения $P(z)$ в ряд Тейлора:
+$$ p_n = \frac{1}{n!} \left. \frac{d^n P(z)}{dz^n} \right|_{z=0}. $$
+\end{statement}
+
+\begin{sproof}
+Составим систему уравнений глобального баланса, приравнивая интенсивности выхода из состояния $n$ и входа в него:
+\begin{itemize}
+    \item Для состояния $n = 0$:
+    $$ \lambda p_0 = \mu p_1. $$
+    \item Для состояний $n \ge 1$:
+    $$ (\lambda + \mu) p_n = \mu p_{n+1} + \dsum_{k=1}^{n} p_{n-k} \lambda_k. $$
+\end{itemize}
+Подставляя $\lambda_k = \lambda c_k$, перепишем второе уравнение:
+$$ (\lambda + \mu) p_n = \mu p_{n+1} + \lambda \dsum_{k=1}^{n} p_{n-k} c_k. $$
+Введем производящие функции для распределения размера группы $C(z) = \dsum_{n=1}^{\infty} c_n z^n$ и вероятностей состояний $P(z) = \dsum_{n=0}^{\infty} p_n z^n$. Умножим уравнение для $n \ge 1$ на $z^n$ и просуммируем по $n$ от $1$ до $\infty$:
+$$ (\lambda + \mu) \dsum_{n=1}^{\infty} p_n z^n = \mu \dsum_{n=1}^{\infty} p_{n+1} z^n + \lambda \dsum_{n=1}^{\infty} \dsum_{k=1}^{n} p_{n-k} c_k z^n. $$
+Выразим одинарные суммы через $P(z)$:
+$$ \dsum_{n=1}^{\infty} p_n z^n = P(z) - p_0, \quad \dsum_{n=1}^{\infty} p_{n+1} z^n = \frac{1}{z} \dsum_{n=2}^{\infty} p_n z^n = \frac{1}{z} (P(z) - p_0 - p_1 z). $$
+Для преобразования двойной суммы изменим порядок суммирования. Исходная область индексов представляет собой дискретный клин $1 \le k \le n < \infty$.
+
+\begin{center}
+\begin{tikzpicture}[scale=1.2, >=Stealth, font=\small]
+    \draw[->, thick] (-0.2,0) -- (4,0) node[right] {$n$};
+    \draw[->, thick] (0,-0.2) -- (0,4) node[above] {$k$};
+    
+    \draw[thick, DeepSkyBlue4] (0,0) -- (3.5,3.5) node[above right] {$k=n$};
+    
+    \fill[pattern=north west lines, pattern color=DeepSkyBlue4, opacity=0.5] (1,1) -- (3.5,1) -- (3.5,3.5) -- cycle;
+    \draw[dashed] (1,0) -- (1,1);
+    \node[below] at (1,0) {$1$};
+    \draw[dashed] (0,1) -- (1,1);
+    \node[left] at (0,1) {$1$};
+    
+    \node[fill=Snow2, inner sep=2pt] at (2.5, 1.5) {$k \le n$};
+\end{tikzpicture}
+\end{center}
+
+Меняя пределы, получаем произведение двух рядов:
+$$ \dsum_{n=1}^{\infty} \dsum_{k=1}^{n} p_{n-k} c_k z^n = \dsum_{k=1}^{\infty} \dsum_{n=k}^{\infty} c_k p_{n-k} z^n = \dsum_{k=1}^{\infty} c_k z^k \dsum_{n=k}^{\infty} p_{n-k} z^{n-k} = C(z) P(z). $$
+Подставим полученные выражения в основное уравнение:
+$$ (\lambda + \mu)(P(z) - p_0) = \frac{\mu}{z}(P(z) - p_0 - p_1 z) + \lambda C(z) P(z). $$
+Так как $\frac{\mu}{z} p_1 z = \mu p_1$, и из уравнения для $n=0$ известно соотношение $\mu p_1 = \lambda p_0$, получаем:
+$$ \lambda P(z) - \lambda p_0 + \mu(P(z) - p_0) = \frac{\mu}{z}(P(z) - p_0) - \lambda p_0 + \lambda C(z) P(z). $$
+После сокращения слагаемых $-\lambda p_0$ группируем члены, содержащие $P(z)$, в левой части, а $p_0$ — в правой:
+$$ \lambda P(z) - \lambda C(z) P(z) = \frac{\mu}{z}(P(z) - p_0) - \mu(P(z) - p_0). $$
+Вынося общие множители, находим:
+$$ \lambda P(z) (1 - C(z)) = \mu (P(z) - p_0) \left( \frac{1 - z}{z} \right). $$
+Умножая обе части на $z$, выражаем $P(z)$:
+$$ \lambda z P(z) (1 - C(z)) = \mu (1 - z) P(z) - \mu (1 - z) p_0, $$
+$$ P(z) \left[ \mu(1 - z) - \lambda z (1 - C(z)) \right] = \mu(1 - z) p_0, $$
+$$ P(z) = \frac{\mu(1 - z) p_0}{\mu(1 - z) - \lambda z (1 - C(z))}. $$
+Разделив числитель и знаменатель на $\mu(1 - z)$ и введя функцию $\overline{C}(z) = \frac{1 - C(z)}{1 - z}$, приходим к требуемому соотношению для производящей функции.
+
+Найдем вероятность простоя $p_0$, используя условие нормировки $P(1) = 1$. Перейдем к пределу при $z \to 1$. Значение $\overline{C}(1)$ вычисляется по правилу Лопиталя:
+$$ \lim_{z \to 1} \overline{C}(z) = \lim_{z \to 1} \frac{1 - C(z)}{1 - z} = \lim_{z \to 1} \frac{-C'(z)}{-1} = C'(1). $$
+Поскольку $C'(1) = \dsum_{n=1}^{\infty} n c_n = \E[X]$, знаменатель функции $P(z)$ в точке $z=1$ принимает вид $1 - \frac{\lambda}{\mu} \E[X]$. Из условия нормировки следует:
+$$ 1 = \frac{p_0}{1 - \frac{\lambda}{\mu} \E[X]} \implies p_0 = 1 - \rho, $$
+где $\rho = \frac{\lambda}{\mu} \E[X]$. Для существования стационарного режима необходимо выполнение условия $p_0 > 0$, что эквивалентно $\rho < 1$.
+\end{sproof}
+
+\begin{theorem}{Макроскопические характеристики $M^{[X]}|M|1$}
+При условии $\rho < 1$ стационарный режим существует. Основные метрики эффективности системы определяются соотношениями:
+\begin{itemize}
+    \item Среднее число заявок в системе: $\displaystyle L = \frac{\rho + \frac{\lambda}{\mu}\E[X^2]}{2(1 - \rho)}$.
+    \item Среднее время пребывания заявки: $\displaystyle W = \frac{L}{\lambda \E[X]}$.
+    \item Среднее время ожидания: $\displaystyle W_q = W - \frac{1}{\mu}$.
+    \item Среднее число заявок в очереди: $\displaystyle L_q = L - \rho$.
+\end{itemize}
+\end{theorem}
+
+\begin{tproof}
+Среднее число заявок $L$ вычисляется как значение первой производной производящей функции в точке $1$: $L = P'(1)$. Представим $P(z)$ в виде $P(z) = p_0 \left( 1 - \frac{\lambda}{\mu} z \overline{C}(z) \right)^{-1}$ и продифференцируем:
+$$ P'(z) = p_0 \left( 1 - \frac{\lambda}{\mu} z \overline{C}(z) \right)^{-2} \cdot \frac{\lambda}{\mu} \left( \overline{C}(z) + z \overline{C}'(z) \right). $$
+Для нахождения предела $\overline{C}'(1)$ продифференцируем дробь $\overline{C}(z)$ по правилу дифференцирования частного:
+$$ \overline{C}'(z) = \frac{-C'(z)(1-z) - (1-C(z))(-1)}{(1-z)^2} = \frac{-C'(z)(1-z) + 1 - C(z)}{(1-z)^2}. $$
+При $z \to 1$ возникает неопределенность $\left[\frac{0}{0}\right]$. Применяем правило Лопиталя:
+$$ \lim_{z \to 1} \overline{C}'(z) = \lim_{z \to 1} \frac{-C''(z)(1-z) - C'(z)(-1) - C'(z)}{-2(1-z)} = \lim_{z \to 1} \frac{-C''(z)(1-z)}{-2(1-z)} = \frac{1}{2} C''(1). $$
+По определению второй факториальный момент равен $C''(1) = \E[X(X-1)] = \E[X^2] - \E[X]$. 
+Подставляя найденные пределы в выражение для $P'(1)$, получаем:
+$$ L = P'(1) = \frac{p_0}{p_0^2} \cdot \frac{\lambda}{\mu} \left( \E[X] + \frac{1}{2}(\E[X^2] - \E[X]) \right) = \frac{1}{1-\rho} \cdot \frac{\lambda}{2\mu} \left( \E[X] + \E[X^2] \right). $$
+Учитывая, что $\frac{\lambda}{2\mu}\E[X] = \frac{\rho}{2}$, итоговая формула длины очереди принимает вид:
+$$ L = \frac{\rho + \frac{\lambda}{\mu}\E[X^2]}{2(1-\rho)}. $$
+
+Остальные метрики выводятся на основе закона Литтла. Поскольку группы заявок поступают с интенсивностью $\lambda$, а средний размер одной группы равен $\E[X]$, эффективная интенсивность поступления индивидуальных заявок (общее число единичных заявок, приходящих в систему за единицу времени) определяется произведением: 
+$$ \lambda_{\text{eff}} = \lambda \E[X]. $$
+Отсюда среднее время пребывания $W = \frac{L}{\lambda_{\text{eff}}}$. Средняя длина очереди $L_q = \lambda_{\text{eff}} W_q = \lambda_{\text{eff}} \left(W - \frac{1}{\mu}\right) = L - \frac{\lambda_{\text{eff}}}{\mu} = L - \rho$.
+\end{tproof}
+
+\begin{example}{Фиксированный размер группы}
+Рассмотрим систему $M^{[X]}|M|1$, в которой заявки поступают строго пакетами фиксированной длины $k$ ($X = k = \text{const}$). Необходимо вычислить среднее число заявок в системе $L$.
+\end{example}
+
+\begin{eproof}
+Для детерминированной величины $X = k$ начальные моменты равны $\E[X] = k$ и $\E[X^2] = k^2$. Коэффициент загрузки составляет $\rho = \frac{\lambda k}{\mu}$.
+Подставляя моменты в полученную формулу для макроскопических характеристик, находим:
+$$ L = \frac{\rho + \frac{\lambda}{\mu} k^2}{2(1 - \rho)} = \frac{\rho + \rho k}{2(1 - \rho)} = \frac{k+1}{2} \cdot \frac{\rho}{1 - \rho}. $$
+\end{eproof}
+
+\begin{example}{Геометрическое распределение размера группы}
+Пусть размер группы имеет геометрическое распределение с параметром $\alpha \in (0, 1)$: $\P(X = n) = (1 - \alpha) \alpha^{n-1}$ для $n \in \N$. Требуется определить среднее число заявок в системе $L$.
+\end{example}
+
+\begin{eproof}
+Составим производящую функцию $C(z)$:
+$$ C(z) = \dsum_{n=1}^{\infty} (1 - \alpha) \alpha^{n-1} z^n = \frac{z(1 - \alpha)}{1 - \alpha z}. $$
+Вычислим первый момент $\E[X]$:
+$$ \E[X] = \lim_{z \to 1} \frac{1 - C(z)}{1 - z} = \lim_{z \to 1} \frac{1 - \frac{z(1-\alpha)}{1-\alpha z}}{1 - z} = \lim_{z \to 1} \frac{1 - \alpha z - z + \alpha z}{(1 - \alpha z)(1 - z)} = \lim_{z \to 1} \frac{1 - z}{(1 - \alpha z)(1 - z)} = \frac{1}{1 - \alpha}. $$
+Второй начальный момент для смещенного геометрического распределения равен $\E[X^2] = \frac{1 + \alpha}{(1 - \alpha)^2}$. Загрузка системы составит $\rho = \frac{\lambda}{\mu (1 - \alpha)}$.
+Подставим моменты в общую формулу:
+$$ L = \frac{\rho + \frac{\lambda}{\mu} \frac{1 + \alpha}{(1 - \alpha)^2}}{2(1 - \rho)}. $$
+Так как $\frac{\lambda}{\mu} = \rho (1 - \alpha)$, преобразуем числитель:
+$$ L = \frac{\rho + \rho (1 - \alpha) \frac{1 + \alpha}{(1 - \alpha)^2}}{2(1 - \rho)} = \frac{\rho \left(1 + \frac{1 + \alpha}{1 - \alpha}\right)}{2(1 - \rho)}. $$
+После приведения скобки к общему знаменателю $\left( \frac{1 - \alpha + 1 + \alpha}{1 - \alpha} = \frac{2}{1 - \alpha} \right)$, получаем итоговый результат:
+$$ L = \frac{\rho \cdot \frac{2}{1 - \alpha}}{2(1 - \rho)} = \frac{1}{1 - \alpha} \cdot \frac{\rho}{1 - \rho}. $$
+\end{eproof}
+
+\begin{note}
+В обоих рассмотренных примерах среднее число заявок в системе $L$ принимает вид произведения средней длины очереди классической системы $M|M|1$ (равной $\frac{\rho}{1-\rho}$) на константный множитель. Общую формулу для $L$ можно переписать в виде:
+$$ L = \frac{\rho}{1 - \rho} \cdot \frac{\E[X^2] + \E[X]}{2 \E[X]}. $$
+Данный мультипликативный фактор зависит исключительно от первых двух моментов распределения размера группы. Это отражает следующее свойство (аналогичное формуле Поллачека-Хинчина): при фиксированной общей загрузке $\rho$ дисперсия размера пакета напрямую увеличивает среднюю длину очереди. Чем больше разброс размера группы по сравнению с одиночным поступлением, тем на большую величину масштабируется базовая метрика системы $M|M|1$.
+\end{note}
+[END OF lectures\lec7.tex]
+
+
+[FILE]: lectures\lec8.tex
+-------------------------
+\section{Системы с фазовым обслуживанием. Модель $M|Er_k|1$}
+
+\begin{definition}{Система $M|Er_k|1$}
+Одноканальная система массового обслуживания, на вход которой поступает пуассоновский поток заявок с интенсивностью $\lambda$. Процесс обслуживания каждой заявки состоит из $k$ последовательных независимых этапов (фаз). Время прохождения каждой фазы распределено по экспоненциальному закону. Суммарное время обслуживания заявки $S$ подчиняется распределению Эрланга $k$-го порядка ($S \sim Er_k$).
+\end{definition}
+
+Для обеспечения математического ожидания полного времени обслуживания $\E[S] = \frac{1}{\mu}$, среднее время выполнения одной обособленной фазы должно составлять $\frac{1}{k\mu}$. Следовательно, интенсивность переходов процесса обслуживания между смежными фазами равна $k\mu$.
+
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=1.0, every node/.style={font=\small}]
+    % Определение кастомных стилей для фазовых переходов (толщина 1.0pt)
+    \tikzset{redarrow/.style={->, dashed, red!85!black, line width=1pt}}
+    \tikzset{rednode/.style={circle, draw, dashed, red!85!black, line width=1.5pt, minimum size=0.6cm, inner sep=1pt}}
+
+    % Состояние 0 (придвинуто к красной стрелке, которая заканчивается на 0.9)
+    \node[circle, draw, thick, minimum size=0.8cm] (S0) at (0.5,0) {0};
+
+    % Макро-состояние 1 (Смещено вправо, левая граница на x=2.0)
+    \node[draw, thick, rounded corners=4pt, minimum width=4.8cm, minimum height=1.6cm] (B1) at (4.4, 0) {};
+    \node[circle, draw, thick, minimum size=0.8cm] (M1) at (4.4, -1.8) {1};
+
+    % Макро-состояние 2
+    \node[draw, thick, rounded corners=4pt, minimum width=4.8cm, minimum height=1.6cm] (B2) at (10.8, 0) {};
+    \node[circle, draw, thick, minimum size=0.8cm] (M2) at (10.8, -1.8) {2};
+
+    % Многоточие уходящее вправо
+    \node at (15.2, 0) {\Large $\dots$};
+
+    % Фазы в состоянии 1
+    \node[rednode] (P1) at (2.6,0) {1};
+    \node[rednode] (P2) at (3.8,0) {2};
+    \node[red!85!black] (Pdots1) at (5.0,0) {\dots};
+    \node[rednode] (Pk) at (6.2,0) {$k$};
+
+    % Фазы в состоянии 2
+    \node[rednode] (Pk1) at (9.0,0) {\scriptsize $k\!\!+\!\!1$};
+    \node[rednode] (Pk2) at (10.2,0) {\scriptsize $k\!\!+\!\!2$};
+    \node[red!85!black] (Pdots2) at (11.4,0) {\dots};
+    \node[rednode] (P2k) at (12.6,0) {\scriptsize $2k$};
+
+    % Внутренние красные пунктирные стрелки
+    \draw[redarrow] (P2) -- node[above, font=\scriptsize] {$k\mu$} (P1);
+    \draw[redarrow] (Pdots1) -- node[above, font=\scriptsize] {$k\mu$} (P2);
+    \draw[redarrow] (Pk) -- node[above, font=\scriptsize] {$k\mu$} (Pdots1);
+
+    \draw[redarrow] (Pk1) -- node[above, font=\scriptsize] {$k\mu$} (Pk);
+    \draw[redarrow] (Pk2) -- node[above, font=\scriptsize] {$k\mu$} (Pk1);
+    \draw[redarrow] (Pdots2) -- node[above, font=\scriptsize] {$k\mu$} (Pk2);
+    \draw[redarrow] (P2k) -- node[above, font=\scriptsize] {$k\mu$} (Pdots2);
+
+    % Внешние пунктирные стрелки
+    \draw[redarrow] (P1.west) -- node[above, font=\scriptsize] {$k\mu$} (0.9, 0);
+    \draw[redarrow] (14.3, 0) -- node[above, font=\scriptsize] {$k\mu$} (P2k.east);
+
+    % Макроскопические черные стрелки (\lambda)
+    % Первая стрелка теперь "висит в воздухе" симметрично нижней
+    \draw[->, thick] (0.9, 0.8) to [bend left=25] node[above] {$\lambda$} (B1.north);
+    \draw[->, thick] (B1.north) to [bend left=25] node[above] {$\lambda$} (B2.north);
+    \draw[->, thick] (B2.north) to [bend left=25] node[above] {$\lambda$} (14.3, 0.8);
+
+    % Макроскопические черные стрелки (\mu)
+    \draw[->, thick] (14.3, -0.8) to [bend left=25] node[below] {$\mu$} (B2.south);
+    \draw[->, thick] (B2.south) to [bend left=25] node[below] {$\mu$} (B1.south);
+    \draw[->, thick] (B1.south) to [bend left=25] node[below] {$\mu$} (0.9, -0.8);
+\end{tikzpicture}
+\caption{Структура фазового обслуживания системы $M|Er_k|1$. Состояния марковской цепи сгруппированы в макро-состояния (соответствующие числу заявок в системе), внутри которых протекает последовательное выполнение независимых фаз. Нумерация микро-состояний ведется по суммарному числу оставшихся этапов обслуживания.}
+\end{center}
+\end{figure}
+
+Состояние системы в произвольный момент времени описывается двумерным вектором $(n, i)$, где $n$ — общее число заявок в системе, а $i \in \{1, 2, \dots, k\}$ — номер текущей фазы обслуживаемой заявки. 
+
+Для снижения размерности задачи сведем двумерное пространство состояний к одномерному. Введем случайную величину $J$, равную суммарному числу невыполненных фаз обслуживания для всех заявок, находящихся в системе. При наличии $n$ заявок и обслуживании первой из них на стадии $i$, искомое значение $J$ задается соотношением:
+$$ J = (n - 1)k + i, \quad \text{при } n > 0, $$
+и $J = 0$ при отсутствии заявок в системе ($n = 0$).
+
+\begin{statement}
+Марковская цепь, описывающая изменение суммарного числа невыполненных фаз $J$ в системе $M|Er_k|1$, стохастически эквивалентна марковской цепи системы с групповым поступлением заявок $M^{[X]}|M|1$, в которой размер группы строго фиксирован и равен $k$ ($X = k = \text{const}$).
+\end{statement}
+
+\begin{sproof}
+Рассмотрим динамику изменения состояния системы, выраженного через переменную $J(t)$. Поступление новой заявки образует пуассоновский поток с интенсивностью $\lambda$ и мгновенно увеличивает суммарное число невыполненных фаз на $k$. Данное событие соответствует скачкообразному переходу марковской цепи из состояния $j$ в $j + k$.
+
+В свою очередь, обслуживание заявок представляет собой последовательное выполнение фаз. Завершение обработки каждой отдельной фазы происходит с интенсивностью $k\mu$ и строго уменьшает текущее число оставшихся фаз на единицу (переход $j \to j - 1$). Таким образом, процесс изменения числа фаз стохастически идентичен процессу изменения числа элементов в системе $M^{[X=k]}|M|1$, где пакеты фиксированного размера $k$ поступают с интенсивностью $\lambda$, а элементы пакета обслуживаются поодиночке с интенсивностью $k\mu$.
+\end{sproof}
+
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}[
+    scale=1.5,
+    >={Stealth[length=3mm]},
+    state/.style={circle, draw, minimum size=0.8cm, thick},
+    every node/.style={font=\small}
+]
+    % Состояния
+    \node[state] (s0) at (0,0) {0};
+    \node[state] (s1) at (1.5,0) {1};
+    \node[state] (s2) at (3,0) {2};
+    \node (dots1) at (4.5,0) {\Large $\dots$};
+    \node[state] (sk) at (6,0) {$k$};
+    \node[state] (sk1) at (7.5,0) {\scriptsize $k\!+\!1$};
+    \node (dots2) at (9,0) {\Large $\dots$};
+
+    % Обслуживание (k\mu) - идет влево (уменьшение фаз)
+    \draw[->, thick] (s1) to [bend left=30] node[midway, below] {$k\mu$} (s0);
+    \draw[->, thick] (s2) to [bend left=30] node[midway, below] {$k\mu$} (s1);
+    \draw[->, thick] (dots1) to [bend left=30] node[midway, below] {$k\mu$} (s2);
+    \draw[->, thick] (sk) to [bend left=30] node[midway, below] {$k\mu$} (dots1);
+    \draw[->, thick] (sk1) to [bend left=30] node[midway, below] {$k\mu$} (sk);
+
+    % Прибытие (\lambda) - прыжок на k вправо (приход k фаз)
+    \draw[->, thick] (s0) to [bend left=45] node[midway, above] {$\lambda$} (sk);
+    \draw[->, thick] (s1) to [bend left=45] node[midway, above] {$\lambda$} (sk1);
+    \draw[->, thick] (s2) to [bend left=45] node[midway, above] {$\lambda$} (dots2);
+\end{tikzpicture}
+\caption{Граф интенсивностей переходов для суммарного числа невыполненных фаз $J$ в системе $M|Er_k|1$. Граф полностью эквивалентен модели $M^{[X=k]}|M|1$ с индивидуальной интенсивностью обслуживания $k\mu$.}
+\end{center}
+\end{figure}
+
+Ключевое отличие $M|Er_k|1$ от классической системы с групповым поступлением заключается в физической интерпретации состояний: в $M^{[X=k]}|M|1$ окончание одной стадии обслуживания означает уход заявки из системы, тогда как в $M|Er_k|1$ заявка покидает прибор только после завершения всех $k$ стадий. Данная связь позволяет напрямую вывести временные характеристики системы.
+
+\begin{theorem}{Макроскопические характеристики $M|Er_k|1$}
+При выполнении условия стационарности $\rho = \frac{\lambda}{\mu} < 1$, метрики эффективности системы определяются следующими соотношениями:
+\begin{itemize}
+    \item Среднее время ожидания заявки в очереди: $\displaystyle W_q = \frac{k+1}{2k} \cdot \frac{\rho}{\mu(1 - \rho)}$.
+    \item Среднее число заявок в очереди: $\displaystyle L_q = \frac{k+1}{2k} \cdot \frac{\rho^2}{1 - \rho}$.
+    \item Среднее время пребывания заявки в системе: $\displaystyle W = W_q + \frac{1}{\mu}$.
+    \item Среднее число заявок в системе: $\displaystyle L = L_q + \rho$.
+\end{itemize}
+\end{theorem}
+
+\begin{tproof}
+Вычислим среднее время ожидания заявки в очереди $W_q$. При использовании дисциплины обслуживания FCFS (First-Come, First-Served) время ожидания вновь прибывшей заявки строго равно суммарному времени, необходимому для завершения всех фаз обслуживания, уже находящихся в системе к моменту ее поступления.
+
+В силу свойства PASTA (Poisson Arrivals See Time Averages), пуассоновский поток заявок застает систему в стационарном состоянии. Следовательно, математическое ожидание числа невыполненных фаз, наблюдаемое прибывающей заявкой, совпадает со средним числом фаз в произвольный момент времени $\E[J]$.
+
+Для вычисления $\E[J]$ воспользуемся установленной стохастической эквивалентностью с системой $M^{[X]}|M|1$. Подставим параметры эквивалентной модели в формулу для средней длины очереди системы с групповым поступлением:
+\begin{itemize}
+    \item Интенсивность входного потока групп: $\lambda$.
+    \item Размер группы: $X = k$ (детерминированная величина, $\E[X] = k$, $\E[X^2] = k^2$).
+    \item Интенсивность обслуживания одного элемента (одной фазы): $\mu_{\text{phase}} = k\mu$.
+    \item Коэффициент загрузки по фазам: $\rho_{\text{phase}} = \frac{\lambda \E[X]}{\mu_{\text{phase}}} = \frac{\lambda k}{k\mu} = \rho$.
+\end{itemize}
+
+Среднее число фаз в системе равно:
+$$ \E[J] = \frac{\rho_{\text{phase}} + \frac{\lambda}{\mu_{\text{phase}}} \E[X^2]}{2(1 - \rho_{\text{phase}})} = \frac{\rho + \frac{\lambda}{k\mu} k^2}{2(1 - \rho)} = \frac{\rho + \rho k}{2(1 - \rho)} = \frac{k+1}{2} \cdot \frac{\rho}{1 - \rho}. $$
+
+Поскольку среднее время выполнения одной фазы составляет $\frac{1}{k\mu}$, полное время ожидания вычисляется как произведение среднего числа фаз на длительность одной фазы:
+$$ W_q = \E[J] \cdot \frac{1}{k\mu} = \frac{k+1}{2} \cdot \frac{\rho}{1 - \rho} \cdot \frac{1}{k\mu} = \frac{k+1}{2k} \cdot \frac{\rho}{\mu(1 - \rho)}. $$
+
+Дальнейший вывод метрик базируется на фундаментальных законах теории массового обслуживания. Применяя закон Литтла для подсистемы очереди ($L_q = \lambda W_q$), получаем:
+$$ L_q = \lambda \cdot \frac{k+1}{2k} \cdot \frac{\rho}{\mu(1 - \rho)} = \frac{k+1}{2k} \cdot \frac{\rho^2}{1 - \rho}. $$
+
+Среднее время пребывания заявки в системе складывается из времени ожидания и среднего времени обслуживания:
+$$ W = W_q + \E[S] = W_q + \frac{1}{\mu}. $$
+
+Среднее число заявок в системе в целом определяется по закону Литтла ($L = \lambda W$):
+$$ L = \lambda \left( W_q + \frac{1}{\mu} \right) = L_q + \rho. $$
+\end{tproof}
+
+\begin{note}
+Коэффициент $\frac{k+1}{2k}$ в полученных формулах можно представить в виде $\frac{1}{2}\left(1 + \frac{1}{k}\right)$. Рассмотрим асимптотическое поведение системы:
+\begin{itemize}
+    \item При $k = 1$ модель вырождается в классическую $M|M|1$, а множитель обращается в 1.
+    \item При $k \to \infty$ распределение Эрланга стремится к детерминированной величине (распределение Дирака). Модель переходит в $M|D|1$, а множитель асимптотически стремится к $\frac{1}{2}$. 
+\end{itemize}
+Данный предел аналитически согласуется со следствиями из формулы Полячека-Хинчина, согласно которым полное устранение стохастичности времени обслуживания приводит к двукратному сокращению длины очереди при фиксированном коэффициенте загрузки.
+\end{note}
+
+\section{Протоколы множественного доступа. Алгоритмы ALOHA}
+
+Рассмотрим сетевую архитектуру, использующую два независимых частотных канала: прямую линию связи (Downlink) и обратную линию связи (Uplink). В канале Downlink центральный узел осуществляет широковещательную передачу пакетов. В канале Uplink множество из $n$ независимых терминалов конкурируют за доступ к разделяемой среде передачи.
+
+В классическом протоколе ALOHA терминал инициирует передачу в канал немедленно после генерации пакета, без предварительного контроля состояния среды.
+
+\begin{note}
+Отсутствие механизма прослушивания несущей (Carrier Sense) в классической архитектуре ALOHA обусловлено требованием максимальной аппаратной простоты терминалов. На этапе разработки протокола генерируемый трафик имел низкую общую интенсивность, и вероятностью коллизий пренебрегали. Механизмы предварительного контроля состояния канала (семейство CSMA) были формализованы позднее как ответ на рост нагрузки в сетях.
+\end{note}
+
+Поскольку передачи узлов независимы, пакеты могут пересекаться во времени. Наложение сигналов называется коллизией, в результате которой информация искажается и не может быть демодулирована. Для обеспечения гарантированной доставки применяется механизм автоматического запроса повторения (ARQ): при успешном приеме центральный узел отправляет кадр подтверждения (ACK). Отсутствие подтверждения диагностируется как коллизия и инициирует повторную передачу пакета через случайный интервал времени.
+
+\subsection{Асинхронная ALOHA}
+
+Определим абсолютную пропускную способность канала $S_{\text{abs}}$ как среднее число успешно переданных пакетов в единицу времени. Зафиксируем параметры модели:
+
+\begin{itemize}
+    \item В зоне радиовидимости базовой станции находятся $n$ передатчиков. Мощности принимаемых сигналов идентичны (эффект захвата отсутствует).
+    \item Все генерируемые пакеты имеют строго фиксированную длину. Время передачи одного пакета составляет $\Delta t$.
+    \item Суммарный поток пакетов (включая первичные и повторные передачи), генерируемый всеми узлами, является пуассоновским с абсолютной интенсивностью $\lambda$ [пакетов/с].
+    \item Емкость буфера каждого терминала равна $1$. При наличии пакета в буфере новые заявки отбрасываются.
+    \item Канал является идеальным: единственной причиной потери пакета выступает коллизия.
+\end{itemize}
+
+Введем безразмерную величину $G \dot= \lambda \Delta t$, определяющую предложенную нагрузку на канал (среднее число пакетов, поступающих за время $\Delta t$). При симметричной нагрузке интенсивность трафика отдельного узла равна $\frac{\lambda}{n}$. Рассмотрим асимптотический режим, при котором $n \to \infty$, а суммарная интенсивность $\lambda$ конечна и фиксирована.
+
+\begin{statement}[Пропускная способность чистой ALOHA при бесконечном числе устройств]
+В асимптотическом режиме $n \to \infty$ нормированная пропускная способность $S = S_{\text{abs}} \Delta t$ асинхронной сети ALOHA определяется выражением:
+$$S = G e^{-2G}$$
+Глобальный максимум достигается при $G = \frac{1}{2}$ и составляет $S_{\max} = \frac{1}{2e} \approx 0.184$.
+\end{statement}
+
+\begin{sproof}
+Абсолютная пропускная способность выражается через интенсивность входного потока и вероятность отсутствия коллизии: $S_{\text{abs}} = \lambda \cdot \mathbb{P}(\text{успех})$. 
+
+Для вычисления вероятности успешной передачи зафиксируем некоторый целевой пакет, инициированный в произвольный момент времени $t_0$. Поскольку длительность передачи равна $\Delta t$, она завершится в момент $t_0 + \Delta t$. Передача окажется успешной тогда и только тогда, когда ни один другой узел не начнет передачу в интервале $[t_0 - \Delta t, t_0 + \Delta t]$. Длина этого «уязвимого интервала» (vulnerable period) строго равна $\tau = 2\Delta t$.
+
+\begin{center}
+\begin{tikzpicture}[
+    scale=1.1,
+    >={Stealth[length=2.5mm]},
+    every node/.style={font=\small},
+    packet/.style={draw=black, thick, minimum height=0.8cm, align=center}
+]
+    % --- ФОНОВАЯ ПОДСВЕТКА ОПАСНОГО ИНТЕРВАЛА ---
+    \fill[BG] (2.5, -0.8) rectangle (7.5, 6.2);
+
+    % --- ОСИ И ПОДПИСИ СТАНЦИЙ ---
+    % Оси начинаются левее (-0.5), чтобы вместить успешный пакет
+    \foreach \y/\label in {4.5/1, 3.0/2, 1.5/3, 0.0/4} {
+        \node[left, font=\bfseries] at (-0.8, \y) {Станция \label};
+        \draw[->, thick] (-0.5, \y) -- (11.5, \y) node[right] {$t$};
+    }
+
+    % --- ВЕРТИКАЛЬНЫЕ ЛИНИИ (ГРАНИЦЫ ИНТЕРВАЛОВ) ---
+    \draw[thick, dashed, DeepSkyBlue4] (2.5, -0.5) -- (2.5, 6.2) node[above, black] {$t_0 - \Delta t$};
+    \draw[thick, dashed, black] (5.0, -0.5) -- (5.0, 6.2) node[above, black] {$t_0$};
+    \draw[thick, dashed, DeepSkyBlue4] (7.5, -0.5) -- (7.5, 6.2) node[above, black] {$t_0 + \Delta t$};
+
+    % --- МАРКЕР УЯЗВИМОГО ВРЕМЕНИ НАД ГРАФИКОМ ---
+    \draw[<->, thick] (2.5, 5.8) -- (7.5, 5.8) node[midway, fill=BG, inner sep=2pt, font=\footnotesize\bfseries] {Уязвимый интервал ($2\Delta t$)};
+
+    % ==========================================
+    % ОТРИСОВКА ПАКЕТОВ (\Delta t = 2.5)
+    % ==========================================
+
+    % --- СТАНЦИЯ 1 (Левая коллизия) ---
+    \fill[DeepSkyBlue4!15] (3.5, 4.1) rectangle (6.0, 4.9);
+    \fill[Red3!25] (5.0, 4.1) rectangle (6.0, 4.9); % Зона перекрытия
+    \draw[thick] (3.5, 4.1) rectangle (6.0, 4.9);
+    \node[font=\footnotesize] at (4.25, 4.5) {Пакет $i$};
+    
+    % Стрелка момента времени t_i
+    \draw[->, thick] (3.5, 3.5) node[below, font=\scriptsize] {$t_i$} -- (3.5, 4.05);
+    
+    % Указатель коллизии
+    \draw[<-, thick, Red3] (5.5, 4.9) -- (5.8, 5.3) node[right, font=\footnotesize\bfseries] {Коллизия};
+
+    % --- СТАНЦИЯ 2 (Целевой пакет) ---
+    \fill[SpringGreen4!15] (5.0, 2.6) rectangle (7.5, 3.4);
+    \fill[Red3!25] (5.0, 2.6) rectangle (6.0, 3.4); % Перекрытие от Станции 1
+    \fill[Red3!25] (6.5, 2.6) rectangle (7.5, 3.4); % Перекрытие от Станции 3
+    \draw[thick] (5.0, 2.6) rectangle (7.5, 3.4);
+    
+    % Подпись вынесена за пределы пакета (сверху) для читаемости
+    \node[font=\footnotesize\bfseries, above] at (6.25, 3.45) {Целевой пакет};
+    
+    % Размерная линия \Delta t
+    \draw[<->, thick] (5.0, 2.3) -- (7.5, 2.3) node[midway, below, font=\footnotesize] {$\Delta t$};
+
+    % --- СТАНЦИЯ 3 (Правая коллизия) ---
+    \fill[DeepSkyBlue4!15] (6.5, 1.1) rectangle (9.0, 1.9);
+    \fill[Red3!25] (6.5, 1.1) rectangle (7.5, 1.9); % Зона перекрытия
+    \draw[thick] (6.5, 1.1) rectangle (9.0, 1.9);
+    \node[font=\footnotesize] at (8.25, 1.5) {Пакет $j$};
+    
+    % Стрелка момента времени t_j
+    \draw[->, thick] (6.5, 0.5) node[below, font=\scriptsize] {$t_j$} -- (6.5, 1.05);
+    
+    % Указатель коллизии
+    \draw[<-, thick, Red3] (7.0, 1.1) -- (7.5, 0.6) node[right, font=\footnotesize\bfseries] {Коллизия};
+
+    % --- СТАНЦИЯ 4 (Безопасная передача) ---
+    % Пакет сдвинут влево и заканчивается на 2.2, чтобы не касаться границы 2.5
+    \fill[SpringGreen4!15] (-0.3, -0.4) rectangle (2.2, 0.4);
+    \draw[thick] (-0.3, -0.4) rectangle (2.2, 0.4);
+    \node[font=\footnotesize, align=center] at (0.95, 0) {Успешная\\передача};
+
+\end{tikzpicture}
+\end{center}
+
+В силу независимости терминалов, процесс генерации пакетов \textit{остальными} $n-1$ узлами формирует фоновый пуассоновский поток. При $n \to \infty$ интенсивность этого фонового потока совпадает с суммарной интенсивностью $\lambda$. Фиксированный целевой пакет выступает детерминированным условием наблюдения, поэтому он исключается из множества случайных событий фонового процесса.
+
+Вероятность успешной передачи совпадает с вероятностью того, что на уязвимом интервале $\tau = 2\Delta t$ наступит ровно ноль событий фонового потока. Применяя формулу Пуассона для $k=0$ и среднего числа событий $\lambda \tau = \lambda(2\Delta t) = 2G$:
+$$\mathbb{P}(\text{успех}) = \mathbb{P}(k=0) = \frac{(2G)^0}{0!} e^{-2G} = e^{-2G}.$$
+Абсолютная пропускная способность составляет $S_{\text{abs}} = \lambda e^{-2G}$. Переходя к нормированной величине $S = S_{\text{abs}} \Delta t$ (числу успешных пакетов за время $\Delta t$), получаем итоговую формулу:
+$$S = (\lambda \Delta t) e^{-2G} = G e^{-2G}.$$
+Вычислим производную функции $S(G)$ для нахождения точки оптимума:
+$$\frac{dS}{dG} = e^{-2G} - 2Ge^{-2G} = e^{-2G}(1 - 2G) = 0 \implies G = \frac{1}{2}.$$
+\end{sproof}
+
+\begin{note}
+В дальнейших выкладках стандартной практикой является нормировка оси времени, при которой $\Delta t \equiv 1$. В этом случае понятия абсолютной и приведенной интенсивностей совпадают ($\lambda = G$, $S_{\text{abs}} = S$), а единицей измерения времени становится длительность одного пакета.
+\end{note}
+
+\subsection{Синхронная (слотированная) ALOHA при бесконечном числе устройств}
+
+Основным фактором снижения эффективности чистой ALOHA является избыточная длина уязвимого интервала ($2\Delta t$). Алгоритм синхронной ALOHA устраняет частичные наложения пакетов за счет квантования времени.
+
+Ось времени разбивается на равные слоты длительностью $\Delta t$. Терминалам разрешается инициировать передачу исключительно на границах слотов. Для координации узлов применяется глобальный синхронизирующий сигнал.
+
+\begin{statement}[Пропускная способность слотированной ALOHA]
+В асимптотическом режиме $n \to \infty$ нормированная пропускная способность синхронной сети ALOHA задается выражением:
+$$S = G e^{-G}$$
+Глобальный максимум достигается при $G = 1$ и составляет $S_{\max} = \frac{1}{e} \approx 0.368$.
+\end{statement}
+
+\begin{sproof}
+Пусть передача целевого пакета запланирована в слоте, ограниченном моментами $k\Delta t$ и $(k+1)\Delta t$. Заявки, инициирующие эту передачу, формируются терминалом на предшествующем интервале. Поскольку любые передачи стартуют строго по границам слотов, частичное наложение пакетов невозможно: пакеты либо полностью совпадают во времени, либо не пересекаются вовсе.
+
+\begin{center}
+\begin{tikzpicture}[
+    scale=1.1,
+    >={Stealth[length=2.5mm]},
+    every node/.style={font=\small},
+    packet/.style={draw=black, thick, minimum height=0.8cm, align=center}
+]
+    % --- ФОНОВАЯ ПОДСВЕТКА СЛОТОВ ---
+    % В Slotted ALOHA уязвимым является только сам слот целевого пакета
+    \fill[BG] (5.0, -0.8) rectangle (7.5, 6.2);
+
+    % --- ОСИ И ПОДПИСИ СТАНЦИЙ ---
+    \foreach \y/\label in {4.5/1, 3.0/2, 1.5/3, 0.0/4} {
+        \node[left, font=\bfseries] at (-0.8, \y) {Станция \label};
+        \draw[->, thick] (-0.5, \y) -- (11.5, \y) node[right] {$t$};
+    }
+
+    % --- ВЕРТИКАЛЬНЫЕ ЛИНИИ (ГРАНИЦЫ СЛОТОВ) ---
+    \draw[thick, dashed, black!50] (0.0, -0.5) -- (0.0, 6.2);
+    \draw[thick, dashed, DeepSkyBlue4] (2.5, -0.5) -- (2.5, 6.2) node[above, black] {$t_0 - \Delta t$};
+    \draw[thick, dashed, black] (5.0, -0.5) -- (5.0, 6.2) node[above, black] {$t_0$};
+    \draw[thick, dashed, DeepSkyBlue4] (7.5, -0.5) -- (7.5, 6.2) node[above, black] {$t_0 + \Delta t$};
+    \draw[thick, dashed, black!50] (10.0, -0.5) -- (10.0, 6.2) node[above, black] {$t_0 + 2\Delta t$};
+
+    % --- ПОДПИСИ НОМЕРОВ СЛОТОВ ВНИЗУ ---
+    \node[below, font=\footnotesize, text=gray!80!black] at (1.25, -0.6) {Слот $k-2$};
+    \node[below, font=\footnotesize, text=Red3] at (3.75, -0.6) {Слот $k-1$ (Уязвимый)};
+    \node[below, font=\footnotesize\bfseries, text=DeepSkyBlue4] at (6.25, -0.6) {Слот $k$};
+    \node[below, font=\footnotesize, text=DeepSkyBlue4] at (8.75, -0.6) {Слот $k+1$};
+
+    % --- МАРКЕР УЯЗВИМОГО ВРЕМЕНИ НАД ГРАФИКОМ ---
+    \draw[<->, thick] (2.5, 5.6) -- (5.0, 5.6) node[midway, above=2pt, fill=BG, font=\footnotesize\bfseries] {Уязвимый интервал ($\Delta t$)};
+
+    % ==========================================
+    % ОТРИСОВКА ПАКЕТОВ (\Delta t = 2.5)
+    % ==========================================
+
+    % --- СТАНЦИЯ 1 (Коллизия внутри слота k) ---
+    % Пакет полностью совпадает с границами слота [5.0, 7.5]
+    \fill[Red3!25] (5.0, 4.1) rectangle (7.5, 4.9);
+    \draw[thick] (5.0, 4.1) rectangle (7.5, 4.9);
+    \node[font=\footnotesize] at (6.25, 4.5) {Пакет $i$};
+    
+    \node[font=\footnotesize\bfseries, text=Red3, anchor=west] (col) at (7.8, 3.75) {Коллизия};
+    % Стрелки "вилочкой" к конфликтующим пакетам
+    \draw[->, thick, Red3] (col.west) -- (7.5, 4.4);
+    \draw[->, thick, Red3] (col.west) -- (7.5, 3.1);
+
+    % --- СТАНЦИЯ 2 (Целевой пакет внутри слота k) ---
+    % Полностью перекрывается с Пакетом i
+    \fill[Red3!25] (5.0, 2.6) rectangle (7.5, 3.4);
+    \draw[thick] (5.0, 2.6) rectangle (7.5, 3.4);
+    
+    % Подпись вынесена за пределы пакета (сверху) для читаемости
+    \node[font=\footnotesize, align=center] at (6.25, 3.0) {Целевой\\пакет};
+    
+
+    % --- СТАНЦИЯ 3 (Успешная передача в следующем слоте k+1) ---
+    % Пакет строго в границах [7.5, 10.0]
+    \fill[SpringGreen4!15] (7.5, 1.1) rectangle (10.0, 1.9);
+    \draw[thick] (7.5, 1.1) rectangle (10.0, 1.9);
+    \node[font=\footnotesize, align=center] at (8.75, 1.5) {Успешная\\передача};
+
+    % --- СТАНЦИЯ 4 (Успешная передача в предыдущем слоте k-1) ---
+    % Пакет строго в границах [2.5, 5.0]
+    \fill[SpringGreen4!15] (2.5, -0.4) rectangle (5.0, 0.4);
+    \draw[thick] (2.5, -0.4) rectangle (5.0, 0.4);
+    \node[font=\footnotesize, align=center] at (3.75, 0) {Успешная\\передача};
+
+\end{tikzpicture}
+\end{center}
+
+Уязвимый интервал для целевой передачи сужается до одного предыдущего слота $[(k-1)\Delta t, k\Delta t]$. Если на этом интервале длительностью $\tau = \Delta t$ ни один конкурирующий узел не сгенерирует заявку, в следующем слоте целевой пакет будет передан успешно.
+
+Математическое ожидание числа событий фонового потока на интервале $\Delta t$ равно $\lambda \Delta t = G$. Вероятность того, что фоновых событий не произойдет, составляет $\mathbb{P}(k=0) = e^{-G}$.
+Следовательно, нормированная пропускная способность равна $S = G e^{-G}$.
+
+Точка экстремума определяется из уравнения:
+$$\frac{dS}{dG} = e^{-G} - Ge^{-G} = e^{-G}(1 - G) = 0 \implies G = 1.$$
+\end{sproof}
+
+\begin{note}
+При оптимальной нагрузке ($G=1$) вероятностное распределение состояний произвольного слота имеет вид:
+\begin{itemize}
+    \item Слот пуст (простой канала): $\P(0) = \frac{1^0}{0!}e^{-1} = e^{-1} \approx 0.368$.
+    \item Успешная передача (ровно 1 пакет): $\P(1) = \frac{1^1}{1!}e^{-1} = e^{-1} \approx 0.368$.
+    \item Коллизия ($k \ge 2$ пакетов): $\P(k \ge 2) = 1 - \P(0) - \P(1) = 1 - 2e^{-1} \approx 0.264$.
+\end{itemize}
+Данное распределение описывает безусловную статистику состояний канала и вычислено безотносительно к попытке передачи какого-либо выделенного пакета.
+\end{note}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    width=0.85\textwidth, height=7.5cm,
+    xlabel={Суммарная нагрузка $G$ (пакеты/слот)},
+    ylabel={Пропускная способность $S$},
+    xmin=0, xmax=3, ymin=0, ymax=0.45,
+    grid=major,
+    legend pos=north east,
+    samples=150, thick
+]
+    % Асинхронная ALOHA
+    \addplot[DeepSkyBlue4, domain=0:3] {x * exp(-2*x)};
+    \addlegendentry{Асинхронная ALOHA}
+
+    % Синхронная ALOHA
+    \addplot[Red3, domain=0:3] {x * exp(-x)};
+    \addlegendentry{Синхронная ALOHA}
+
+    % Максимум асинхронной
+    \draw[dashed, gray] (axis cs:0.5, 0) -- (axis cs:0.5, 0.1839) -- (axis cs:0, 0.1839);
+    \node[circle, fill=DeepSkyBlue4, inner sep=1.5pt] at (axis cs:0.5, 0.1839) {};
+    \node[above right, font=\footnotesize, DeepSkyBlue4] at (axis cs:0.5, 0.1839) {$(0.5; \frac{1}{2e})$};
+
+    % Максимум синхронной
+    \draw[dashed, gray] (axis cs:1, 0) -- (axis cs:1, 0.3678) -- (axis cs:0, 0.3678);
+    \node[circle, fill=Red3, inner sep=1.5pt] at (axis cs:1, 0.3678) {};
+    \node[above right, font=\footnotesize, Red3] at (axis cs:1, 0.3678) {$(1; \frac{1}{e})$};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\subsection{Синхронная ALOHA при конечном числе устройств}
+
+В предыдущем разделе пропускная способность сети вычислялась в асимптотическом предположении о бесконечном числе терминалов ($n \to \infty$), генерирующих суммарный пуассоновский поток. Рассмотрим более реалистичную модель слотированной ALOHA с конечным числом узлов.
+
+\begin{statement}[Пропускная способность системы с конечным числом терминалов]
+Рассмотрим сеть, состоящую из $n$ независимых терминалов. Пусть $G_i \in (0, 1)$ --- вероятность начала передачи пакета $i$-м терминалом в произвольном слоте. Суммарная нагрузка на канал $G$ (математическое ожидание числа попыток передачи в одном слоте) равна $G = \dsum_{i=1}^{n} G_i$.
+
+Индивидуальная пропускная способность $S_i$ (вероятность успешной передачи $i$-го терминала) и суммарная пропускная способность системы $S$ задаются соотношениями:
 $$
-\Delta \approx \beta \sqrt{r} \implies c \approx r + \beta \sqrt{r}, \quad \beta > 0.
+S_i = \frac{G_i}{1 - G_i} \prod_{j=1}^{n} (1 - G_j), \qquad S = \sum_{i=1}^{n} S_i.
 $$
 \end{statement}
 
-Проверим выполнимость данного правила на нашем примере. Найдем параметр $\beta$ для исходного состояния ($r = 9, c = 12$):
+\begin{sproof}
+Успешная передача пакета $i$-м терминалом в выделенном слоте происходит тогда и только тогда, когда $i$-й терминал осуществляет передачу, а все остальные $n-1$ терминалов «молчат» (не инициируют передачу). В силу независимости работы терминалов вероятность совместного наступления этих событий равна произведению их вероятностей:
 $$
-12 = 9 + \beta \sqrt{9} \implies 3 = 3\beta \implies \beta = 1.
+S_i = G_i \prod_{\substack{j=1 \\ j \neq i}}^{n} (1 - G_j).
 $$
-Применяя найденную константу $\beta = 1$ для возросшей нагрузки $r = 36$, получаем:
+Для приведения выражения к симметричному виду относительно произведения по всем $j$, умножим и разделим правую часть на вероятность отсутствия передачи $i$-го терминала $(1 - G_i)$:
 $$
-c_{new} = 36 + 1 \cdot \sqrt{36} = 36 + 6 = 42.
+S_i = \frac{G_i}{1 - G_i} \prod_{j=1}^{n} (1 - G_j).
 $$
-Полученное аналитическое значение абсолютно точно совпадает с результатом, гарантирующим сохранение вероятности задержки на уровне $0.266$.
+События, заключающиеся в успешной передаче пакета $i$-м или $k$-м терминалом в одном и том же слоте, являются несовместными (в противном случае возникает коллизия). Следовательно, суммарная пропускная способность сети вычисляется как сумма индивидуальных пропускных способностей:
+$$
+S = \sum_{i=1}^{n} S_i = \left( \sum_{i=1}^{n} \frac{G_i}{1 - G_i} \right) \prod_{j=1}^{n} (1 - G_j).
+$$
+\end{sproof}
 
-\vspace{5mm}
-\begin{center}
-    \begin{tikzpicture}[scale=1.2, >=stealth, thick]
-        % Оси
-        \draw[->] (-0.2,0) -- (6.5,0) node[below] {Предложенная нагрузка $r$};
-        \draw[->] (0,-0.2) -- (0,6.5) node[right, align=left] {Число\\серверов $c$};
-        
-        % Линия стабильности c = r
-        \draw[dashed, gray] (0,0) -- (6,6) node[above right] {$c = r \ (\rho = 1)$};
-        
-        % Режим 1: c = r / \rho (Quality) - Пусть \rho = 0.75 -> c = 1.33 r
-        \draw[DeepSkyBlue4, domain=0:4.5] 
-            plot (\x, {1.333*\x}) 
-            node[above left] {Режим 1 ($\rho = \mathrm{const}$)};
-            
-        % Режим 2: c = r + \Delta (Efficiency) - Пусть \Delta = 0.5 (scaled down)
-        \draw[Red3, domain=0:5.5] 
-            plot (\x, {\x + 0.5}) 
-            node[below right] {Режим 2 ($\Delta = \mathrm{const}$)};
-            
-        % Режим 3: QED c = r + \beta\sqrt{r} - Пусть \beta = 0.8
-        \draw[SpringGreen4, domain=0:5.5, samples=100] 
-            plot (\x, {\x + 0.8*sqrt(\x)}) 
-            node[right] {Режим QED ($c \approx r + \beta\sqrt{r}$)};
-            
-        % Отметка исходной точки
-        \filldraw[black] (1.5, {1.5 + 0.8*sqrt(1.5)}) circle (1.5pt);
-        \node[left] at (1.5, {1.5 + 0.8*sqrt(1.5)}) {$(r_0, c_0)$};
-        
-        % Закраска области стабильности
-        \fill[gray, opacity=0.05] (0,0) -- (6,6) -- (6,0) -- cycle;
-        \node[gray] at (5,2) {Перегрузка ($c < r$)};
-        
-    \end{tikzpicture}
-    
-    \vspace{2mm}
-    \small\textit{Траектории масштабирования системы в зависимости от выбранного режима.}
-\end{center}
+\begin{conseq}
+Предположим, что нагрузка распределена между терминалами равномерно. Тогда для любого $i \in \{1, \dots, n\}$ вероятность передачи составляет $G_i = \frac{G}{n}$. Подставим данное значение в формулу суммарной пропускной способности:
+$$
+S = n \cdot S_i = n \frac{\frac{G}{n}}{1 - \frac{G}{n}} \left(1 - \frac{G}{n}\right)^n = \frac{G}{1 - \frac{G}{n}} \left(1 - \frac{G}{n}\right)^n.
+$$
+Устремим число узлов к бесконечности ($n \to \infty$) при строго фиксированной суммарной нагрузке $G$. Используя классический предел $\lim\limits_{n \to \infty} \left(1 - \frac{x}{n}\right)^n = e^{-x}$ и учитывая, что знаменатель $\left(1 - \frac{G}{n}\right) \to 1$, вычисляем предел пропускной способности:
+$$
+\lim_{n \to \infty} S = G \lim_{n \to \infty} \left(1 - \frac{G}{n}\right)^n = G e^{-G}.
+$$
+Данный результат совпадает с формулой пропускной способности слотированной ALOHA с бесконечным числом устройств, полученной ранее на основе гипотезы о пуассоновском характере фонового трафика.
+\end{conseq}
+
+[END OF lectures\lec8.tex]
+
+
+[FILE]: lectures\lec9.tex
+-------------------------
+\section{Древовидные стек-алгоритмы разрешения коллизий}
+
+Рассмотрим класс алгоритмов множественного доступа, обеспечивающих детерминированное разрешение возникающих коллизий. В отличие от протоколов ALOHA, где задержки повторных передач выбираются случайно на непрерывном интервале, стек-алгоритмы (в частности, алгоритм Капетанакиса — Цыбакова — Михайлова) упорядочивают процесс повторных передач с помощью логической структуры дерева.
+
+\begin{definition}{Модель системы с тернарной обратной связью}
+Функционирование алгоритма опирается на следующие предположения:
+\begin{itemize}
+    \item \textbf{Синхронизация времени:} Ось времени разбита на слоты фиксированной длины, равной времени передачи одного пакета. Передачи начинаются строго на границах слотов.
+    \item \textbf{Блокировка новых заявок:} Терминалы, сгенерировавшие пакеты после начала текущего цикла разрешения коллизии, ожидают его полного завершения.
+    \item \textbf{Тернарная обратная связь:} В конце каждого слота все терминалы мгновенно и безошибочно получают из канала один из трех сигналов:
+    \begin{enumerate}
+        \item $0$ (Пустой слот) — ни один терминал не осуществлял передачу.
+        \item $1$ (Успех) — ровно один терминал передал пакет.
+        \item $e$ (Коллизия) — два или более терминалов осуществили передачу.
+    \end{enumerate}
+\end{itemize}
+\end{definition}
+
+\begin{statement}[Базовый древовидный алгоритм]
+Процесс разрешения коллизии описывается построением бинарного дерева:
+\begin{enumerate}
+    \item Если в слоте возникает коллизия, все участвовавшие в ней терминалы с равной вероятностью ($p = 0.5$) принимают решение: передавать пакет в следующем слоте (переход в левое поддерево) или ожидать (переход в правое поддерево).
+    \item Сначала полностью разрешается левое поддерево. Терминалы, выбравшие правое поддерево, ожидают успешного разрешения всех коллизий в левом поддереве.
+    \item Если в левом поддереве вновь возникает коллизия, терминалы из левого поддерева снова делятся на две группы по тем же правилам. Процесс рекурсивно продолжается до тех пор, пока все пакеты не будут успешно переданы.
+\end{enumerate}
+\end{statement}
 
 \begin{note}
-Эвристическое правило квадратного корня является глубоким математическим результатом. Строгое асимптотическое доказательство этого закона, известного в современной теории массового обслуживания как \textbf{режим Хальфина — Уитта} (Halfin-Whitt regime), а также формальный вывод зависимости вероятности задержки от константы $\beta$ будут детально рассмотрены в следующей лекции.
+Для реализации данного алгоритма каждому терминалу достаточно поддерживать локальный целочисленный счетчик (стек), который увеличивается на 1 при каждой новой коллизии (если терминал ожидает) и уменьшается на 1 при успешной передаче или пустом слоте. Передача разрешена при значении счетчика, равном нулю.
 \end{note}
-[END OF lectures\lec5.tex]
+
+\begin{example}
+Рассмотрим пример работы алгоритма для группы из 4 терминалов $\{1, 2, 3, 4\}$, одновременно начавших передачу. 
+
+Предположим следующую реализацию случайного выбора: при первом разделении терминалы $\{1, 2, 4\}$ выбирают передачу, а терминал $\{3\}$ — ожидание. При втором разделении все терминалы $\{1, 2, 4\}$ выбирают ожидание (в левое поддерево не переходит никто).
+
+\begin{center}
+\begin{tikzpicture}[
+    >=Stealth, thick,
+    level 1/.style={sibling distance=5cm},
+    level 2/.style={sibling distance=3cm},
+    level 3/.style={sibling distance=2.5cm},
+    level 4/.style={sibling distance=2cm},
+    % Перенесите стили в общие настройки, чтобы они были доступны всем узлам
+    every node/.style={circle, draw, minimum size=0.9cm, font=\small},
+    coll/.style={draw=Red3, fill=Red3!10, thick},
+    succ/.style={draw=SpringGreen4, fill=SpringGreen4!10, thick},
+    idle/.style={draw=Tan1, fill=Tan1!10, dashed, thick}
+]
+
+% Сами узлы должны явно использовать стили:
+\node[coll, label=above:{\textbf{Слот 1}}] (root) {1,2,3,4}
+    child { node[coll, label=above left:{\textbf{Слот 2}}] (c1) {1,2,4}
+        child { node[idle, label=above left:{\textbf{Слот 3}}] (i1) {$\varnothing$} }
+        child { node[coll, label=above right:{\textbf{Слот 4}}] (c2) {1,2,4}
+            child { node[succ, label=above left:{\textbf{Слот 5}}] (s1) {1} }
+            child { node[coll, label=above right:{\textbf{Слот 6}}] (c3) {2,4}
+                child { node[succ, label=left:{\textbf{Слот 7}}] (s2) {2} }
+                child { node[succ, label=right:{\textbf{Слот 8}}] (s3) {4} }
+            }
+        }
+    }
+    child { node[succ, label=above right:{\textbf{Слот 9}}] (s4) {3} };
+\end{tikzpicture}
+\end{center}
+
+Временная диаграмма использования канала для данного дерева имеет следующий вид:
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, thick, font=\small]
+    \draw[->] (0,0) -- (10.5,0) node[right] {$t$};
+    \foreach \x in {1,...,9} {
+        \draw (\x, 0.1) -- (\x, -0.1) node[below] {\x};
+    }
+    
+    % Пакеты
+    \node[draw=Red3, fill=Red3!10, minimum width=0.8cm, minimum height=1.6cm, align=center] at (1, 1.0) {1\\2\\3\\4};
+    \node[draw=Red3, fill=Red3!10, minimum width=0.8cm, minimum height=1.2cm, align=center] at (2, 0.8) {1\\2\\4};
+    \node[draw=Tan1, dashed, fill=Tan1!10, minimum width=0.8cm, minimum height=0.4cm] at (3, 0.4) {$\varnothing$};
+    \node[draw=Red3, fill=Red3!10, minimum width=0.8cm, minimum height=1.2cm, align=center] at (4, 0.8) {1\\2\\4};
+    \node[draw=SpringGreen4, fill=SpringGreen4!10, minimum width=0.8cm, minimum height=0.4cm] at (5, 0.4) {1};
+    \node[draw=Red3, fill=Red3!10, minimum width=0.8cm, minimum height=0.8cm, align=center] at (6, 0.6) {2\\4};
+    \node[draw=SpringGreen4, fill=SpringGreen4!10, minimum width=0.8cm, minimum height=0.4cm] at (7, 0.4) {2};
+    \node[draw=SpringGreen4, fill=SpringGreen4!10, minimum width=0.8cm, minimum height=0.4cm] at (8, 0.4) {4};
+    \node[draw=SpringGreen4, fill=SpringGreen4!10, minimum width=0.8cm, minimum height=0.4cm] at (9, 0.4) {3};
+\end{tikzpicture}
+\end{center}
+\end{example}
+
+\begin{statement}[Модифицированный стек-алгоритм]
+В рассмотренном выше примере слот 4 содержит коллизию, которая является детерминированной. Если в слоте $k$ произошла коллизия, а слот $k+1$ оказался пустым, это однозначно указывает на то, что все терминалы, участвовавшие в коллизии слота $k$, выбрали правое поддерево. Следовательно, их одновременная передача в слоте $k+2$ неизбежно приведет к повторной коллизии тех же пакетов.
+
+Для устранения данного эффекта вводится правило оптимизации: \textbf{если после коллизии следует пустой слот, терминалы из правого поддерева обязаны немедленно выполнить разделение, не осуществляя передачу.}
+\end{statement}
+
+Применение модифицированного алгоритма позволяет исключить слот 4 из временной диаграммы, сокращая общее время разрешения коллизии с 9 до 8 слотов. Несмотря на высокую эффективность и устойчивость стек-алгоритмов к перегрузкам, их применение на практике ограничено жестким требованием к наличию канала мгновенной обратной связи и строгой синхронизации.
+
+
+\section{Введение в протоколы CSMA}
+
+В сетях, где терминалы имеют техническую возможность анализировать состояние среды передачи перед началом отправки данных, применяются алгоритмы класса CSMA (Carrier Sense Multiple Access — множественный доступ с контролем несущей).
+
+\begin{definition}{Контроль несущей (Carrier Sense)}
+Процедура прослушивания канала (измерения уровня энергии сигнала) перед началом передачи. Терминал классифицирует состояние канала как \textit{свободное} или \textit{занятое}. Эта аппаратная особенность позволяет существенно снизить вероятность коллизий по сравнению с протоколами семейства ALOHA.
+\end{definition}
+
+В зависимости от логики поведения терминала при обнаружении занятого канала, выделяют три базовые стратегии (дисциплины) CSMA:
+
+\begin{itemize}
+    \item \textbf{1-настойчивый (1-persistent) CSMA.} 
+    Если канал свободен, терминал немедленно начинает передачу (с вероятностью 1). Если канал занят, терминал непрерывно прослушивает его вплоть до момента освобождения, после чего сразу инициирует передачу. Данный метод минимизирует задержку простоя среды, но приводит к неизбежной коллизии, если передачи ожидали два и более терминалов.
+    
+    \item \textbf{Ненастойчивый (Non-persistent) CSMA.} 
+    Если канал свободен, терминал начинает передачу. Если канал занят, терминал прекращает прослушивание и откладывает следующую попытку на случайный интервал времени. Это снижает интенсивность коллизий при высокой нагрузке, однако увеличивает среднее время задержки пакета.
+    
+    \item \textbf{p-настойчивый (p-persistent) CSMA.} 
+    Применяется в синхронизированных (слотированных) системах. Если канал свободен, терминал начинает передачу с вероятностью $p$, и с вероятностью $q = 1-p$ откладывает решение до следующего слота. Если канал занят, терминал ожидает его освобождения и вновь применяет вероятностное правило. Параметр $p$ выступает инструментом балансировки между риском коллизии и временем задержки.
+\end{itemize}
+[END OF lectures\lec9.tex]
 
 
 [FILE]: settings\colors.tex
 ---------------------------
 % Colors
 % -------------------------------------------------------------------------
-\usepackage[x11names]{xcolor}
+\usepackage[svgnames, dvipsnames, x11names]{xcolor}
+\definecolor{MyPurple}{RGB}{102, 51, 153}
 
 \colorlet   {BG}    {Snow2}
 \colorlet   {TEXT}  {black}
@@ -3422,6 +5328,7 @@ $$
 \colorlet   {SUB}   {DeepSkyBlue4}
 \colorlet   {DEF}   {SpringGreen4}
 \colorlet   {LEM}   {Sienna1}
+\colorlet{Tan1}{orange!70!brown}
 
 \pagecolor{BG}
 \color{TEXT}
@@ -3436,12 +5343,22 @@ $$
 \usepackage{graphicx}
 \usepackage{tikz}
 \usepackage{tikz-cd}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage[most]{tcolorbox}
 \usetikzlibrary{shadows, arrows.meta, patterns, backgrounds}
+\usetikzlibrary{trees, fit}
 \usetikzlibrary{decorations.pathreplacing}
 \usetikzlibrary{automata, positioning}
 \usetikzlibrary{calc}
+\usetikzlibrary{babel} % ОБЯЗАТЕЛЬНО для корректной работы стрелок с русским языком
 \usepackage[framemethod=TikZ]{mdframed}
 \usepackage[most]{tcolorbox}
+\usepackage{pgfplots}
+\usepackage{caption}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.18} % или ваша версия pgfplots
+\usetikzlibrary{arrows.meta, calc}
+\usetikzlibrary{arrows.meta, patterns}
 % -----------------------
 [END OF settings\graphics.tex]
 
@@ -3521,6 +5438,7 @@ $$
 \usepackage[T1,T2A]{fontenc}
 \usepackage[utf8]{inputenc}      
 \usepackage[english, russian]{babel}
+\DeclareUnicodeCharacter{00A0}{ }
 % -------------------------------------------------------------------------
 
 

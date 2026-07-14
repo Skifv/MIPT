@@ -1,8 +1,7 @@
 # Fdb version 4
-["pdflatex"] 1770316966.44916 "c:/Users/Skif/Desktop/Chubarov_Lectures_Sem2/settings/mainset.tex" "build/mainset.pdf" "mainset" 1770316968.67475 2
-  "build/mainset.aux" 1770316561 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
-  "c:/Users/Skif/.texlive2025/texmf-var/fonts/tfm/lh/lh-t2a/larm1000.tfm" 1753460363 3220 0e417eaf233b160335902e97259a6c77 ""
-  "c:/Users/Skif/Desktop/Chubarov_Lectures_Sem2/settings/mainset.tex" 1770302132 307 66437629b602477f70e30add7e4c99bf ""
+["pdflatex"] 1779138584.11368 "mainset.tex" "build/mainset.pdf" "mainset" 1779138585.49357 2
+  "build/mainset.aux" 1779138576 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "c:/Users/Skifv/.texlive2025/texmf-var/fonts/tfm/lh/lh-t2a/larm1000.tfm" 1771457354 3220 0e417eaf233b160335902e97259a6c77 ""
   "d:/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1753368725 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "d:/texlive/2025/texmf-dist/tex/generic/babel-english/english.ldf" 1753366523 7008 9ff5fdcc865b01beca2b0fe4a46231d4 ""
   "d:/texlive/2025/texmf-dist/tex/generic/babel-russian/russianb.ldf" 1753366574 27193 cd3440b122aaa8e30416378ef38b3173 ""
@@ -22,7 +21,7 @@
   "d:/texlive/2025/texmf-dist/web2c/texmf.cnf" 1753366092 42213 4e2ca030e8e2640502016e9e45868dcb ""
   "d:/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1753374612 3604403 2f4383bc032edb0afbeb19f03f98474f ""
   "d:/texlive/2025/texmf.cnf" 1753374390 713 e69b156964470283e0530f5060668171 ""
-  "mainset.tex" 1770302132 307 66437629b602477f70e30add7e4c99bf ""
+  "mainset.tex" 1776538404 341 af33ad541669d311d251fd0db2a70097 ""
   (generated)
   "build/mainset.aux"
   "build/mainset.log"

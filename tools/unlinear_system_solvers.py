@@ -437,7 +437,7 @@ def solve_newton_multidim(
     f: Callable[[np.ndarray], np.ndarray],
     x0: np.ndarray,
     *,
-    jac: Callable[[np.ndarray], np.ndarray] = None,
+    jac: Optional[Callable[[np.ndarray], np.ndarray]] = None,
     atol: float = 1e-8,
     maxiter: int = 1000,
     full_output: bool = False,
